@@ -9,7 +9,10 @@ export default function Home() {
   useEffect(() => {
     async function checkUserSession() {
       try {
-        const res = await fetch("/api/check-session");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/check-session`, {
+          credentials: "include",
+        });
+
         const data = await res.json();
         setLoggedIn(data.loggedIn);
       } catch (error) {

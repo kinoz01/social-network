@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	auth "social-network/handlers/authentication"
+	"social-network/handlers/authentication"
 	mw "social-network/handlers/middlewares"
 )
 
@@ -17,6 +17,7 @@ func Routes() http.Handler {
 	// Allow 1 request per 20(x) microsecond
 	// rl := NewRateLimiter(20 * time.Microsecond)
 	mux.HandleFunc("/api/check-session", auth.CheckSession)
+	mux.HandleFunc("/api/signup", auth.SignUpHandler)
 
-	return mw.SecureHeaders(mux)
+	return mw.EnableCORS(mw.SecureHeaders(mux))
 }
