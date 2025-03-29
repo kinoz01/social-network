@@ -17,14 +17,20 @@
     background-color: var(--white);
     width: 90%;
     max-width: 450px;
-    max-height: 700px;
+    max-height: 80vh;
     padding: 2rem;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 15px var(--post-card-shadow);
+    box-shadow: 0 4px 5px var(--post-card-shadow);
     transition: all 0.3s ease-in-out;
     overflow-y: auto !important;
     scrollbar-width: none;
+}
+
+@media (max-width: 350px) {
+    .modal-dialog {
+        padding: 1rem;
+    }
 }
 
 .modal-dialog::-webkit-scrollbar {
@@ -87,7 +93,7 @@
     display: block;
     margin-bottom: 0.4rem;
     font-weight: 600;
-    color: var(--filter-title);
+    color: var(--content-grey);
 }
 
 .auth-form span {
@@ -124,8 +130,7 @@
 .toggle-password {
     position: absolute;
     right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 20%;
     background: none;
     border: none;
     cursor: pointer;
@@ -171,6 +176,7 @@
     text-decoration: underline;
 }
 
+/********************************* File Upload *********************************/
 .file-upload-container {
     display: flex;
     flex-direction: column;
@@ -183,7 +189,7 @@
     display: none;
 }
 
-/* Style the label to look like a modern upload box */
+/* upload box */
 .file-upload {
     display: inline-flex !important;
     align-items: center;
@@ -229,8 +235,9 @@
     color: #ccc;
 }
 
+/************************ About textArea************************/
 .about-me {
-    height: 70px; 
+    height: 70px;
     resize: none;
     overflow-y: auto;
     scrollbar-width: none;
@@ -240,3 +247,38 @@
     display: none;
 }
 
+
+/********************* Account Type Selection *********************/
+.account-type-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.account-btn {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--border-white);
+    border-radius: 8px;
+    background-color: var(--white);
+    color: var(--content-grey);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.account-btn:hover {
+    background-color: var(--light-blue);
+}
+
+.account-btn.selected {
+    background-color: var(--light-blue);
+    border-color: var(--light-blue);
+}
+
+.error-message {
+    color: var(--error-red);
+    margin-top: 20px;
+}

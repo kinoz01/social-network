@@ -10,7 +10,7 @@ check-npm:
 # Check if Next.js is installed
 check-nextjs:
 	@if [ ! -d "front-end/node_modules/next" ]; then \
-		echo "Next.js is not installed. Installing now..."; \
+		echo "🔴 Next.js is not installed. Installing now..."; \
 		cd front-end && npm install; \
 	else \
 		echo "Next.js is installed."; \

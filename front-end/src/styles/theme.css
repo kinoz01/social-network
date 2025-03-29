@@ -52,6 +52,7 @@
     --noscript-red: rgb(250, 99, 99);
     --notification-red: #ff4d4d;
     --red-color: red;
+    --error-red: rgb(207, 25, 25);
     --orange: orange;
     --orange-hvr: rgb(255, 72, 0);
 }

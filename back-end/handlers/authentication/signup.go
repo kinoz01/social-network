@@ -36,8 +36,8 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		email, username, password, firstName, lastName, birthday, aboutMe string
-		profilePic                                                        []byte
+		email, username, password, firstName, lastName, birthday, aboutMe, accountType string
+		profilePic                                                                     []byte
 	)
 
 	fields := map[string]struct {
@@ -45,13 +45,14 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		target   *string
 		errorMsg string
 	}{
-		"email":      {maxEmailSize, &email, "Email is too long"},
-		"username":   {maxUsernameSize, &username, "Username is too long"},
-		"password":   {maxPasswordSize, &password, "Password is too long"},
-		"first_name": {maxNameSize, &firstName, "First name is too long"},
-		"last_name":  {maxNameSize, &lastName, "Last name is too long"},
-		"birthday":   {maxDateSize, &birthday, "Birthday is too large or invalid"},
-		"about_me":   {maxAboutMeSize, &aboutMe, "AboutMe too long"},
+		"email":        {maxEmailSize, &email, "Email is too long"},
+		"username":     {maxUsernameSize, &username, "Username is too long"},
+		"password":     {maxPasswordSize, &password, "Password is too long"},
+		"first_name":   {maxNameSize, &firstName, "First name is too long"},
+		"last_name":    {maxNameSize, &lastName, "Last name is too long"},
+		"birthday":     {maxDateSize, &birthday, "Birthday is too large or invalid"},
+		"about_me":     {maxAboutMeSize, &aboutMe, "AboutMe too long"},
+		"account_type": {10, &accountType, "Invalid account type"},
 	}
 
 	// Process each form part
@@ -96,15 +97,21 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		*spec.target = string(b)
 	}
 
+	// Set default to public
+	if accountType != "public" && accountType != "private" {
+		accountType = "public"
+	}
+
 	// Build user struct
 	user := tp.User{
-		Email:     email,
-		Username:  username,
-		Password:  password,
-		FirstName: firstName,
-		LastName:  lastName,
-		Bday:      birthday,
-		AboutMe:   aboutMe,
+		Email:       email,
+		Username:    username,
+		Password:    password,
+		FirstName:   firstName,
+		LastName:    lastName,
+		Bday:        birthday,
+		AboutMe:     aboutMe,
+		AccountType: accountType,
 	}
 
 	// Validate fields
@@ -127,7 +134,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			help.JsonError(w, "svg images aren't supported", http.StatusUnauthorized, nil)
 			return
 		}
-		profilePicPath, err = help.SaveImg(profilePic)
+		profilePicPath, err = help.SaveImg(profilePic, "avatars/")
 		if err != nil {
 			help.JsonError(w, "Failed to save profile image", http.StatusInternalServerError, err)
 			return
@@ -136,9 +143,9 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Insert user
 	insertUser := `
-	INSERT INTO users (email, username, password, first_name, last_name, birthday, about_me, profile_pic)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	_, err = tp.DB.Exec(insertUser, user.Email, user.Username, hashedPassword, user.FirstName, user.LastName, user.Bday, user.AboutMe, profilePicPath)
+	INSERT INTO users (email, username, password, first_name, last_name, birthday, about_me, profile_pic, account_type)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	_, err = tp.DB.Exec(insertUser, user.Email, user.Username, hashedPassword, user.FirstName, user.LastName, user.Bday, user.AboutMe, profilePicPath, user.AccountType)
 	if err != nil {
 		help.JsonError(w, "unexpected error, try again later", http.StatusInternalServerError, err)
 		return
@@ -174,6 +181,16 @@ func ValidateSignUp(user tp.User) error {
 		usernameRegex := `^[a-zA-Z0-9_.-]+$`
 		if match, _ := regexp.MatchString(usernameRegex, user.Username); !match {
 			return fmt.Errorf("username can only contain letters, digits, underscores, dots, and hyphens")
+		}
+
+		// Check if username already exists
+		exists := false
+		err := tp.DB.QueryRow(`SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)`, user.Username).Scan(&exists)
+		if err != nil {
+			return fmt.Errorf("unexpected error, try again later")
+		}
+		if exists {
+			return fmt.Errorf("username already exists")
 		}
 	}
 
@@ -213,14 +230,14 @@ func ValidateSignUp(user tp.User) error {
 		return fmt.Errorf("password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character")
 	}
 
-	// Check if email/username already exists
+	// Check if email already exists
 	exists := false
-	err := tp.DB.QueryRow(`SELECT EXISTS(SELECT 1 FROM users WHERE email = ? OR username = ?)`, user.Email, user.Username).Scan(&exists)
+	err := tp.DB.QueryRow(`SELECT EXISTS(SELECT 1 FROM users WHERE email = ?)`, user.Email).Scan(&exists)
 	if err != nil {
 		return fmt.Errorf("unexpected error, try again later")
 	}
 	if exists {
-		return fmt.Errorf("email or username already exists")
+		return fmt.Errorf("email already exists")
 	}
 
 	return nil

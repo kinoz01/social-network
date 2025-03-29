@@ -2,8 +2,9 @@ package server
 
 import (
 	"net/http"
+	"time"
 
-	"social-network/handlers/authentication"
+	auth "social-network/handlers/authentication"
 	mw "social-network/handlers/middlewares"
 )
 
@@ -13,11 +14,12 @@ var Router http.Handler
 func Routes() http.Handler {
 	mux := http.NewServeMux()
 
-	// Rate limiters, prevent spam and DoS attacks.
 	// Allow 1 request per 20(x) microsecond
-	// rl := NewRateLimiter(20 * time.Microsecond)
+	rl := mw.NewRateLimiter(20 * time.Microsecond)
+
 	mux.HandleFunc("/api/check-session", auth.CheckSession)
-	mux.HandleFunc("/api/signup", auth.SignUpHandler)
+	mux.Handle("/api/signup", rl.RateLimitMW(http.HandlerFunc(auth.SignUpHandler)))
+	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

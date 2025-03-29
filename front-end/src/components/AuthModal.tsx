@@ -1,23 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "../styles/auth.css";
 import Image from "next/image";
 
-interface FormData {
-    email: string;
-    username: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    birthday: string;
-    aboutMe: string;
-    profilePic: File | null;
+interface AuthModalProps {
+    authSuccess: () => void;
 }
 
-export default function AuthModal() {
+export default function AuthModal({ authSuccess }: AuthModalProps) {
+    const router = useRouter();
     const [isLogin, setIsLogin] = useState(true);
+    const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
-    const [formData, setFormData] = useState<FormData>({
+    const [cantSubmit, setCantSubmit] = useState(true);
+    const [fileName, setFileName] = useState("Upload Image (optional)");
+    const [formData, setFormData] = useState({
         email: "",
         username: "",
         password: "",
@@ -25,81 +23,91 @@ export default function AuthModal() {
         lastName: "",
         birthday: "",
         aboutMe: "",
-        profilePic: null,
+        profilePic: null as File | null,
+        accountType: "public",
     });
 
-    const displayError = (text: string) => setErrorMsg(text);
+    useEffect(() => {
+        const requiredFields = isLogin
+            ? [formData.email || formData.username, formData.password]
+            : [formData.firstName, formData.lastName, formData.birthday, formData.email, formData.password];
 
-    const validateSignup = (data: FormData) => {
-        if (!data.firstName.trim()) return "First Name is required.";
-        if (!data.lastName.trim()) return "Last Name is required.";
-        if (!data.birthday.trim()) return "Birthday is required.";
-        if (!data.email.trim()) return "Email is required.";
-        if (!data.password.trim()) return "Password is required.";
-        return "";
-    };
+        setCantSubmit(requiredFields.some(field => !field.trim()));
+    }, [formData, isLogin]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleAccountType = (type: "private" | "public") => {
+        setFormData(prev => ({ ...prev, accountType: type }));
+    };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
-            setFormData(prev => ({ ...prev, profilePic: e.target.files![0] }));
+            const file = e.target.files[0];
+            let fileName = file.name.length > 60 ? file.name.slice(0, 60) + "..." : file.name;
+            setFileName(fileName);
+            setFormData(prev => ({ ...prev, profilePic: file }));
+        } else {
+            setFileName("Upload Image (optional)");
+            setFormData(prev => ({ ...prev, profilePic: null }));
         }
     };
 
     const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setErrorMsg("");
-        const err = validateSignup(formData);
-        if (err) return displayError(err);
 
         const signupData = new FormData();
         signupData.append("email", formData.email);
-        if (formData.username) signupData.append("username", formData.username);
+        signupData.append("username", formData.username);
         signupData.append("password", formData.password);
         signupData.append("first_name", formData.firstName);
         signupData.append("last_name", formData.lastName);
         signupData.append("birthday", formData.birthday);
         signupData.append("about_me", formData.aboutMe);
+        signupData.append("account_type", formData.accountType);
         if (formData.profilePic) signupData.append("profile_pic", formData.profilePic);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, { method: "POST", body: signupData });
-            if (!res.ok) displayError((await res.json()).msg);
-            else {
-                localStorage.setItem("newUser", "true");
-                setIsLogin(true);
-            }
-        } catch {
-            displayError("Network error or invalid image format.");
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
+                method: "POST",
+                body: signupData,
+                credentials: "include",
+            });
+            if (!res.ok) throw new Error((await res.json()).msg);
+
+            localStorage.setItem("showWelcome", "true");
+            await handleLogin(e); // Auto-login and redirect
+        } catch (error: any) {
+            setErrorMsg(error.message || "Signup failed.");
         }
     };
+
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setErrorMsg("");
-        if (!formData.email.trim() && !formData.username.trim()) {
-            return displayError("Please enter your email or username.");
-        }
-        if (!formData.password.trim()) return displayError("Please enter your password.");
-
+        console.log(formData.email );
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
-                method: "POST",
+                method: "POST",              
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    emailOrUsername: formData.email || formData.username, password: formData.password
+                    login: formData.email,
+                    password: formData.password
                 }),
+                credentials: "include",
             });
-            if (!res.ok) displayError((await res.json()).msg);
-            else localStorage.setItem("justLoggedIn", "true");
-        } catch {
-            displayError("Network error or invalid credentials.");
+            if (!res.ok) throw new Error((await res.json()).msg);
+            
+            authSuccess()
+        } catch (error: any) {
+            setErrorMsg(error.message || "Login failed.");
         }
     };
+
 
     return (
         <div className="modal">
@@ -114,15 +122,15 @@ export default function AuthModal() {
                             <input type="text" name="lastName" className="input-field" placeholder="Last Name" value={formData.lastName} onChange={handleInputChange} required />
                             <label>Birthday <span>*</span></label>
                             <input type="date" name="birthday" className="input-field" value={formData.birthday} onChange={handleInputChange} required />
-                            <label>About Me</label>
+                            <label>About Me (optional)</label>
                             <textarea name="aboutMe" className="input-field about-me" placeholder="A short bio" value={formData.aboutMe} onChange={handleInputChange} />
                         </>
                     )}
 
                     {isLogin ? (
                         <>
-                            <label>Email or Username <span>*</span></label>
-                            <input type="text" name="email" className="input-field" placeholder="Your Email or Username" value={formData.email} onChange={handleInputChange} required />
+                            <label>Email <span>*</span></label>
+                            <input type="text" name="email" className="input-field" placeholder="Your Email " value={formData.email} onChange={handleInputChange} required />
                         </>
                     ) : (
                         <>
@@ -135,26 +143,37 @@ export default function AuthModal() {
 
                     <label>Password <span>*</span></label>
                     <div className="password-container">
-                        <input type="password" name="password" className="input-field" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
-                        <button type="button" className="toggle-password" onClick={() => { }}>
-                            <Image src="/img/show-light.png" alt="Show Password" width={20} height={20} />
+                        <input type={showPassword ? "text" : "password"} name="password" className="input-field" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
+                        <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
+                            <Image src={`/img/${showPassword ? "hide" : "show"}-light.png`} alt="Toggle Password" width={20} height={20} />
                         </button>
                     </div>
 
                     {!isLogin && (
-                        <div className="file-upload-container">
-                            <label htmlFor="signupImage" className="file-upload">
-                                <span className="upload-icon">
-                                    <Image src="/img/upload.svg" alt="Upload Icon" width={24} height={24} />
-                                </span>
-                                <span className="upload-text">Upload Avatar (optional)</span>
-                            </label>
-                            <input type="file" id="signupImage" className="post-input hidden-file-input" accept="image/*" onChange={handleFileChange} />
-                        </div>
+                        <>
+                            {/* Account Type Selection */}
+                            <label>Account Type</label>
+                            <div className="account-type-container">
+                                <button type="button" className={`account-btn ${formData.accountType === "private" ? "selected" : ""}`} onClick={() => handleAccountType("private")}>Private</button>
+                                <button type="button" className={`account-btn ${formData.accountType === "public" ? "selected" : ""}`} onClick={() => handleAccountType("public")}>Public</button>
+                            </div>
+
+                            <div className="file-upload-container">
+                                <label htmlFor="signupImage" className="file-upload">
+                                    <span className="upload-icon">
+                                        <Image src="/img/upload.svg" alt="Upload Icon" width={24} height={24} />
+                                    </span>
+                                    <span className="upload-text">{fileName}</span>
+                                </label>
+                                <input type="file" id="signupImage" className="post-input hidden-file-input" accept="image/*" onChange={handleFileChange} />
+                            </div>
+                        </>
                     )}
 
+                    <button type="submit" disabled={cantSubmit} className="submit-button">
+                        {isLogin ? "Log In" : "Sign Up"}
+                    </button>
                     {errorMsg && <p className="error-message">{errorMsg}</p>}
-                    <button type="submit" className="submit-button">{isLogin ? "Log In" : "Sign Up"}</button>
                 </form>
 
                 <p className="switch-text">

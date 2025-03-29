@@ -46,12 +46,12 @@ func IsSVG(imageB []byte) bool {
 
 // Save image and return uuid path to insert in DB.
 // Return only Image name
-func SaveImg(imageB []byte) (string, error) {
+func SaveImg(imageB []byte, genre string) (string, error) {
 	imguuid, err := uuid.NewV4()
 	if err != nil {
 		return "", err
 	}
-	imgSavingPath := "../" + imguuid.String() + ".jpg"
+	imgSavingPath := "./storage/"+ genre + imguuid.String() + ".jpg"
 
 	err = os.WriteFile(imgSavingPath, imageB, 0o644)
 	if err != nil {

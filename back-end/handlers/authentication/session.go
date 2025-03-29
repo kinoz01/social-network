@@ -7,6 +7,8 @@ import (
 
 	"social-network/handlers/helpers"
 	tp "social-network/handlers/types"
+
+	"github.com/gofrs/uuid"
 )
 
 type CheckUser struct {
@@ -63,4 +65,40 @@ func GetUser(r *http.Request) (*tp.User, error) {
 	}
 
 	return &user, nil
+}
+
+// Create session token (cookie) and insert it into DB.
+func CreateSession(w http.ResponseWriter, user *tp.User) error {
+	tokenuuid, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
+	token := tokenuuid.String()
+
+	// Set token expiration time.
+	expiresAt := time.Now().Add(24 * time.Hour)
+
+	// Limit concurrent sessions to only one per user
+	_, err = tp.DB.Exec(`DELETE FROM sessions WHERE user_id = ?`, user.ID)
+	if err != nil {
+		return err
+	}
+
+	// Insert session into DB.
+	_, err = tp.DB.Exec(`INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)`, user.ID, token, expiresAt)
+	if err != nil {
+		return err
+	}
+
+	// Set the token in a cookie
+	cookie := &http.Cookie{
+		Name:     "session_token",
+		Value:    token,
+		Expires:  expiresAt,
+		HttpOnly: true,  
+		Path:     "/",
+	}
+
+	http.SetCookie(w, cookie)
+	return nil
 }
