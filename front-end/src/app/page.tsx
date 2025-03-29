@@ -18,7 +18,7 @@ export default function Home() {
             // Show welcome message if the user just signed up
             if (localStorage.getItem("showWelcome") === "true") {
                 localStorage.removeItem("showWelcome");
-                setShowWelcome(true); 
+                setShowWelcome(true);
             }
         } catch (error) {
             setLoggedIn(false);
@@ -29,7 +29,7 @@ export default function Home() {
         checkUserSession();
     }, []);
 
-    if (loggedIn === null) return <LoadingSpinner />;
+    if (loggedIn === null) return <div className="full-loading"><LoadingSpinner/></div>;
 
     return (
         <div>

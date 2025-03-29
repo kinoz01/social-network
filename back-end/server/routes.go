@@ -17,6 +17,7 @@ func Routes() http.Handler {
 	// Allow 1 request per 20(x) microsecond
 	rl := mw.NewRateLimiter(20 * time.Microsecond)
 
+	// Authentication:
 	mux.HandleFunc("/api/check-session", auth.CheckSession)
 	mux.Handle("/api/signup", rl.RateLimitMW(http.HandlerFunc(auth.SignUpHandler)))
 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))

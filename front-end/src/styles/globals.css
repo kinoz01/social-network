@@ -15,7 +15,7 @@ body {
 }
 
 /********************* Loading Spinner *******************/
-.loading-container {
+.full-loading {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -44,7 +44,6 @@ body {
         transform: rotate(360deg);
     }
 }
-
 
 /******************* Welcome Popup *******************/
 .welcome-popup {
