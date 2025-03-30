@@ -5,6 +5,7 @@ import (
 	"time"
 
 	auth "social-network/handlers/authentication"
+	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 )
 
@@ -16,6 +17,9 @@ func Routes() http.Handler {
 
 	// Allow 1 request per 20(x) microsecond
 	rl := mw.NewRateLimiter(20 * time.Microsecond)
+
+	// Serving storage
+	mux.HandleFunc("/api/storage/", hlp.FilesHandler)
 
 	// Authentication:
 	mux.HandleFunc("/api/check-session", auth.CheckSession)

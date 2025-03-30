@@ -151,7 +151,6 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
 
                     {!isLogin && (
                         <>
-                            {/* Account Type Selection */}
                             <label>Account Type</label>
                             <div className="account-type-container">
                                 <button type="button" className={`account-btn ${formData.accountType === "private" ? "selected" : ""}`} onClick={() => handleAccountType("private")}>Private</button>

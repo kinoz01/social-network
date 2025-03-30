@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"regexp"
+	"time"
 
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
@@ -234,6 +235,30 @@ func ValidateSignUp(user tp.User) error {
 	}
 	if exists {
 		return fmt.Errorf("email already exists")
+	}
+
+	// Validate birth date
+	// Parse the date (backend always get date in YYYY-MM-DD format)
+	birthdate, err := time.Parse("2006-01-02", user.Bday)
+	if err != nil {
+		return fmt.Errorf("invalid date format")
+	}
+
+	today := time.Now()
+	age := today.Year() - birthdate.Year()
+	// Adjust if the birthday hasn't happened yet this year
+	if today.Before(birthdate.AddDate(age, 0, 0)) {
+		age--
+	}
+	if age <= 0 {
+		return fmt.Errorf("invalid date")
+	}
+	// Check min & max age
+	if age < 13 {
+		return fmt.Errorf("you're to young, go play outside")
+	}
+	if age > 150 {
+		return fmt.Errorf("are you a vampire?")
 	}
 
 	return nil

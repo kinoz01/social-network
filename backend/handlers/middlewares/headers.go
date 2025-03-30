@@ -15,10 +15,10 @@ func SecureHeaders(next http.Handler) http.Handler {
 // CORS Middleware
 func EnableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")        // Allow frontend
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")      // Allow Http methods
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization") // Allowed headers
-		w.Header().Set("Access-Control-Allow-Credentials", "true")                    // Allow cookies & tokens
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")            // Allow frontend
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE, PUT") // Allow Http methods
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")     // Allowed headers
+		w.Header().Set("Access-Control-Allow-Credentials", "true")                        // Allow cookies & tokens
 
 		// Allow Preflight Requests
 		if r.Method == "OPTIONS" {
