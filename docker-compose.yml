@@ -6,10 +6,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./back-end/database/socNet.db:/app/database/socNet.db
-      - ./back-end/database/schema.sql:/app/database/schema.sql 
-    networks:
-      - app_network
+      - ./backend/database/socNet.db:/app/database/socNet.db
+      - ./backend/database/schema.sql:/app/database/schema.sql 
 
   frontend:
     build:
@@ -19,11 +17,3 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-    environment:
-      - DOCKERIZED=true 
-    networks:
-      - app_network
-
-networks:
-  app_network:
-    driver: bridge

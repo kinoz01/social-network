@@ -117,25 +117,25 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                     {!isLogin && (
                         <>
                             <label>First Name <span>*</span></label>
-                            <input type="text" name="firstName" className="input-field" placeholder="First Name" value={formData.firstName} onChange={handleInputChange} required />
+                            <input type="text" name="firstName" className="input-field" placeholder="First Name" value={formData.firstName} onChange={handleInputChange} maxLength={16} required />
                             <label>Last Name <span>*</span></label>
-                            <input type="text" name="lastName" className="input-field" placeholder="Last Name" value={formData.lastName} onChange={handleInputChange} required />
+                            <input type="text" name="lastName" className="input-field" placeholder="Last Name" value={formData.lastName} onChange={handleInputChange} maxLength={16} required />
                             <label>Birthday <span>*</span></label>
                             <input type="date" name="birthday" className="input-field" value={formData.birthday} onChange={handleInputChange} required />
                             <label>About Me (optional)</label>
-                            <textarea name="aboutMe" className="input-field about-me" placeholder="A short bio" value={formData.aboutMe} onChange={handleInputChange} />
+                            <textarea name="aboutMe" className="input-field about-me" placeholder="A short bio" value={formData.aboutMe} maxLength={400} onChange={handleInputChange} />
                         </>
                     )}
 
                     {isLogin ? (
                         <>
                             <label>Email <span>*</span></label>
-                            <input type="text" name="email" className="input-field" placeholder="Your Email " value={formData.email} onChange={handleInputChange} required />
+                            <input type="text" name="email" className="input-field" placeholder="Your Email " value={formData.email} onChange={handleInputChange} maxLength={20} required />
                         </>
                     ) : (
                         <>
                             <label>Username (optional)</label>
-                            <input type="text" name="username" className="input-field" placeholder="Choose a Username" value={formData.username} onChange={handleInputChange} />
+                            <input type="text" name="username" className="input-field" placeholder="Choose a Username" value={formData.username} maxLength={16} onChange={handleInputChange} />
                             <label>Email <span>*</span></label>
                             <input type="email" name="email" className="input-field" placeholder="Your Email" value={formData.email} onChange={handleInputChange} required />
                         </>
@@ -143,7 +143,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
 
                     <label>Password <span>*</span></label>
                     <div className="password-container">
-                        <input type={showPassword ? "text" : "password"} name="password" className="input-field" placeholder="Password" value={formData.password} onChange={handleInputChange} required />
+                        <input type={showPassword ? "text" : "password"} name="password" className="input-field" placeholder="Password" value={formData.password} maxLength={30} onChange={handleInputChange} required />
                         <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
                             <Image src={`/img/${showPassword ? "hide" : "show"}-light.png`} alt="Toggle Password" width={20} height={20} />
                         </button>

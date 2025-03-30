@@ -8,7 +8,7 @@ RUN apk add --no-cache gcc musl-dev
 ENV CGO_ENABLED=1
 
 # Copy backend files
-COPY back-end/ ./
+COPY backend/ ./
 
 # Download dependencies
 RUN go mod tidy

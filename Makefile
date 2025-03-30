@@ -9,9 +9,9 @@ check-npm:
 
 # Check if Next.js is installed
 check-nextjs:
-	@if [ ! -d "front-end/node_modules/next" ]; then \
+	@if [ ! -d "frontend/node_modules/next" ]; then \
 		echo "🔴 Next.js is not installed. Installing now..."; \
-		cd front-end && npm install; \
+		cd frontend && npm install; \
 	else \
 		echo "Next.js is installed."; \
 	fi
@@ -27,17 +27,17 @@ kill-ports:
 # Run backend on background
 run-backend:
 	@echo "Starting Go backend..."
-	cd back-end && go run main.go &
+	cd backend && go run main.go &
 
 # Run backend.
 go:
 	@echo "Starting Go backend..."
-	cd back-end && go run main.go
+	cd backend && go run main.go
 
 # Run frontend
 run-frontend:
 	@echo "Starting Next.js frontend..."
-	cd front-end && npm run dev
+	cd frontend && npm run dev
 
 # Run everything
 run: check-npm check-nextjs kill-ports run-backend run-frontend

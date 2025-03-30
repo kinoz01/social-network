@@ -13,13 +13,13 @@ import (
 )
 
 const (
-	maxEmailSize    = 200
-	maxUsernameSize = 50
-	maxNameSize     = 50
-	maxPasswordSize = 100
+	maxEmailSize    = 20
+	maxUsernameSize = 16
+	maxNameSize     = 16
+	maxPasswordSize = 30
 	maxPicSize      = 1 << 20 // 1 MB for profile pic
-	maxAboutMeSize  = 1000
-	maxDateSize     = 20
+	maxAboutMeSize  = 400
+	maxDateSize     = 15
 )
 
 // Signing up a new user.
@@ -50,8 +50,8 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		"password":     {maxPasswordSize, &password, "Password is too long"},
 		"first_name":   {maxNameSize, &firstName, "First name is too long"},
 		"last_name":    {maxNameSize, &lastName, "Last name is too long"},
-		"birthday":     {maxDateSize, &birthday, "Birthday is too large or invalid"},
-		"about_me":     {maxAboutMeSize, &aboutMe, "AboutMe too long"},
+		"birthday":     {maxDateSize, &birthday, "Birthday is invalid"},
+		"about_me":     {maxAboutMeSize, &aboutMe, "Your bio is too long"},
 		"account_type": {10, &accountType, "Invalid account type"},
 	}
 
@@ -175,9 +175,6 @@ func ValidateSignUp(user tp.User) error {
 		if len(user.Username) < 3 {
 			return fmt.Errorf("username is too short")
 		}
-		if len(user.Username) > 16 {
-			return fmt.Errorf("username is too long")
-		}
 		usernameRegex := `^[a-zA-Z0-9_.-]+$`
 		if match, _ := regexp.MatchString(usernameRegex, user.Username); !match {
 			return fmt.Errorf("username can only contain letters, digits, underscores, dots, and hyphens")
@@ -194,22 +191,21 @@ func ValidateSignUp(user tp.User) error {
 		}
 	}
 
+	// Validate bio
+	if user.AboutMe != "" && len(user.AboutMe) < 8 {
+		return fmt.Errorf("your bio is too short")
+	}
+
 	// Validate First Name & Last Name
 	nameRegex := `^[a-zA-Z]+$`
 	if !regexp.MustCompile(nameRegex).MatchString(user.FirstName) {
-		return fmt.Errorf("invalid first name")
+		return fmt.Errorf("first name must contain only letters (A-Z, a-z)")
 	}
 	if len(user.FirstName) < 3 {
 		return fmt.Errorf("first name is too short")
 	}
-	if len(user.FirstName) > 25 {
-		return fmt.Errorf("first name is too long")
-	}
 	if len(user.LastName) < 3 {
 		return fmt.Errorf("last name is too short")
-	}
-	if len(user.LastName) > 25 {
-		return fmt.Errorf("last name is too long")
 	}
 	if !regexp.MustCompile(nameRegex).MatchString(user.LastName) {
 		return fmt.Errorf("last name must contain only letters (A-Z, a-z)")

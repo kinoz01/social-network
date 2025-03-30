@@ -24,7 +24,7 @@ func LimitRead(part io.Reader, maxSize int) ([]byte, error) {
 
 	// If we read more than maxSize bytes, the data is too large.
 	if n > int64(maxSize) {
-		return nil, fmt.Errorf("data exceeds max allowed size of 1mb")
+		return nil, fmt.Errorf("data exceeds max allowed size")
 	}
 
 	// Return the full data (up to maxSize).
@@ -51,7 +51,7 @@ func SaveImg(imageB []byte, genre string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	imgSavingPath := "./storage/"+ genre + imguuid.String() + ".jpg"
+	imgSavingPath := "./storage/" + genre + imguuid.String() + ".jpg"
 
 	err = os.WriteFile(imgSavingPath, imageB, 0o644)
 	if err != nil {
