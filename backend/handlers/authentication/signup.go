@@ -158,7 +158,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 // Validate signup payload.
 func ValidateSignUp(user tp.User) error {
-	if user.Email == "" || user.Password == "" || user.FirstName == "" || user.LastName == "" {
+	if user.Email == "" || user.Password == "" || user.FirstName == "" || user.LastName == "" || user.Bday == "" {
 		return fmt.Errorf("missing fields")
 	}
 

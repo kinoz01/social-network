@@ -27,12 +27,12 @@ kill-ports:
 # Run backend on background
 run-backend:
 	@echo "Starting Go backend..."
-	cd backend && go run main.go &
+	@cd backend && go run main.go &
 
 # Run backend.
 go:
 	@echo "Starting Go backend..."
-	cd backend && go run main.go
+	@cd backend && go run main.go
 
 # Run frontend
 run-frontend:
