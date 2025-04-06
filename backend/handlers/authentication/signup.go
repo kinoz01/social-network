@@ -255,7 +255,7 @@ func ValidateSignUp(user tp.User) error {
 	}
 	// Check min & max age
 	if age < 13 {
-		return fmt.Errorf("you're to young, go play outside")
+		return fmt.Errorf("you're too young, go play outside")
 	}
 	if age > 150 {
 		return fmt.Errorf("are you a vampire?")
