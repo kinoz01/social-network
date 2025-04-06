@@ -1,11 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import AuthModal from "../components/AuthModal";
 import LoadingSpinner from "../components/Loading";
 
 export default function Home() {
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
-    const [showWelcome, setShowWelcome] = useState(false); // Track welcome state
 
     async function checkUserSession() {
         try {
@@ -18,7 +18,7 @@ export default function Home() {
             // Show welcome message if the user just signed up
             if (localStorage.getItem("showWelcome") === "true") {
                 localStorage.removeItem("showWelcome");
-                setShowWelcome(true);
+                showWelcome()
             }
         } catch (error) {
             setLoggedIn(false);
@@ -29,14 +29,13 @@ export default function Home() {
         checkUserSession();
     }, []);
 
-    if (loggedIn === null) return <div className="full-loading"><LoadingSpinner/></div>;
+    if (loggedIn === null) return <div className="full-loading"><LoadingSpinner /></div>;
 
     return (
         <div>
             {loggedIn ? (
                 <>
                     <h2>Hello World</h2>
-                    {showWelcome && <WelcomePopup />}
                 </>
             ) : (
                 <AuthModal authSuccess={checkUserSession} />
@@ -45,22 +44,18 @@ export default function Home() {
     );
 }
 
-// Welcome Popup Component
-const WelcomePopup = () => {
-    useEffect(() => {
-        const popup = document.createElement("div");
-        popup.classList.add("welcome-popup");
-        popup.innerHTML = `
+// Welcome Popup on signup
+const showWelcome = () => {
+    const popup = document.createElement("div");
+    popup.classList.add("welcome-popup");
+    popup.innerHTML = `
             <span class="close-popup">&times;</span>
             🎉🎉🎉<br>
             <strong>Welcome to our Community!</strong><br>
             Feel free to share your thoughts.
         `;
-        document.body.appendChild(popup);
-        document.querySelector(".close-popup")?.addEventListener("click", () => popup.remove());
-        setTimeout(() => popup.classList.add("fade-out"), 5000);
-        setTimeout(() => popup.remove(), 6500);
-    }, []);
-
-    return null; // This component runs effects but doesn't render anything
+    document.body.appendChild(popup);
+    document.querySelector(".close-popup")?.addEventListener("click", () => popup.remove());
+    setTimeout(() => popup.classList.add("fade-out"), 5000);
+    setTimeout(() => popup.remove(), 6500);
 };

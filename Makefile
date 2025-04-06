@@ -1,11 +1,11 @@
 # Check if npm is installed
 check-npm:
 	@command -v npm >/dev/null 2>&1 || { \
-		echo "npm is not installed."; \
+		echo "nodejs/npm is not installed."; \
 		echo "🔴 Try installing using: curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt install -y nodejs"; \
 		exit 1; \
 	}
-	@echo "npm is installed."
+	@echo "nodejs & npm are installed."
 
 # Check if Next.js is installed
 check-nextjs:

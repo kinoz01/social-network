@@ -20,7 +20,7 @@ func EnableCORS(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")     // Allowed headers
 		w.Header().Set("Access-Control-Allow-Credentials", "true")                        // Allow cookies & tokens
 
-		// Allow Preflight Requests
+		// Allow Preflight Requests (sent before some methods (eg. PUT, POST))
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusNoContent)
 			return

@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
+import { useState } from "react";
 import "../styles/auth.css";
 import Image from "next/image";
 
@@ -8,12 +8,10 @@ interface AuthModalProps {
     authSuccess: () => void;
 }
 
-export default function AuthModal({ authSuccess }: AuthModalProps) {
-    const router = useRouter();
+export default function AuthModal({ authSuccess }: AuthModalProps) {    
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
-    const [cantSubmit, setCantSubmit] = useState(true);
     const [fileName, setFileName] = useState("Upload Image (optional)");
     const [formData, setFormData] = useState({
         email: "",
@@ -26,14 +24,6 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         profilePic: null as File | null,
         accountType: "public",
     });
-
-    useEffect(() => {
-        const requiredFields = isLogin
-            ? [formData.email || formData.username, formData.password]
-            : [formData.firstName, formData.lastName, formData.birthday, formData.email, formData.password];
-
-        setCantSubmit(requiredFields.some(field => !field.trim()));
-    }, [formData, isLogin]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -89,7 +79,6 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData.email );
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
                 method: "POST",              
@@ -107,6 +96,11 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
             setErrorMsg(error.message || "Login failed.");
         }
     };
+
+    const requiredFields = isLogin
+        ? [formData.email, formData.password]
+        : [formData.firstName, formData.lastName, formData.birthday, formData.email, formData.password];
+    const submitDisabled = requiredFields.some(field => !field || !field.trim());
 
 
     return (
@@ -169,7 +163,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                         </>
                     )}
 
-                    <button type="submit" disabled={cantSubmit} className="submit-button">
+                    <button type="submit" disabled={submitDisabled} className="submit-button">
                         {isLogin ? "Log In" : "Sign Up"}
                     </button>
                     {errorMsg && <p className="error-message">{errorMsg}</p>}

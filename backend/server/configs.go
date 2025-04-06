@@ -29,7 +29,7 @@ func InitialiseDB() {
 	// Connection pool configuration
 	db.DB.SetMaxOpenConns(10)                 // Simultaneously opened connections
 	db.DB.SetMaxIdleConns(5)                  // Reuse some opened connections
-	db.DB.SetConnMaxLifetime(5 * time.Minute) // remove stale connections
+	db.DB.SetConnMaxLifetime(5 * time.Minute) // Remove stale connections
 
 	content, err := os.ReadFile("./database/schema.sql")
 	if err != nil {
@@ -49,7 +49,7 @@ func Shutdown() {
 	<-stop
 	log.Println("shutting down server...")
 	if err := db.DB.Close(); err != nil {
-		log.Println("Error closing DB:", err)
+		log.Fatal("Error closing DB:", err)
 	}
 	os.Exit(0)
 }
