@@ -38,7 +38,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)) != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
 		help.JsonError(w, "Invalid Password.", http.StatusUnauthorized, err)
 		return
 	}
