@@ -18,7 +18,7 @@ check-nextjs:
 
 # Kill processes on ports 8080 (backend) and 3000 (frontend) if running
 kill-ports:
-	-docker compose down --volumes --remove-orphans
+	-docker-compose down --volumes --remove-orphans
 	@echo "Checking for running services on ports 8080 and 3000..."
 	@lsof -ti:8080 | xargs kill -9 2>/dev/null || echo "No process on port 8080"
 	@lsof -ti:3000 | xargs kill -9 2>/dev/null || echo "No process on port 3000"
@@ -46,12 +46,12 @@ run: check-npm check-nextjs kill-ports run-backend run-frontend
 
 #------------------------- Docker -------------------------#
 buildDocker: kill-ports
-	docker compose up --build
+	docker-compose up --build
 
 # Stop and remove backend and frontend containers
 cleanDocker:
-	-docker stop $(docker compose ps -q backend) $(docker compose ps -q frontend)
-	-docker rm $(docker compose ps -q backend) $(docker compose ps -q frontend)
+	-docker stop $(docker-compose ps -q backend) $(docker compose ps -q frontend)
+	-docker rm $(docker-compose ps -q backend) $(docker compose ps -q frontend)
 	-docker rmi $(docker images -q backend) $(docker images -q frontend)
 	-docker system prune -f --volumes
 

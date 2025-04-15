@@ -167,7 +167,7 @@ func ValidateSignUp(user tp.User) error {
 	if match, _ := regexp.MatchString(emailRegex, user.Email); !match {
 		return fmt.Errorf("invalid email format")
 	}
-	if len(user.Email) > 200 {
+	if len(user.Email) > 20 {
 		return fmt.Errorf("email is too long")
 	}
 
