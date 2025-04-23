@@ -1,0 +1,38 @@
+:root {
+  --color1: #040404;
+  --color2: #fcfaf6;
+  --color3: #303030;
+  --color4:rgb(221, 255, 142); 
+  --color5:rgb(234, 255, 185); 
+  --color6: rgb(196, 196, 196);
+
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--color1);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+main {
+  display: flex;
+}
