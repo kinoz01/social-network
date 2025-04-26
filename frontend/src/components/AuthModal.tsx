@@ -37,7 +37,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files?.[0]) {
             const file = e.target.files[0];
-            let fileName = file.name.length > 60 ? file.name.slice(0, 60) + "..." : file.name;
+            const fileName = file.name.length > 60 ? file.name.slice(0, 60) + "..." : file.name;
             setFileName(fileName);
             setFormData(prev => ({ ...prev, profilePic: file }));
         } else {
