@@ -24,7 +24,7 @@ func Routes() http.Handler {
 
 	//chatApp
 	mux.HandleFunc("/api/fetchUsers", chat.FetchUsers)
-	mux.HandleFunc("ws://localhost:8080/ws", chat.HandleConnection)
+	mux.HandleFunc("/ws", chat.HandleConnection)
 
 	// Authentication:
 	mux.HandleFunc("/api/check-session", auth.CheckSession)

@@ -13,7 +13,7 @@ export default function ChatPage() {
             
         })
         socketRef.current.addEventListener('message', (event) => {
-            const data = JSON.parse(event)
+            const data = JSON.parse(event.data)
             console.log("message from server ", data);
             
         })
@@ -59,7 +59,7 @@ export default function ChatPage() {
                 const messageInput = container.querySelector('input[type="text"]');
 
                 sendButton.addEventListener('click', () => {
-                    SendMessage()
+                    SendMessage(messageInput)
                 })
                 
             });
@@ -75,8 +75,23 @@ export default function ChatPage() {
     },[users])
 
 
+    const SendMessage = (messageInput) => {
+        const message = messageInput.value.trim()
+        console.log(message, "message");
+        
+        const time = new Date().toDateString()
+        console.log(time)
+        if (message == "") return
+        const data = {
+            type: "message",
+            senderId: 2,
+            receiverId: 2,
+            text: message,
+            timestamp: time
+        }
+        socketRef.current.send(JSON.stringify(data))
+    }
 
-    
     return <>
         <h1>chat page</h1>
         <ul>

@@ -9,6 +9,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+
+
 // Create an upgrader
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -45,17 +47,17 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%#v\n", wsMsg)
 
 
+		
 		mu.Lock()
-		delete(clients, user_id)
-		mu.Unlock()
-
-
-		mu.Lock()
+		fmt.Println("ok")
 		if conn, exists := clients[wsMsg.Receiver_id]; exists {
+			fmt.Println("exists")
 			if err := conn.WriteJSON(wsMsg); err != nil {
 				log.Println("Error sending message:", err)
 				return
 			}
+		} else {
+			fmt.Println("does not exits")
 		}
 		mu.Unlock()
 	}
