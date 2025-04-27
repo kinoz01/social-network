@@ -11,7 +11,7 @@ var Port = "8080"
 
 // Starts the HTTP server
 func Serve(handler http.Handler) {
-	listener, err := net.Listen("tcp", "127.0.0.1:"+Port)
+	listener, err := net.Listen("tcp", ":"+Port)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

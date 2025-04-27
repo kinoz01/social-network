@@ -1,61 +1,8 @@
-"use client";
+import { requireSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-import { useEffect, useState } from "react";
-import AuthModal from "../components/AuthModal";
-import LoadingSpinner from "../components/Loading";
-
-export default function Home() {
-    const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
-
-    async function checkUserSession() {
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/check-session`, {
-                credentials: "include",
-            });
-            const data = await res.json();
-            setLoggedIn(data.loggedIn);
-
-            // Show welcome message if the user just signed up
-            if (localStorage.getItem("showWelcome") === "true") {
-                localStorage.removeItem("showWelcome");
-                showWelcome()
-            }
-        } catch (error) {
-            setLoggedIn(false);
-        }
-    }
-
-    useEffect(() => {
-        checkUserSession();
-    }, []);
-
-    if (loggedIn === null) return <div className="full-loading"><LoadingSpinner /></div>;
-
-    return (
-        <div>
-            {loggedIn ? (
-                <>
-                    <h2>Hello World</h2>
-                </>
-            ) : (
-                <AuthModal authSuccess={checkUserSession} />
-            )}
-        </div>
-    );
+export default async function Index() {
+    await requireSession();
+    // If we reach here, session is valid
+    redirect("/home")
 }
-
-// Welcome Popup on signup
-const showWelcome = () => {
-    const popup = document.createElement("div");
-    popup.classList.add("welcome-popup");
-    popup.innerHTML = `
-            <span class="close-popup">&times;</span>
-            🎉🎉🎉<br>
-            <strong>Welcome to our Community!</strong><br>
-            Feel free to share your thoughts.
-        `;
-    document.body.appendChild(popup);
-    document.querySelector(".close-popup")?.addEventListener("click", () => popup.remove());
-    setTimeout(() => popup.classList.add("fade-out"), 5000);
-    setTimeout(() => popup.remove(), 6500);
-};

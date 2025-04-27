@@ -85,6 +85,8 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Handle other fields using the spec map
+		// Note: spec is a copy of the struct
+		// if u don't use pointer (*spec.target) original email, username, etc stay unchanged → still empty.
 		spec, exists := fields[fieldName]
 		if !exists {
 			continue // Ignore unknown fields
@@ -251,7 +253,7 @@ func ValidateSignUp(user tp.User) error {
 		age--
 	}
 	if age <= 0 {
-		return fmt.Errorf("invalid date")
+		return fmt.Errorf("invalid Birthdate")
 	}
 	// Check min & max age
 	if age < 13 {
