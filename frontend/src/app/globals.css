@@ -2,10 +2,9 @@
   --color1: #040404;
   --color2: #fcfaf6;
   --color3: #303030;
-  --color4:rgb(221, 255, 142); 
-  --color5:rgb(234, 255, 185); 
-  --color6: rgb(196, 196, 196);
-
+  --color4: #ddff8e;
+  --color5: #eaffb9;
+  --color6: #c4c4c4;
 }
 
 html,
@@ -33,6 +32,185 @@ a {
   text-decoration: none;
 }
 
+/* MAIN */
 main {
   display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  background-color: var(--color1);
+  font-size: clamp(1rem, 1.2vw, 1.5rem);
+}
+
+.mainContent {
+  background-color: var(--color2);
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border-radius: 25px 0 0 25px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Sidebar */
+
+.sideBar {
+  width: 10%;
+  height: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+}
+
+.sideBar:hover .navSection {
+  width: 100%;
+}
+
+.sideBar:hover .icon {
+  width: 3rem;
+}
+
+.sideBar:hover {
+  width: 13rem;
+}
+
+.logo {
+  font-size: 150%;
+  font-weight: 800;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  background-color: var(--color4);
+  border-radius: 50%;
+  padding: 0.5rem;
+  color: var(--color1);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.logo:hover {
+  background-color: var(--color1);
+  color: var(--color4);
+  border: 1px solid var(--color4);
+  transform: scale(1.1);
+}
+
+.navIcons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navLinks {
+  background-color: #c4c4c4;
+  height: 100%s;
+}
+
+.sideBar .icon {
+  width: 3rem;
+  transition: width 2s ease;
+  fill: var(--color5);
+  padding: 0.4rem;
+}
+
+.navSection {
+  width: 3rem;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  border: 1px solid var(--color4);
+  border-radius: 50px;
+  transition: all 0.5s ease;
+}
+
+.navSection span {
+  width: 100%;
+  color: var(--color2);
+}
+
+.navSection:hover {
+  background-color: var(--color4);
+  border: none;
+  color: var(--color1);
+}
+
+.navSection:hover span {
+  color: var(--color1);
+}
+
+.navSection:hover .icon {
+  fill: var(--color1);
+}
+
+.createPopup {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.411);
+}
+
+.buttons {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 auto;
+  padding: 0.5rem;
+  border-radius: 15px;
+}
+
+.buttons button {
+  padding: 1rem;
+  border: none;
+  border-radius: 15px;
+  transition: all 0.2s ease;
+  background-color: #000;
+  color: var(--color2);
+  cursor: pointer;
+  height: 3rem;
+  width: 8rem;
+  text-wrap: nowrap;
+}
+
+.buttons button:hover {
+  background-color: var(--color4);
+  color: var(--color1);
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+  transform: scale(1.1);
+}
+
+@media (max-width: 1440px) {
+  .sideBar:hover {
+    width: 16rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .mainContent.chat {
+    flex-wrap: wrap;
+    width: 90%;
+  }
 }

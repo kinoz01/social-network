@@ -1,9 +1,14 @@
+"use client";
+
 import Image from "next/image";
-import styles from "../app/page.module.css";
-import AddComment from "./AddComments";
-import Comment from "./Comment";
+import styles from "./posts.module.css";
+import AddComment from "../comments/AddComments";
+import Comment from "../comments/Comment";
+import { useState } from "react";
 
 export default function Post() {
+  const [showComments, setComments] = useState(false);
+
   return (
     <div className={styles.post}>
       {/* HEADER */}
@@ -35,15 +40,22 @@ export default function Post() {
           incidunt animi in quos corporis dolores qui voluptatem facere
           blanditiis molestias!
         </div>
-        <div className={styles.commentsBtn}>comments</div>
+        <button
+          className={styles.commentsBtn}
+          onClick={
+            !showComments ? () => setComments(true) : () => setComments(false)
+          }
+        >
+          comments
+        </button>
       </div>
       {/* COMMENTS */}
-      <div className={styles.postComments}>
-        {/* <AddComment /> */}
-        {/* <Comment />
-        <Comment />
-        <Comment /> */}
-      </div>
+      {showComments ? (
+        <div className={styles.comments}>
+          <AddComment />
+          <Comment />
+        </div>
+      ) : null}
     </div>
   );
 }

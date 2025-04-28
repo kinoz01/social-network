@@ -1,8 +1,11 @@
 import Post from "./Post";
-import styles from "../app/page.module.css";
-function Feed(){
+import styles from "./posts.module.css";
+import AddPost from "./AddPost";
+
+function Feed() {
   return (
     <div className={styles.feed}>
+      <AddPost />
       <Post />
       <Post />
       <Post />

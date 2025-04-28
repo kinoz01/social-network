@@ -1,9 +1,11 @@
-import Image from "next/image";
-import styles from "../app/page.module.css";
+"use client";
 
-export default function AddComment() {
+import Image from "next/image";
+import styles from "./posts.module.css";
+
+export default function AddPost() {
   return (
-    <div className={styles.addComment}>
+    <div className={styles.addPost}>
       {/* ICON */}
       <div>
         <Image
@@ -15,15 +17,16 @@ export default function AddComment() {
         />
       </div>
       {/* FORM */}
-      {/* FORM */}
-      <form className={styles.commentForm}>
-        <input
-          type="text"
-          name="comment"
-          className={styles.commentInput}
-          placeholder="Add a comment..."
+      <form className={styles.postForm} >
+        <textarea
+          name="content"
+          className={styles.postContentInput}
+          placeholder="Content of the post..."
+        // maxLength={250}
+        // required
+
         />
-        <button type="submit" className={styles.addCommentBtn}>
+        <button type="submit" className={styles.addPostBtn}>
           Create
         </button>
       </form>

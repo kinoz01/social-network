@@ -1,17 +1,13 @@
-import styles from "./page.module.css";
-import RightMenu from "@/components/RightMenu";
-import Feed from "@/components/Feed";
+import Feed from "@/components/posts/Feed";
+import RightMenu from "@/components/menus/RightMenu";
+import LeftMenu from "@/components/menus/LeftMenu";
 
 export default async function Home() {
-
-
   return (
-    <div className={styles.body}>
-      <main className={styles.main}>
-        <RightMenu />
-        <Feed />
-        <RightMenu />
-      </main>
+    <div className="mainContent home">
+      <LeftMenu type="home" />
+      <Feed />
+      <RightMenu />
     </div>
   );
 }
