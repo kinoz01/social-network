@@ -10,24 +10,16 @@ export async function requireSession() {
     if (!token) redirect("/login");
 
     // check session validity (backend call)
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/check-session`, {
-            headers: { cookie: cookieStore.toString() }, // The server needs to pass cookies manually
-            cache: "no-store",
-        });
-
-        if (!res.ok) {
-            console.error("Session check failed, status:", res.status);
-            redirect("/login");
-        }
-
-        const { loggedIn } = await res.json();
-
-        if (!loggedIn) {
-            redirect("/login");
-        }
-    } catch (error) {
-        console.error("Error checking session:", error);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/check-session`, {
+        headers: { cookie: cookieStore.toString() }, // The server needs to pass cookies manually
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        console.error("Session check failed, status:", res.status);
+        redirect("/login");
+    }
+    const { loggedIn } = await res.json();
+    if (!loggedIn) {
         redirect("/login");
     }
 
