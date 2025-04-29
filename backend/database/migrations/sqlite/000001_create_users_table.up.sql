@@ -1,6 +1,6 @@
 CREATE TABLE
     IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         email TEXT NOT NULL UNIQUE,
         username TEXT UNIQUE,
         password TEXT NOT NULL,
