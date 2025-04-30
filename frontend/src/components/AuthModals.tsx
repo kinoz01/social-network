@@ -63,16 +63,24 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         if (formData.profilePic) signupData.append("profile_pic", formData.profilePic);
 
         try {
+            console.log('URL-->', process.env.NEXT_PUBLIC_API_URL);
+
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
                 method: "POST",
                 body: signupData,
                 credentials: "include",
             });
-            if (!res.ok) throw new Error((await res.json()).msg);
+            const responseData = await res.json();
 
-            localStorage.setItem("showWelcome", "true");
-            await handleLogin(e); // Auto-login and redirect
+            if (!res.ok) {
+                throw new Error(responseData.msg || "Signup failed");
+            }
+
+            console.log("Signup===>", responseData)
+            localStorage.setItem("showWelcome", "true")
+            await handleLogin(e)
         } catch (error: any) {
+            console.log("response00--->", error.message);
             setErrorMsg(error.message || "Signup failed.");
         }
     };
