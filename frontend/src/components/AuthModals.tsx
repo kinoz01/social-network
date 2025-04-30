@@ -63,8 +63,6 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         if (formData.profilePic) signupData.append("profile_pic", formData.profilePic);
 
         try {
-            console.log('URL-->', process.env.NEXT_PUBLIC_API_URL);
-
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
                 method: "POST",
                 body: signupData,
@@ -78,7 +76,6 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
             localStorage.setItem("showWelcome", "true")
             await handleLogin(e)
         } catch (error: any) {
-            console.log("response00--->", error.message);
             setErrorMsg(error.message || "Signup failed.");
         }
     };

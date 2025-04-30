@@ -118,21 +118,17 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		AboutMe:     aboutMe,
 		AccountType: accountType,
 	}
-	fmt.Println("here00---------->", user)
 	// Validate fields
 	if err := ValidateSignUp(user); err != nil {
-		fmt.Println("----------------->error here", err)
 		help.JsonError(w, err.Error(), http.StatusNotAcceptable, err)
 		return
 	}
-	fmt.Println("here01---------->")
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		help.JsonError(w, "unexpected error, try again later", http.StatusInternalServerError, err)
 		return
 	}
-	fmt.Println("here02---------->")
 	// Save optional profile pic
 	profilePicPath := "avatar.webp"
 	if len(profilePic) > 0 {
@@ -147,16 +143,13 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println("here03---------->")
 	// Insert user
 	insertUser := `
 	INSERT INTO users (id, email, username, password, first_name, last_name, birthday, about_me, profile_pic, account_type)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	_, err = tp.DB.Exec(insertUser, user.ID, user.Email, user.Username, hashedPassword, user.FirstName, user.LastName, user.Bday, user.AboutMe, profilePicPath, user.AccountType)
-	fmt.Println("--------------INSERT")
 	if err != nil {
 		help.JsonError(w, "unexpected error, try again later", http.StatusInternalServerError, err)
-		fmt.Println("--------------db")
 		return
 	}
 

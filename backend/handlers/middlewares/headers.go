@@ -29,17 +29,3 @@ func EnableCORS(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
-// allowedOrigins := []string{
-// 	"http://localhost:3000",
-// 	"http://10.1.1.5:3000",
-// }
-
-// origin := r.Header.Get("Origin")
-// fmt.Println("here origin ", origin)
-// for _, allowedOrigin := range allowedOrigins {
-// 	if origin == allowedOrigin {
-// 		w.Header().Set("Access-Control-Allow-Origin", origin)
-// 		break
-// 	}
-// }
