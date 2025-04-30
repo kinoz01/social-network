@@ -42,7 +42,7 @@ func GetUser(r *http.Request) (*tp.User, error) {
 
 	token := cookie.Value
 	var session struct {
-		UserID    int
+		UserID    string
 		ExpiresAt time.Time
 	}
 

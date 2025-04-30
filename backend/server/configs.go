@@ -36,16 +36,7 @@ func InitialiseDB() {
 	db.DB.SetMaxOpenConns(10)                 // Simultaneously opened connections
 	db.DB.SetMaxIdleConns(5)                  // Reuse some opened connections
 	db.DB.SetConnMaxLifetime(5 * time.Minute) // Remove stale connections
-
-	// content, err := os.ReadFile("./database/schema.sql")
-	// if err != nil {
-	// 	log.Fatal("Failed to get database tables:", err)
-	// }
-
-	// if _, err := db.DB.Exec(string(content)); err != nil {
-	// 	log.Fatal("Failed to create database tables:", err)
-	// }
-
+	
 	runMigrations("./database/socNet.db")
 }
 

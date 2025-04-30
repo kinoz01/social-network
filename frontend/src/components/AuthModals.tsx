@@ -73,7 +73,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
             const responseData = await res.json();
 
             if (!res.ok) {
-                throw new Error(responseData.msg || "Signup failed");
+                if (!res.ok) throw new Error((await res.json()).msg);
             }
 
             console.log("Signup===>", responseData)
