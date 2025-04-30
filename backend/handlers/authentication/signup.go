@@ -10,6 +10,7 @@ import (
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 
+	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -104,9 +105,10 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	if accountType != "public" && accountType != "private" {
 		accountType = "public"
 	}
-
+	uuid := uuid.Must(uuid.NewV4())
 	// Build user struct
 	user := tp.User{
+		ID:          uuid.String(),
 		Email:       email,
 		Username:    username,
 		Password:    password,
@@ -116,20 +118,17 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		AboutMe:     aboutMe,
 		AccountType: accountType,
 	}
-
 	// Validate fields
 	if err := ValidateSignUp(user); err != nil {
 		help.JsonError(w, err.Error(), http.StatusNotAcceptable, err)
 		return
 	}
-
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		help.JsonError(w, "unexpected error, try again later", http.StatusInternalServerError, err)
 		return
 	}
-
 	// Save optional profile pic
 	profilePicPath := "avatar.webp"
 	if len(profilePic) > 0 {
@@ -146,9 +145,9 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Insert user
 	insertUser := `
-	INSERT INTO users (email, username, password, first_name, last_name, birthday, about_me, profile_pic, account_type)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-	_, err = tp.DB.Exec(insertUser, user.Email, user.Username, hashedPassword, user.FirstName, user.LastName, user.Bday, user.AboutMe, profilePicPath, user.AccountType)
+	INSERT INTO users (id, email, username, password, first_name, last_name, birthday, about_me, profile_pic, account_type)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	_, err = tp.DB.Exec(insertUser, user.ID, user.Email, user.Username, hashedPassword, user.FirstName, user.LastName, user.Bday, user.AboutMe, profilePicPath, user.AccountType)
 	if err != nil {
 		help.JsonError(w, "unexpected error, try again later", http.StatusInternalServerError, err)
 		return

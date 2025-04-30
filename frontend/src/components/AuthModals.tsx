@@ -68,10 +68,13 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                 body: signupData,
                 credentials: "include",
             });
-            if (!res.ok) throw new Error((await res.json()).msg);
 
-            localStorage.setItem("showWelcome", "true");
-            await handleLogin(e); // Auto-login and redirect
+            if (!res.ok) {
+                if (!res.ok) throw new Error((await res.json()).msg || "signup failed");
+            }
+
+            localStorage.setItem("showWelcome", "true")
+            await handleLogin(e)
         } catch (error: any) {
             setErrorMsg(error.message || "Signup failed.");
         }
