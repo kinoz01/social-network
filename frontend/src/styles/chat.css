@@ -1,0 +1,207 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body{
+    overflow: scroll;
+    background: rgb(255, 255, 255);
+}
+.chatContainer{
+    width: 100vw;
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chatBox {
+    width: 350px;
+    max-height: 600px;
+    background: rgb(46, 44, 44);
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border-radius: 10px;
+    
+}
+.chatBox::-webkit-scrollbar{
+    width: 0px; 
+}
+
+.userBox{
+    width: 100%;
+    background: rgba(82, 79, 79, 0.829); 
+    padding: 10px 0;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    overflow: hidden;
+    max-width: 350px;
+}
+.img-username{
+    display: flex;
+    align-items: center;
+    position: relative;
+    color: whitesmoke;
+    padding: 0 4px;
+
+}
+.img-username img{
+    width: 70px;
+    object-fit: cover;
+    vertical-align: middle;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+/* .img-username .connected {
+    display: block;
+    width: 15px;
+    height: 15px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    left: 50px;
+    bottom: 5px;
+} */
+
+.user-message {
+    flex-grow: 1;
+    min-width: 0;
+    max-width: 200px;
+}
+.user-message .message {
+    display: block;
+    width: 100%;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0;
+}
+.time-msgNumber{
+    margin-right: 8px;
+}
+.time-msgNumber .time{
+    font-size: 18px;
+    margin-bottom: 7px;
+    color: whitesmoke;
+    font-weight: 600;
+}
+
+
+.messageContainer{
+    background: rgb(46, 44, 44);
+    width: 500px;
+    height: 600px;
+    border-radius: 10px;
+    border: none;
+}
+.messageContainer .username-arrowLeft{
+    display:flex;
+    background: rgba(82, 79, 79, 0.829);
+    height: 60px;
+    align-items: center;
+    border-radius: 10px 10px 0 0;
+}
+.messageContainer .username-arrowLeft i {
+    align-items: center;
+    font-size: 30px;
+    padding: 10px 20px;
+    color: whitesmoke;
+}
+.messageContainer .username-arrowLeft div{
+    width: 100%;
+    text-align: center;
+    font-size: 26px;
+    padding: 10px 0;
+    color: whitesmoke;
+}
+.messageBox{
+    height: 465px;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+
+
+}
+.messageBox::-webkit-scrollbar {
+    width: 0px;
+}
+
+.messageBox .sender, .messageBox .receiver{
+    max-width: 340px;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+}
+.messageBox .sender{
+    background: orange;
+    align-self: flex-end;
+    margin-right: 10px;
+
+}
+.messageBox .receiver{
+    background: greenyellow;
+    margin-left: 10px;
+    align-self: flex-start;
+}
+.messageBox .sender span, .messageBox .receiver span{
+    display: block;
+    text-align: end;
+}
+.inputContainer{
+    background:  rgba(82, 79, 79, 0.829);
+    height: 56px;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 10px;
+}
+.inputContainer input:nth-child(1){
+    width: 80%;
+    font-size: 18px;
+    height: 45px;
+    border: none;
+    border-radius: 10px;
+    padding: 0 10px;
+    outline: none;
+}
+
+.inputContainer input:nth-child(2){
+    font-size: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: rgb(46, 44, 44);
+    color: whitesmoke;
+    cursor: pointer;
+}
+
+.date-separator {
+    text-align: center;
+    margin: 15px 0;
+    padding: 4px 10px;
+    border-radius: 10px;
+    display: inline-block;
+    font-size: 12px;
+    color: #e0e0e0;
+}
+
+
+@media (max-width: 480px) {
+    .messageContainer{
+        width: 90%;
+    }
+    .messageBox .sender, .messageBox .receiver{
+        max-width: 240px;
+    }
+    .inputContainer input:nth-child(1){
+        width: 70%;
+    }
+}
