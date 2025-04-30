@@ -1,7 +1,11 @@
 "use client";
 
-export default function LoadingSpinner() {    
+import "@/styles/spinner.css";
+
+export default function LoadingSpinner() {
     return (
-        <div className="spinner"></div>
+        <div className="loaderContainer">
+            <div className="loader"></div>
+        </div>
     );
 }

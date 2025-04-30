@@ -40,6 +40,7 @@ func InitialiseDB() {
 	runMigrations("./database/socNet.db")
 }
 
+// Applies database migrations using golang-migrate.
 func runMigrations(databasePath string) {
 	absPath, err := filepath.Abs("./database/migrations/sqlite")
 	if err != nil {

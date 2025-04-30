@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import { useLogout } from "@/lib/logout";
 
 export default function Home() {
+    const { handleLogout } = useLogout();
+
     useEffect(() => {
         if (localStorage.getItem("showWelcome") === "true") {
             localStorage.removeItem("showWelcome");
@@ -10,7 +13,15 @@ export default function Home() {
         }
     }, []);
 
-    return <h2>Hello World</h2>;
+    return (
+        <div>
+            <h2>Hello World</h2>
+            <button onClick={handleLogout} className="logout-button">
+                Logout
+            </button>
+        </div>
+    );
+
 }
 
 // Welcome Popup on signup
