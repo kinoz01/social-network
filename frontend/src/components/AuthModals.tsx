@@ -70,13 +70,11 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                 body: signupData,
                 credentials: "include",
             });
-            const responseData = await res.json();
 
             if (!res.ok) {
-                if (!res.ok) throw new Error((await res.json()).msg);
+                if (!res.ok) throw new Error((await res.json()).msg || "signup failed");
             }
 
-            console.log("Signup===>", responseData)
             localStorage.setItem("showWelcome", "true")
             await handleLogin(e)
         } catch (error: any) {
