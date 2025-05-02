@@ -5,13 +5,18 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	// Import the SQLite3 driver
+	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/mattn/go-sqlite3"
 
 	db "social-network/handlers/types"
+
+	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 // create/open DB and create tables if they aren't already created.
@@ -31,13 +36,30 @@ func InitialiseDB() {
 	db.DB.SetMaxIdleConns(5)                  // Reuse some opened connections
 	db.DB.SetConnMaxLifetime(5 * time.Minute) // Remove stale connections
 
-	content, err := os.ReadFile("./database/schema.sql")
+	runMigrations("./database/socNet.db")
+}
+
+// Applies database migrations using golang-migrate.
+func runMigrations(databasePath string) {
+	absPath, err := filepath.Abs("./database/migrations/sqlite")
 	if err != nil {
-		log.Fatal("Failed to get database tables:", err)
+		log.Fatalf("Could not get absolute path: %v", err)
 	}
 
-	if _, err := db.DB.Exec(string(content)); err != nil {
-		log.Fatal("Failed to create database tables:", err)
+	m, err := migrate.New(
+		"file://"+absPath,
+		"sqlite3://"+databasePath,
+	)
+	if err != nil {
+		log.Fatalf("Error loading migrations: %v", err)
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatalf("Migration failed: %v", err)
+	} else if err == migrate.ErrNoChange {
+		log.Println("No new migrations to apply")
+	} else {
+		log.Println("Migrations applied successfully")
 	}
 }
 
@@ -52,4 +74,21 @@ func Shutdown() {
 		log.Fatal("Error closing DB:", err)
 	}
 	os.Exit(0)
+}
+
+// Reallow users to send invitaion requests after 15 days.
+func ResetDBRoutine() {
+	for {
+		time.Sleep(15 * 24 * time.Hour)
+		log.Println("Running invitation cleanup...")
+		_, err := db.DB.Exec(`
+			DELETE FROM group_invitations
+			WHERE status = 'rejected'
+		`)
+		if err != nil {
+			log.Println("Cleanup error:", err)
+		} else {
+			log.Println("Invitation cleanup completed.")
+		}
+	}
 }

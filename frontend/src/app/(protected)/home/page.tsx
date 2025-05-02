@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useLogout } from "@/lib/logout";
+import Link from "next/link";
 
 export default function Home() {
+    const router = useRouter();
+    const { handleLogout } = useLogout();
+
     useEffect(() => {
         if (localStorage.getItem("showWelcome") === "true") {
             localStorage.removeItem("showWelcome");
@@ -10,7 +16,17 @@ export default function Home() {
         }
     }, []);
 
-    return <h2>Hello World</h2>;
+    return (
+        <div>
+            <h2>Hello World</h2>
+            <button onClick={handleLogout} className="logout-button">
+                Logout
+            </button>
+            <Link href="/groups-dashboard">
+                <button className="groups-button">Groups</button>
+            </Link>
+        </div>
+    );
 }
 
 // Welcome Popup on signup

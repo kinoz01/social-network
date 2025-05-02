@@ -18,7 +18,6 @@ check-nextjs:
 
 # Kill processes on ports 8080 (backend) and 3000 (frontend) if running
 kill-ports:
-	-docker-compose down --volumes --remove-orphans
 	@echo "Checking for running services on ports 8080 and 3000..."
 	@lsof -ti:8080 | xargs kill -9 2>/dev/null || echo "No process on port 8080"
 	@lsof -ti:3000 | xargs kill -9 2>/dev/null || echo "No process on port 3000"
@@ -46,6 +45,7 @@ run: check-npm check-nextjs kill-ports run-backend run-frontend
 
 #------------------------- Docker -------------------------#
 buildDocker: kill-ports
+	-docker-compose down --volumes --remove-orphans
 	docker-compose up --build
 
 # Stop and remove backend and frontend containers
@@ -61,3 +61,28 @@ deepClean:
 	-docker rm $$(docker ps -aq)
 	-docker rmi $$(docker images -q)
 	-docker system prune -a -f --volumes
+
+#------------------------- Docker -------------------------#
+
+#------------------------ Migration -----------------------#
+# Check if golang-migrate is installed
+check-migrate:
+	@command -v migrate >/dev/null 2>&1 || { \
+		echo "🔴 golang-migrate is not installed."; \
+		echo "➡️  Install from: https://github.com/golang-migrate/migrate"; \
+		echo "➡️  Or use: curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz"; \
+		echo "and: sudo mv migrate /usr/local/bin/"; \
+		exit 1; \
+	}
+	@echo "golang-migrate is installed."
+
+# Create SQLite migration files for all tables
+migrate-sqlite:
+	- check-migrate
+	@echo "Creating migrations in ./backend/database/migrations/sqlite"
+	@tables="users sessions posts comments follow_requests post_privacy like_reaction private_chats groups group_users group_chats group_events event_responses notifications"; \
+	for t in $$tables; do \
+		echo "- creating $$t"; \
+		migrate create -seq -ext sql -dir "./backend/database/migrations/sqlite" "create_$${t}_table"; \
+	done; \
+	echo "Created $$(echo $$tables | wc -w) table migrations"
