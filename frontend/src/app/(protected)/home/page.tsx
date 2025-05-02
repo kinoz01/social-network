@@ -17,13 +17,6 @@ export default function Home() {
     }, []);
 
     return (
-        // <div>
-        //     <h2>Hello World</h2>
-        //     <button onClick={handleLogout} className="logout-button">
-        //         Logout
-        //     </button>
-        // </div>
-
         <div className="mainContent home">
             <LeftMenu type="home" />
             <Feed type="home" />

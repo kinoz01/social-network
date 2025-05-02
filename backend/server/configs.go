@@ -36,7 +36,7 @@ func InitialiseDB() {
 	db.DB.SetMaxOpenConns(10)                 // Simultaneously opened connections
 	db.DB.SetMaxIdleConns(5)                  // Reuse some opened connections
 	db.DB.SetConnMaxLifetime(5 * time.Minute) // Remove stale connections
-
+	
 	runMigrations("./database/socNet.db")
 }
 
