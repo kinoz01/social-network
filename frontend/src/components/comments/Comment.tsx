@@ -1,5 +1,5 @@
 import Image from "next/image";
-import styles from "../../app/page.module.css";
+import styles from "../posts/posts.module.css";
 
 export default function Comment() {
   return (

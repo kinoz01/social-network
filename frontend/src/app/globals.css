@@ -16,6 +16,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--color1);
+  overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -45,7 +46,7 @@ body {
   padding: 0;
   font-family: system-ui, sans-serif;
   background-color: var(--color1);
-  font-size: clamp(1rem, 1.2vw, 1.5rem);
+  font-size: clamp(1rem, 1.2rem, 1.5rem);
 }
 
 .mainContent {
@@ -66,7 +67,7 @@ body {
 .sideBar {
   width: 10%;
   height: 100%;
-  padding: 2rem;
+  padding: 3rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -83,7 +84,7 @@ body {
 }
 
 .sideBar:hover {
-  width: 13rem;
+  width: 18rem;
 }
 
 .logo {
@@ -134,8 +135,10 @@ body {
   justify-content: flex-start;
   align-items: center;
   border: 1px solid var(--color4);
+  background-color: transparent;
   border-radius: 50px;
   transition: all 0.5s ease;
+  cursor: pointer;
 }
 
 .navSection span {
@@ -157,29 +160,83 @@ body {
   fill: var(--color1);
 }
 
-.createPopup {
+/* Create Button */
+.create {
+  position: absolute;
+  right: 5%;
+  bottom: 5%;
+  width: 60px;
+  height: 60px;
+  z-index: 10;
+}
+
+.create .icon {
   position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
+  right: 5%;
+  bottom: 5%;
+  width: 60px;
+  height: 60px;
   z-index: 10;
-  background-color: rgba(0, 0, 0, 0.411);
+  border-radius: 50%;
+  border: none;
+  background-color: var(--color5);
+  padding: 1rem;
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+  transition: all 0.2s ease;
+  fill: var(--color1);
+}
+
+.create:hover .icon {
+  box-shadow: rgba(0, 0, 0, 0.45) 25px 0px 20px -20px;
+  transform: rotate(90deg) scale(1.1);
+}
+
+.createButtons button:hover {
+  box-shadow: rgba(0, 0, 0, 0.45) 25px 0px 20px -20px;
+  transform: scale(1.1);
+  width: 8rem;
+}
+
+.createButtons {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  align-items: center;
+  gap: 1rem;
+  right: 0;
+  bottom: 100px;
+  transition: all 0.2s ease;
+}
+
+.createButtons button {
+  width: 100px;
+  padding: 0.5rem;
+  border-radius: 25px;
+  border: none;
+  background-color: var(--color5);
+  color: var(--color1);
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 15px 25px -10px;
+  transition: all 0.2s ease;
 }
 
 .buttons {
   width: 100%;
+  background-color: var(--color2);
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 10;
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   margin: 0 auto;
   padding: 0.5rem;
-  border-radius: 15px;
 }
 
 .buttons button {
@@ -191,7 +248,7 @@ body {
   color: var(--color2);
   cursor: pointer;
   height: 3rem;
-  width: 8rem;
+  width: 7rem;
   text-wrap: nowrap;
 }
 
@@ -203,14 +260,96 @@ body {
 }
 
 @media (max-width: 1440px) {
+  .buttons button {
+    width: 100%;
+  }
+
   .sideBar:hover {
     width: 16rem;
   }
+
+  /* .post {
+    font-size: clamp(1rem, 1.2vw, 1.2rem);
+    padding: 1.5rem;
+  } */
 }
 
 @media (max-width: 900px) {
-  .mainContent.chat {
+  .buttons button {
+    width: 100%;
+  }
+
+  /* .rightMenu {
+    width: 30%;
+    right: 20px;
+  }
+
+  .leftMenu .home {
+    display: none;
+  } */
+
+  /* .feed {
+    width: 70%;
+  } */
+
+  .mainContent.chat,
+  .mainContent.group {
     flex-wrap: wrap;
     width: 90%;
   }
+
+  .buttons {
+    background-color: #ddff8e;
+    width: auto;
+    height: 100%;
+    flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 700px) {
+  /* .rightMenu {
+    display: none;
+  } */
+
+  /* .feed {
+    width: 100%;
+  } */
+}
+
+@media (max-width: 500px) {
+  /* .sideBar {
+    border-radius: 0 25px 25px 0;
+    padding: 2rem;
+    position: fixed;
+    background-color: var(--color1);
+    z-index: 1;
+  } */
+
+  /* .post {
+    font-size: small;
+  }
+
+  .postImage {
+    height: 10rem;
+  } */
+
+  /* .feed {
+    width: 100%;
+  } */
+  /* .main {
+    height: auto;
+  } */
+
+  /* .mainContent {
+    border-radius: 0;
+    height: auto;
+    width: 90%;
+    margin-left: 3rem;
+    padding: 0.5rem;
+  } */
+
+  /* .feed {
+    overflow: hidden;
+    height: 100%;
+  } */
 }

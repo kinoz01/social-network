@@ -1,5 +1,9 @@
-export default  function Loading(){
+import LoadingSpinner from "@/components/Loadings"
+
+function Loading() {
     return (
-        <div>Loading...</div>
+        <LoadingSpinner />
     )
 }
+
+export default Loading

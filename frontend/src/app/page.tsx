@@ -1,13 +1,8 @@
-import Feed from "@/components/posts/Feed";
-import RightMenu from "@/components/menus/RightMenu";
-import LeftMenu from "@/components/menus/LeftMenu";
+import { requireSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default async function Home() {
-  return (
-    <div className="mainContent home">
-      <LeftMenu type="home" />
-      <Feed />
-      <RightMenu />
-    </div>
-  );
+export default async function Index() {
+    await requireSession();
+    // If we reach here, session is valid
+    redirect("/home")
 }

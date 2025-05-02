@@ -33,11 +33,6 @@
   gap: 1rem;
 }
 
-.endsAt {
-  width: 100%;
-  text-align: end;
-}
-
 .button {
   padding: 1rem;
   border: none;

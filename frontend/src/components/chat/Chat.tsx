@@ -1,5 +1,5 @@
 import styles from "./chat.module.css";
-import { HomeIcon } from "../icons";
+import { HomeIcon, SendIcon } from "../icons";
 import Message from "./Message";
 
 function Chat() {
@@ -14,7 +14,7 @@ function Chat() {
             <form className={styles.chatForm}>
                 <input type="text" placeholder="Send a message..." />
                 <button className={styles.sendBtn}>
-                    <HomeIcon />
+                    <SendIcon />
                 </button>
             </form>
         </div >

@@ -6,13 +6,19 @@ import {
   ChatsIcon,
   GroupsIcon,
   HomeIcon,
+  LogoutIcon,
   NotificationIcon,
   UserIcon,
 } from "./icons";
 import Link from "next/link";
+import AddPost from "./posts/AddPost";
+import { useLogout } from "@/lib/logout";
 
 export default function SideBar() {
   const [hover, setHover] = useState(false);
+
+  const { handleLogout } = useLogout();
+
 
 
   return (
@@ -25,15 +31,23 @@ export default function SideBar() {
         setHover(false);
       }}
     >
-
-      <div className="logo">SN</div>
+      <Link href="/home">
+        <div className="logo">SN</div>
+      </Link>
       <div className="navIcons">
-        <Link href="/" className="navSection">
+        <Link href="/home" className="navSection">
           <HomeIcon />
           {hover ? <span>Home</span> : null}
         </Link>
-
-        <Link href="/groups" className="navSection">
+        <div className="navSection">
+          <UserIcon />
+          {hover ? (
+            <Link href="/profile/1">
+              <span>Profile</span>
+            </Link>
+          ) : null}
+        </div>
+        <Link href="/groups/1" className="navSection">
           <GroupsIcon />
           {hover ? <span>Groups</span> : null}
         </Link>
@@ -45,26 +59,14 @@ export default function SideBar() {
           <ChatsIcon />
           {hover ? <span>Chats</span> : null}
         </Link>
-        <div className="navSection" >
-          {/* Add new icon */}
-          <AddIcon />
-          {hover ? <span>New post</span> : null}
-        </div>
-        <div className="navSection" >
-          {/* Add new icon */}
-          <AddIcon />
-          {hover ? <span>New Group</span> : null}
-        </div>
-      </div>
-      <div className="navSection">
-        <UserIcon />
-        {hover ? (
-          <Link href="/profile/1">
-            <span>Profile</span>
-          </Link>
-        ) : null}
-      </div>
 
-    </div >
+      </div>
+      <button className="navSection" onClick={handleLogout}>
+        <LogoutIcon />
+        {hover ? (
+          <span>Logout</span>
+        ) : null}
+      </button>
+    </div>
   );
 }

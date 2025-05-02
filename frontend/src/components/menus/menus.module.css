@@ -1,16 +1,29 @@
 /* rigth menu */
 .rightMenu,
 .leftMenu {
+  border-radius: 15px;
+  border: 1px solid var(--color1);
   background-color: transparent;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 8;
+  gap: 1rem;
   width: 30%;
-  height: 100%;
   overflow-y: auto;
   scrollbar-width: none;
+  font-size: clamp(1rem, 1.2rem, 1.3rem);
+}
+
+.List {
+  overflow: hidden;
+}
+
+.List .profileCard {
+  height: 50%;
+}
+
+.List:not(.event):not(:last-of-type) {
+  border-bottom: 1px solid var(--color1);
 }
 
 .header {
@@ -22,7 +35,6 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 1rem;
   width: 100%;
   height: 3rem;
   background-color: var(--color2);
@@ -42,28 +54,19 @@
 }
 
 .List {
-  border-radius: 15px;
   width: 100%;
   overflow-y: auto;
   scrollbar-width: none;
 }
 
-.List:not(.groups) {
-  border: 1px solid black;
-}
-
-.List.event {
-  border: none;
-}
-
 .users {
-  padding: 0.8rem 0.5rem;
+  width: 100%;
+  padding: 1.2rem 0.5rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  width: 100%;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -73,14 +76,14 @@
 }
 
 .ListItem {
-  font-size: clamp(0.8rem, 0.9rem, 1.2rem);
+  font-size: clamp(0.8rem, 1rem, 1.4rem);
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: 10px;
   transition: all 0.2s ease;
 }
@@ -91,8 +94,8 @@
 }
 
 .ListItem .userIcon {
-  width: 30px;
-  height: 30px;
+  width: clamp(30px, 40px, 70px);
+  height: clamp(30px, 40px, 70px);
   object-fit: cover;
   flex-shrink: 0;
   border-radius: 50%;
@@ -107,12 +110,8 @@
   gap: 8;
 }
 
-.ListItemName {
-  color: #1a1a1a;
-}
-
 .options {
-  width: 3rem;
+  width: 6rem;
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -120,16 +119,37 @@
 }
 
 /* GROUP LIST */
+.leftMenu.chat {
+  height: 100%;
+}
 
 .leftMenu.groups {
-  width: 100%;
   height: 100%;
 
-  .header {
-    display: none;
+  .groups {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    overflow-y: auto;
+    scrollbar-width: none;
   }
 
-  .users,
+  .List.groups {
+    width: 100%;
+    height: 100%;
+  }
+
+  .ListItem {
+    font-size: clamp(1rem, 1.2rem, 1.5rem);
+    padding: 1rem;
+    margin: 0.3rem 0.5rem;
+    border: 1px solid var(--color1);
+  }
+
+  /* .users,
   .events {
     padding: 0.8rem 0.5rem;
     display: flex;
@@ -137,13 +157,13 @@
     align-items: center;
     gap: 1rem;
     width: 100%;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
-  }
+  } */
 
-  .groupEvent {
+  /* .groupEvent {
     font-size: clamp(0.8rem, 0.9rem, 1.2rem);
     display: flex;
     flex-wrap: nowrap;
@@ -154,14 +174,14 @@
     padding: 0.5rem;
     border-radius: 10px;
     transition: all 0.2s ease;
-  }
+  } */
 
-  .groupEvent:hover {
+  /* .groupEvent:hover {
     background-color: var(--color5);
     transform: translateY(-10px);
-  }
+  } */
 
-  .groupEvent .userIcon {
+  /* .groupEvent .userIcon {
     width: 30px;
     height: 30px;
     object-fit: cover;
@@ -169,7 +189,6 @@
     border-radius: 50%;
   }
 
-  .ListItem,
   .groupEvent {
     background-color: var(--color5);
     width: auto;
@@ -177,29 +196,20 @@
     justify-content: center;
     border: none;
     height: 5rem;
-  }
+  } */
 
-  .ListItem .userIcon {
+  /* .ListItem .userIcon {
     width: 50px;
     height: 50px;
-  }
+  } */
 
-  .options {
+  /* .options {
     display: none;
   }
 
-  .List.groups {
-    width: 100%;
-    height: 100%;
-  }
-
-  .groups {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-  }
+  
+/* 
+ 
 
   .groupCard {
     border: 1px solid black;
@@ -209,9 +219,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-  }
+  } */
 
-  .groupName {
+  /* .groupName {
     height: 10rem;
     padding: 4.3rem 0.5rem;
     background-color: var(--color1);
@@ -224,9 +234,9 @@
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
-  }
+  } */
 
-  .groupCard .groupName,
+  /* .groupCard .groupName,
   .groupCard .groupUsers,
   .groupCard .groupEvents {
     border: 1px solid black;
@@ -241,34 +251,34 @@
     justify-content: space-between;
     align-items: center;
     height: 10rem;
-    width: 40%;
-  }
+    width: 13rem;
+  } */
 }
 
 /* EVENTS LIST */
+.List.event {
+  .header {
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
+  }
 
-.List.event .header {
-  padding: 0;
-  background-color: transparent;
-  border-radius: 0;
-}
-
-.List.event .users {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  grid-auto-rows: auto;
-  width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border: 1px solid var(--color1);
-  border-radius: 15px;
+  .users {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-auto-rows: auto;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid var(--color1);
+    border-radius: 15px;
+  }
 }
 
 /* USER SECTION */
-.userSection {
+.profileCard {
+  background-color: var(--color2);
   padding: 1rem;
-  border: 1px solid var(--color1);
-  border-radius: 15px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -276,10 +286,10 @@
   text-align: center;
   gap: 1rem;
   width: 100%;
-  height: 21rem;
+  border-bottom: 1px solid var(--color1);
 }
 
-.userSection .userSectionHeader {
+.profileCard .profileCardHeader {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -289,25 +299,17 @@
   width: 100%;
 }
 
-.userSection .numbers {
+.username {
+  width: 100%;
+}
+
+.profileCard .numbers {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   text-align: center;
   gap: 1rem;
-}
-
-.buttons .button {
-  width: 100%;
-  padding: 0.4rem;
-  margin: 1rem auto;
-  border: 1px solid var(--color1);
-  border-radius: 15px;
-  transition: all 0.2s ease;
-  background-color: #000;
-  color: var(--color2);
-  cursor: pointer;
 }
 
 .userImage {
@@ -315,16 +317,11 @@
   border: 1px solid var(--color1);
 }
 
-/* @media (max-width: 1440px) {
-    .sideBar:hover {
-      width: 16rem;
-    }
-  
-    .post {
-      font-size: clamp(1rem, 1.2vw, 1.2rem);
-      padding: 1.5rem;
-    }
-  } */
+@media (max-width: 1200px) {
+  .profileCardDesc {
+    display: none;
+  }
+}
 
 @media (max-width: 900px) {
   .rightMenu {
@@ -332,20 +329,31 @@
     right: 20px;
   }
 
-  .leftMenu.home {
-    width: 100%;
+  .rightMenu {
     display: none;
-    background-color: azure;
+  }
+
+  .leftMenu.home {
+    width: 40%;
   }
 
   .leftMenu.chat {
-    width: 100%;
-    height: 6rem;
+    height: auto;
+  }
 
-    .List.suggestions {
-      display: none;
-      background-color: #1a1a1a;
+  /* PRIVATE CHAT MENU */
+  .leftMenu.chat {
+    width: 100%;
+
+    .menuSection {
+      height: 100%;
+      border: none;
     }
+
+    .menuSection:last-of-type {
+      display: none;
+    }
+
     .List .header {
       display: none;
     }
@@ -357,6 +365,8 @@
 
     .users {
       width: 100%;
+      align-items: center;
+      height: 100%;
       flex-wrap: nowrap;
       overflow-x: auto;
       overflow-y: hidden;
@@ -381,48 +391,8 @@
   }
 }
 
-@media (max-width: 700px) {
-  .rightMenu {
+@media (max-width: 800px) {
+  .leftMenu {
     display: none;
   }
 }
-/*   
-  @media (max-width: 500px) {
-    .sideBar {
-      border-radius: 0 25px 25px 0;
-      padding: 2rem;
-      position: fixed;
-      background-color: var(--color1);
-      z-index: 1;
-    }
-  
-    .post {
-      font-size: small;
-    }
-  
-    .postImage {
-      height: 10rem;
-    }
-  
-    .feed {
-      width: 100%;
-    }
-    
-    .main {
-      height: auto;
-    }
-  
-    .mainContent {
-      border-radius: 0;
-      height: auto;
-      width: 90%;
-      margin-left: 3rem;
-      padding: 0.5rem;
-    }
-  
-    .feed {
-      overflow: hidden;
-      height: 100%;
-    }
-  }
-   */
