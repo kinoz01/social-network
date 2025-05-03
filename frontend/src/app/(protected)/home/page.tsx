@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 import { useLogout } from "@/lib/logout";
+import LeftMenu from "@/components/menus/LeftMenu";
+import RightMenu from "@/components/menus/RightMenu";
+import Feed from "@/components/posts/Feed";
 
 export default function Home() {
     const { handleLogout } = useLogout();
@@ -14,11 +17,10 @@ export default function Home() {
     }, []);
 
     return (
-        <div>
-            <h2>Hello World</h2>
-            <button onClick={handleLogout} className="logout-button">
-                Logout
-            </button>
+        <div className="mainContent home">
+            <LeftMenu type="home" />
+            <Feed type="home" />
+            <RightMenu />
         </div>
     );
 
