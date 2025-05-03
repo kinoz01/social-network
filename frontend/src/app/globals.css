@@ -294,7 +294,6 @@ body {
 
   .mainContent.chat,
   .mainContent.group {
-    flex-wrap: wrap;
     width: 90%;
   }
 
