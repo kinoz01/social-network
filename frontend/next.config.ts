@@ -6,11 +6,22 @@ const nextConfig: NextConfig = {
   /* config options here */
   env: {
     NEXT_PUBLIC_API_URL: isFly
-      ? "https://myflywebsite.com"  // Fly.io uses production API
+      ? "https://myflywebsite.com" // Fly.io uses production API
       : "http://localhost:8080", // Local development
   },
+
   images: {
-    domains: ["https://myflywebsite.com", "localhost"], // or whatever NGINX/proxy domain serves your images
+    domains: ["https://myflywebsite.com", "localhost"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+    ],
   },
 };
 

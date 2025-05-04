@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useLogout } from "@/lib/logout";
-import Link from "next/link";
+import LeftMenu from "@/components/menus/LeftMenu";
+import RightMenu from "@/components/menus/RightMenu";
+import Feed from "@/components/posts/Feed";
 
 export default function Home() {
-    const router = useRouter();
     const { handleLogout } = useLogout();
 
     useEffect(() => {
@@ -17,16 +17,13 @@ export default function Home() {
     }, []);
 
     return (
-        <div>
-            <h2>Hello World</h2>
-            <button onClick={handleLogout} className="logout-button">
-                Logout
-            </button>
-            <Link href="/groups-dashboard">
-                <button className="groups-button">Groups</button>
-            </Link>
+        <div className="mainContent home">
+            <LeftMenu type="home" />
+            <Feed type="home" />
+            <RightMenu />
         </div>
     );
+
 }
 
 // Welcome Popup on signup

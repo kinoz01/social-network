@@ -1,5 +1,3 @@
-"use client";
-
 import "@/styles/spinner.css";
 
 export default function LoadingSpinner() {

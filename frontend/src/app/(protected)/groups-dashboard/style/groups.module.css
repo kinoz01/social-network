@@ -1,91 +1,8 @@
 .groupsLayout {
-    display: flex;
+    display: block;
     min-height: 100vh;
-}
-
-.sidebar {
-    width: 60px;
-    background: black;
-    color: white;
-    padding: 1rem;
-    transition: width 0.3s ease;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 2rem;
-    z-index: 10;
-}
-
-.sidebar:hover {
-    width: 160px;
-}
-
-.sidebar.open {
-    width: 180px;
-}
-
-.bottomLinks {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1rem;
-    gap: 1.5rem;
-}
-
-.menuItem {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: white;
-    font-family: 'Zain', sans-serif;
-    white-space: nowrap;
-}
-
-.iconContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease;
-}
-
-.menuItem:hover .iconContainer {
-    transform: scale(1.2);
-}
-
-.menuText {
-    display: inline-block;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    font-family: 'Zain', sans-serif;
-    color: white;
-    text-decoration: none;
-    font-size: 1.4rem;
-    margin-top: 5px;
-}
-
-.sidebar:hover .menuText {
-    opacity: 1;
-}
-
-.menuText:hover {
-    color: #bebebe;
-}
-
-.sidebarToggle {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: none;
-    border: none;
-    color: black;
-    z-index: 20;
-    display: none;
+    width: 100%;
+    overflow-y: scroll; 
 }
 
 /**************************************** Groups GRID CARDS *********************************************/
@@ -131,6 +48,8 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    min-width: 0;
+    width: 100%;
 }
 
 .groupCard h3 {
@@ -270,10 +189,7 @@
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        display: none;
-    }
-
+   
     .open {
         display: flex;
         position: fixed;

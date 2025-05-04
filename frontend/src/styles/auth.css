@@ -9,8 +9,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), 
-                url('https://i.postimg.cc/vHrFddXr/bgbg.png');
+    background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+        url('https://i.postimg.cc/vHrFddXr/bgbg.png');
     backdrop-filter: blur(30px);
     z-index: 1000;
 }

@@ -21,7 +21,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     background-color: #fff;
-    color: rgba(45, 153, 255, 0.92);
+    color: rgba(34, 34, 34, 0.92);
     padding: 2rem 2.5rem;
     font-size: 1.3rem;
     font-weight: bold;
