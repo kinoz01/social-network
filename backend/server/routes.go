@@ -26,6 +26,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/signup", rl.RateLimitMW(http.HandlerFunc(auth.SignUpHandler)))
 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
+	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

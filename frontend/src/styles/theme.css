@@ -1,60 +1,48 @@
 :root {
-    /*** Blues ***/
-    --body-bg: rgb(210, 229, 247);
-    --body-bg2: #e5edff;
-    /* #def; rgb(221, 237, 255);*/
-    --light-blue: #83dafd;
-    --title-color: #4398e7;
-    --title-color-hvr: #0084ff;
-    --submit-btn: #0079d3;
-    --nav-btn: #1ad1ff;
-    --nav-btn-hvr: #3eacf5;
-    --nav-menu-hvr: #61c8f8;
-    --tag-pill: #adceff;
-    --action-btn: rgb(210, 229, 247);;
+    --body-bg: url('https://i.postimg.cc/vHrFddXr/bgbg.png');
+    --body-bg2: #ffffff;
+    --light-black: #1d1d1d;
+    --title-color: #212529;
+    --title-color-hvr: #1d1d1d;
+    --submit-btn: #1f1f1f;
+    --nav-btn: #6c757d;
+    --nav-btn-hvr: #495057;
+    --nav-menu-hvr: #dee2e6;
+    --tag-pill: #ced4da;
+    --action-btn: #f1f3f5;
 
-    --profile-bg: url('https://i.postimg.cc/1XCwNjhF/cover.png');
-
-
-    /*** Whites-Greys ***/
     --white: #ffffff;
-    --modal-input-bg: #fff;
-    --theme-toggle: #fefefe;
-    --suggestion-list: #eee;
-    --border-white: #bbb;
-    --submit-grey: #ccc;
-    --border-grey: #c4c4c4;
+    --modal-input-bg: #ffffff;
+    --theme-toggle: #e9ecef;
+    --suggestion-list: #f1f3f5;
+    --border-white: #dee2e6;
+    --submit-grey: #ced4da;
+    --border-grey: #adb5bd;
 
+    --light-grey: #6c757d;
+    --tagclose-btn: #343a40;
+    --filter-title: #212529;
+    --content-grey: #343a40;
+    --grey-mr: #495057;
+    --dark-grey: #212529;
 
-    /*** Grey Texts ***/
-    --light-grey: #7e7e7e;
-    --tagclose-btn: #646464;
-    --filter-title: #3f3f3f;
-    --content-grey: #333;
-    /* #353535; */
-    --grey-mr: #252525;
-    --dark-grey: #111;
+    --trans-modal: rgba(0, 0, 0, 0.25);
+    --post-card-shadow: rgba(0, 0, 0, 0.05);
+    --notif-shadow: rgba(0, 0, 0, 0.1);
+    --navBar-shadow: rgba(0, 0, 0, 0.05);
+    --navMenu-shadow: rgba(0, 0, 0, 0.03);
 
+    --msgreceived: #d1e7dd;
+    --msgtxt: #212529;
+    --msgsent: #e2e3e5;
 
-    /*** Shadows ***/
-    --trans-modal: rgba(0, 0, 0, 0.5);
-    --post-card-shadow: rgba(104, 104, 104, 0.315);
-    --notif-shadow: rgba(0, 0, 0, 0.2);
-    --navBar-shadow: rgba(0, 0, 0, 0.1);
-    --navMenu-shadow: rgba(0, 0, 0, 0.05);
-
-    --msgreceived: greenyellow;
-    --msgtxt : rgb(37, 37, 37);
-    --msgsent: rgb(199, 217, 240);
-
-    /*** Reds ***/
-    --noscript-bg: #fcf0f0;
-    --noscript-red: rgb(250, 99, 99);
-    --notification-red: #ff4d4d;
-    --red-color: red;
-    --error-red: rgb(207, 25, 25);
-    --orange: orange;
-    --orange-hvr: rgb(255, 72, 0);
+    --noscript-bg: #fff4f4;
+    --noscript-red: #dc3545;
+    --notification-red: #ff6b6b;
+    --red-color: #dc3545;
+    --error-red: #b02a37;
+    --orange: #fd7e14;
+    --orange-hvr: #e8590c;
 }
 
 
@@ -129,7 +117,7 @@
     --navMenu-shadow: rgba(0, 0, 0, 0.08);
 
     --msgreceived: greenyellow;
-    --msgtxt : rgb(37, 37, 37);
+    --msgtxt: rgb(37, 37, 37);
     --msgsent: rgb(141, 186, 238);
 
     /*** Reds ***/

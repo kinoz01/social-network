@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -95,10 +96,27 @@ func CreateSession(w http.ResponseWriter, user *tp.User) error {
 		Name:     "session_token",
 		Value:    token,
 		Expires:  expiresAt,
-		HttpOnly: true,  
+		HttpOnly: true,
 		Path:     "/",
 	}
 
 	http.SetCookie(w, cookie)
 	return nil
+}
+
+// API for fetching the logged-in user's information
+func GetUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		helpers.JsonError(w, "Method not allowed", http.StatusMethodNotAllowed, nil)
+		return
+	}
+
+	user, err := GetUser(r)
+	if err != nil {
+		helpers.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
