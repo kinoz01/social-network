@@ -34,8 +34,12 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/groups/create", grps.CreateGroupHandler)
 	mux.HandleFunc("/api/groups/owned", grps.GetOwnedGroups)
 	mux.HandleFunc("/api/groups/joined", grps.GetJoinedGroups)
-	mux.HandleFunc("/api/groups/available", grps.GetAvailableGroups)
-	
+	mux.HandleFunc("/api/groups/available", grps.AvailableGroupsHandler)
+	mux.HandleFunc("/api/groups/join-request", grps.JoinRequestHandler)
+	mux.HandleFunc("/api/groups/accept-invitation", grps.AcceptInvitationHandler)
+	mux.HandleFunc("/api/groups/refuse-invitation", grps.RefuseInvitationHandler)
+	mux.HandleFunc("/api/groups/invitations", grps.InvitationsHandler)
+
 	// Following:
 	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)
 

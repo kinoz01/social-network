@@ -3,14 +3,14 @@ package follows
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
+	"strings"
 
 	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
 
-// GET /api/followers get followers of the current user.
+// GET /api/followers get followers of the current user by a search query.
 func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 	/* ---------- current user ---------- */
 	user, err := auth.GetUser(r)
@@ -21,20 +21,37 @@ func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 
 	/* ---------- query params ---------- */
 	status := r.URL.Query().Get("status")
-	if status != "pending" && status != "rejected" {
-		status = "accepted" // fallback
+	switch status {
+	case "pending", "rejected", "accepted":
+		// keep as‑is
+	default:
+		status = "accepted"
 	}
-	offset := parseIntDefault(r.URL.Query().Get("offset"), 0)
-	limit := parseIntDefault(r.URL.Query().Get("limit"), 100)
 
-	/* ---------- DB query ---------- */
-	rows, err := tp.DB.Query(`
+	q := strings.TrimSpace(r.URL.Query().Get("query")) // search text
+
+	/* ---------- build SQL Query ---------- */
+	base := `
 		SELECT u.id, u.first_name, u.last_name, u.profile_pic
 		FROM follow_requests f
 		JOIN users u ON u.id = f.follower_id
-		WHERE f.followed_id = ? AND f.status = ?
-		LIMIT ? OFFSET ?`,
-		user.ID, status, limit, offset)
+		WHERE f.followed_id = ? AND f.status = ?`
+
+	args := []any{user.ID, status}
+
+	if q != "" {
+		base += ` AND (
+			   u.first_name LIKE ? COLLATE NOCASE OR
+			   u.last_name  LIKE ? COLLATE NOCASE OR
+			   u.username   LIKE ? COLLATE NOCASE
+			)`
+		pattern := "%" + q + "%"
+		args = append(args, pattern, pattern, pattern)
+	}
+
+	base += ` ORDER BY u.first_name, u.last_name`
+
+	rows, err := tp.DB.Query(base, args...)
 	if err != nil {
 		help.JsonError(w, "Database error", http.StatusInternalServerError, err)
 		return
@@ -58,15 +75,17 @@ func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 		list = append(list, f)
 	}
 
+	/* ---- no follower matched the query ---- */
+	if len(list) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound) // 404
+		json.NewEncoder(w).Encode(map[string]string{
+			"msg": "User not found",
+		})
+		return
+	}
+
+	/* ---- success ---- */
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(list)
-}
-
-// correcting query params
-func parseIntDefault(s string, def int) int {
-	n, err := strconv.Atoi(s)
-	if err != nil || n < 0 {
-		return def
-	}
-	return n
 }

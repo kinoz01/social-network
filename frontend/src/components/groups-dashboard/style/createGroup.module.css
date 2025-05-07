@@ -223,3 +223,55 @@
     color: #f73c3c;
     font-size: 1.2rem;
 }
+
+
+.selectedBox {
+    max-height: 160px;
+    /* tweak as you like */
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 4px;
+    margin-top: 4px;
+}
+
+.resultsBox {
+    max-height: 160px;
+    min-height: 160px;
+    /* tweak as you like */
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 4px;
+    margin-top: 4px;
+}
+
+.invitedRow,
+.resultRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 2px;
+}
+
+.resultRow {
+    cursor: pointer;
+}
+.resultRow:hover {
+    background: #e5e7eb;
+}
+
+.removeBtn,
+.selectBtn {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+
+.removeBtn:hover {
+    color: #ef4444;
+}

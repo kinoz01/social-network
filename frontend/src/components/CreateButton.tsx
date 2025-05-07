@@ -3,15 +3,12 @@
 import { useState } from "react";
 import { CreateIcon } from "./icons";
 import AddPost from "./posts/AddPost";
-import CreateGroupModal from "../app/(protected)/groups-dashboard/components/CreateGroup";
+import CreateGroupModal from "./groups-dashboard/CreateGroup";
 
 function CreateButton() {
   const [create, setCreate] = useState(false);
   const [newPost, setNewPost] = useState(false);
   const [newGroup, setNewGroup] = useState(false);
-
-  console.log("create: ", create);
-  console.log("newPost: ", newPost);
 
   const close = () => {
     newPost ?

@@ -65,7 +65,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	/* ---------- insert group ---------- */
 	groupID := uuid.Must(uuid.NewV4()).String()
 	_, err = tp.DB.Exec(`
-		INSERT INTO groups (id, groups_name, group_owner, description, group_pic)
+		INSERT INTO groups (id, group_name, group_owner, description, group_pic)
 		VALUES (?,?,?,?,?)`,
 		groupID, groupName, user.ID, description, picPath)
 	if err != nil {
@@ -96,13 +96,36 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer rows.Close()
 
+		tx, err := tp.DB.Begin()
+		if err != nil {
+			help.JsonError(w, "Failed to begin transaction", http.StatusInternalServerError, err)
+			return
+		}
+		stmt, err := tx.Prepare(`
+    		INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
+    		VALUES (?, ?, ?)`)
+		if err != nil {
+			tx.Rollback()
+			help.JsonError(w, "Failed to prepare statement", http.StatusInternalServerError, err)
+			return
+		}
+		defer stmt.Close()
+
 		for rows.Next() {
 			var id string
 			if err := rows.Scan(&id); err == nil {
-				_, _ = tp.DB.Exec(`
-					INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
-					VALUES (?,?,?)`, uuid.Must(uuid.NewV4()).String(), groupID, id)
+				_, err := stmt.Exec(uuid.Must(uuid.NewV4()).String(), groupID, id)
+				if err != nil {
+					tx.Rollback()
+					help.JsonError(w, "Insert failed", http.StatusInternalServerError, err)
+					return
+				}
 			}
+		}
+
+		if err := tx.Commit(); err != nil {
+			help.JsonError(w, "Failed to commit transaction", http.StatusInternalServerError, err)
+			return
 		}
 	} else if j != "" {
 		if err := json.Unmarshal([]byte(j), &inviteeIDs); err != nil {
@@ -125,7 +148,7 @@ func ValidatePayload(groupName string, description string) error {
 	validInputRegex := regexp.MustCompile(`^[\p{L}\p{N}\s.,!?'_@\-]+$`)
 	exists := false
 	err := tp.DB.QueryRow(`
-		SELECT EXISTS(SELECT 1 FROM groups WHERE groups_name = ?)`, groupName).Scan(&exists)
+		SELECT EXISTS(SELECT 1 FROM groups WHERE group_name = ?)`, groupName).Scan(&exists)
 	if err != nil {
 		return fmt.Errorf("unexpected error, try again later")
 	}

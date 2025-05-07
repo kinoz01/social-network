@@ -17,7 +17,7 @@ func GetOwnedGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows, err := tp.DB.Query(`
-        SELECT id, groups_name, group_pic, description
+        SELECT id, group_name, group_pic, description
         FROM groups
         WHERE group_owner = ?
         ORDER BY created_at DESC

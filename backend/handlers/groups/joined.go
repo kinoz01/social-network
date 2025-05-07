@@ -16,11 +16,11 @@ func GetJoinedGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows, err := tp.DB.Query(`
-        SELECT g.id, g.groups_name, g.group_pic, g.description
-        FROM groups g
-        INNER JOIN group_users gu ON g.id = gu.group_id
-        WHERE gu.users_id = ?
-    `, user.ID)
+    	SELECT g.id, g.group_name, g.group_pic, g.description
+    	FROM groups g
+    	INNER JOIN group_users gu ON g.id = gu.group_id
+    	WHERE gu.users_id = ? AND g.group_owner != ?
+	`, user.ID, user.ID)
 	if err != nil {
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return

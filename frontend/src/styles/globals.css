@@ -67,3 +67,13 @@ body {
         font-size: 1.3rem;
     }
 }
+
+::selection {
+    background-color: #161616;
+    color: white;
+}
+
+::-moz-selection {
+    background-color: #161616;
+    color: white;
+}

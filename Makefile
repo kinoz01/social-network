@@ -86,3 +86,48 @@ migrate-sqlite:
 		migrate create -seq -ext sql -dir "./backend/database/migrations/sqlite" "create_$${t}_table"; \
 	done; \
 	echo "Created $$(echo $$tables | wc -w) table migrations"
+
+
+users:
+	@echo "Generating users_insert.sql with static IDs (uuid-1 to uuid-100)..."
+	@echo "INSERT INTO users ( \
+  id, \
+  email, \
+  username, \
+  password, \
+  first_name, \
+  last_name, \
+  birthday, \
+  about_me, \
+  profile_pic, \
+  account_type, \
+  created_at \
+) VALUES" > users_insert.sql
+	@for i in $$(seq 1 100); do \
+		comma=","; \
+		[ "$$i" -eq 100 ] && comma=";"; \
+		echo "  ( \
+'uuid-$$i', 'aaa$$i@example.com', 'aaa$$i', '\$$2b\$$10\$$z4Pf6EjZPcwJuGdH83zEIOXYOB6jzyOPlFqzAf9MiTzVJ7GyaH0Ca', \
+'aaaa', 'aaaa', '1995-01-01', '', 'avatar.webp', 'public', CURRENT_TIMESTAMP \
+  )$$comma" >> users_insert.sql; \
+	done
+	@echo "✅ users_insert.sql generated with 100 static UUIDs."
+
+
+follows:
+	@echo "Generating follow_requests.sql with uuid-1 to uuid-100 as followers..."
+	@echo "INSERT INTO follow_requests ( \
+  id, \
+  follower_id, \
+  followed_id, \
+  status, \
+  created_at \
+) VALUES" > follow_requests.sql
+	@for i in $$(seq 1 100); do \
+		comma=","; \
+		[ "$$i" -eq 100 ] && comma=";"; \
+		echo "  ( \
+'foll-$$i', 'uuid-$$i', 'aa85587c-5f2d-4498-8a72-55806a87cf99', 'accepted', CURRENT_TIMESTAMP \
+  )$$comma" >> follow_requests.sql; \
+	done
+	@echo "✅ follow_requests.sql generated with 100 accepted follow requests."

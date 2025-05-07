@@ -1,50 +1,98 @@
 package groups
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
 	auth "social-network/handlers/authentication"
+	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
 
-func GetAvailableGroups(w http.ResponseWriter, r *http.Request) {
+// GET /api/groups/available
+func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	query := `
-        SELECT g.id, g.groups_name, g.group_pic, g.description,
-            COALESCE(gr.status, '') as request
-        FROM groups g
-        LEFT JOIN group_requests gr ON g.id = gr.group_id AND gr.user_id = ?
-        WHERE g.group_owner != ?
-          AND g.id NOT IN (
-              SELECT group_id FROM group_users WHERE users_id = ?
-              UNION
-              SELECT group_id FROM group_invitations WHERE user_id = ?
-          )
-    `
+	rows, err := tp.DB.Query(`
+    SELECT
+        g.id,
+        g.group_name,
+        g.group_pic,
+        g.description,
 
-	rows, err := tp.DB.Query(query, user.ID, user.ID, user.ID, user.ID)
+        /* "pending" if the user already sent a join-request */
+        CASE
+            WHEN EXISTS (
+                SELECT 1
+                  FROM group_requests gr
+                 WHERE gr.group_id     = g.id
+                   AND gr.requester_id = ?
+            ) THEN 'pending'
+        END AS request,
+
+        /* current member count */
+        (SELECT COUNT(*) FROM group_users gu2 WHERE gu2.group_id = g.id) AS members
+
+    FROM groups g
+
+    /* exclude groups the user already joined */
+    LEFT JOIN group_users gu
+           ON gu.group_id = g.id
+          AND gu.users_id = ?
+
+    WHERE g.group_owner <> ?          -- not the owner
+      AND gu.users_id IS NULL         -- not a member
+      /* exclude groups where the user already has an invitation */
+      AND NOT EXISTS (
+            SELECT 1
+              FROM group_invitations gi
+             WHERE gi.group_id  = g.id
+               AND gi.invitee_id = ?
+      )
+	`, user.ID, /* for CASE (join‑request)        */
+		user.ID, /* for LEFT JOIN (member check)   */
+		user.ID, /* for owner <> ?                 */
+		user.ID) /* for NOT EXISTS (invitation)    */
 	if err != nil {
-		http.Error(w, "Database error", http.StatusInternalServerError)
+		help.JsonError(w, "DB error", http.StatusInternalServerError, err)
 		return
 	}
 	defer rows.Close()
 
-	var groups []tp.Group
+	type group struct {
+		ID          string `json:"id"`
+		GroupName   string `json:"group_name"`
+		GroupPic    string `json:"group_pic"`
+		Description string `json:"description"`
+		Request     string `json:"request"` // "pending" or ""
+		Members     int    `json:"members"`
+	}
+
+	var list []group
 	for rows.Next() {
-		var g tp.Group
-		if err := rows.Scan(&g.ID, &g.GroupName, &g.GroupPic, &g.Description, &g.Request); err != nil {
-			http.Error(w, "Scan error", http.StatusInternalServerError)
+		var req sql.NullString
+		var g group
+
+		if err := rows.Scan(
+			&g.ID,
+			&g.GroupName,
+			&g.GroupPic,
+			&g.Description,
+			&req,
+			&g.Members,
+		); err != nil {
+			help.JsonError(w, "scan error", http.StatusInternalServerError, err)
 			return
 		}
-		groups = append(groups, g)
+		g.Request = req.String // "" when no row (i.e. no pending request)
+		list = append(list, g)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(groups)
+	json.NewEncoder(w).Encode(list)
 }
