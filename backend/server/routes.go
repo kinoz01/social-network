@@ -7,6 +7,7 @@ import (
 	auth "social-network/handlers/authentication"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
+	chat "social-network/handlers/chat"
 )
 
 var Router http.Handler
@@ -27,6 +28,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
+	mux.HandleFunc("/api/fetchUsers", chat.FetchUsers)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

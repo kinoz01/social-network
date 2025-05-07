@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useLogout } from "@/lib/logout";
+// import { useLogout } from "@/lib/logout";
 import LeftMenu from "@/components/menus/LeftMenu";
 import RightMenu from "@/components/menus/RightMenu";
 import Feed from "@/components/posts/Feed";
 
 export default function Home() {
-    const { handleLogout } = useLogout();
+    // const { handleLogout } = useLogout();
 
     useEffect(() => {
         if (localStorage.getItem("showWelcome") === "true") {

@@ -1,8 +1,9 @@
 import styles from "./chat.module.css";
-import { HomeIcon, SendIcon } from "../icons";
+import {  SendIcon } from "../icons";
 import Message from "./Message";
 
 function Chat() {
+    
     return (
         <div className={styles.chat}>
             <div className={styles.messages}>

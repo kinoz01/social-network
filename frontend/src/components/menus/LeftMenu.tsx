@@ -1,7 +1,6 @@
 import styles from "./menus.module.css";
 import ProfileCard from "./ProfileCrad";
 import List from "./List";
-import Link from "next/link";
 
 const LeftMenu = ({
   type,

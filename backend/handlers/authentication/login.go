@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	help "social-network/handlers/helpers"
@@ -12,6 +13,7 @@ import (
 
 // Handle Log In functionality
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("hhhhhhhhhhhhhhhhhhhhhh")
 	if r.Method != http.MethodPost {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 		return
@@ -29,7 +31,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "Invalid request payload or size exceeded", http.StatusBadRequest, err)
 		return
 	}
-
 	var user tp.User
 	row := tp.DB.QueryRow(`SELECT id, email, username, password FROM users WHERE email = ?`, creds.Login)
 	err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password)
