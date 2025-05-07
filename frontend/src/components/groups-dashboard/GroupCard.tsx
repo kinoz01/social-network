@@ -12,9 +12,9 @@ interface Group {
     group_name: string;
     group_pic: string;
     description: string;
-    request?: string;                 // for Available Groups
+    request?: string;        // for Available Groups
     members?: number;
-    invitation_id?: string;           // Invitations
+    invitation_id?: string;  // Invitations
     invitation_status?: "pending" | "rejected";
 }
 

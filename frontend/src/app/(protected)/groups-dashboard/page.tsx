@@ -10,6 +10,7 @@ export default function GroupsPage() {
 
     return (
         <div className={styles.groupsLayout}>
+            <TopBar />
             <div className={styles.groupsContent}>
                 <div className={styles.groupGrid}>
                     <GroupCard title="Your Groups" />
