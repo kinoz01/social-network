@@ -7,6 +7,7 @@ function ListItem({
   type,
   name,
   click,
+  
 }: {
   type:
     | "friendRequests"

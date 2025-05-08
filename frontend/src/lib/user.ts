@@ -1,7 +1,7 @@
 "use client";
 
 export interface User {
-    id: number;
+    id: string;
     email: string;
     username?: string;
     profile_pic: string;
@@ -21,7 +21,7 @@ export async function getUser(): Promise<User | null> {
         });
 
         if (!res.ok) {
-            console.error("Failed to fetch user:", res.status);
+            window.location.href = "/login"
             return null;
         }
 
@@ -29,6 +29,7 @@ export async function getUser(): Promise<User | null> {
         return data;
     } catch (error) {
         console.error("Error fetching user:", error);
+        location.href = "/login"
         return null;
     }
 }

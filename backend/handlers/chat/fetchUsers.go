@@ -10,7 +10,7 @@ import (
 )
 
 type UserData struct {
-	UserId     string `json:"userId"`
+	UserId     string `json:"id"`
 	First_name string `json:"first_name"`
 	Last_name  string `json:"last_name"`
 	Profile    string `json:"image"`

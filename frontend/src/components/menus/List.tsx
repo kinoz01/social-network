@@ -2,12 +2,12 @@ import Link from "next/link";
 import styles from "./menus.module.css";
 import ListItem from "./ListItem";
 import FetchUsers from "../chat/fetchUsers";
-// import { log } from "console";
-// import GroupCard from "./GroupCard";
+import {  User } from "@/lib/user";
+// import { fetchMessages } from "@/lib/message";
+import Chat from "../chat/Chat";
+import { useState } from "react";
 
-// function openChat(event: React.MouseEvent<HTMLDivElement>): void {
-//   console.log("Clicked", event.currentTarget);
-// }
+
 
 
 function List({
@@ -27,15 +27,10 @@ function List({
 }) {
   const users = FetchUsers()
   console.log(users);
-
-  // function openChat(e:any) {
-  //   console.log("Clicked", e.currentTarget);
-  // }
-  
+  const [userCliked, setUserClicked] = useState<User | null>(null)
   
   return (
     <div className={`${styles.List} ${styles[type]} `}>
-      {/* TOP  */}
       <div className={styles.header}>
         <span className={styles.title}>{title}</span>
         {type === "friendRequests" ? (
@@ -56,17 +51,17 @@ function List({
         {type === "chat" ? (
           <>
           {users?.map((user) => {
-  console.log(user); // Inspect user properties
-
-  return (
-    <ListItem
-      key={user.userId}  // Use UserId as the key
-      type={type}
-      name={user.first_name +" " + user.last_name}  // Concatenate with a space
-      click={() => { console.log("clicked", { type, name }); }}
-    />
-  );
-})}
+            console.log(user.id, "dgdgdddddddddddgdfgd");
+            return (
+              <ListItem
+                key={user.id} 
+                type={type}
+                name={user.first_name +" " + user.last_name} 
+                click={() => setUserClicked(user)}
+              />
+            );
+          })}
+          {userCliked && <Chat user={userCliked}/>}
           </>
         
         ) : type === "groups" ? (
