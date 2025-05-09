@@ -9,6 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// Select groups with pending invitations for the user.
 func InvitationsHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {

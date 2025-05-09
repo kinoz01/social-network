@@ -9,7 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-// Retrieves the groups owned by the current user.
+// Select the groups owned by the current user.
 func GetOwnedGroups(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {

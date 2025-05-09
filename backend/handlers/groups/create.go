@@ -14,7 +14,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// POST /api/groups
+// Handle the creation of a new group.
 func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
@@ -62,7 +62,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	/* ---------- insert group ---------- */
+	/* ---------- create group ---------- */
 	groupID := uuid.Must(uuid.NewV4()).String()
 	_, err = tp.DB.Exec(`
 		INSERT INTO groups (id, group_name, group_owner, description, group_pic)
@@ -83,59 +83,21 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* ---------- invitations ---------- */
-	var inviteeIDs []string
-	j := r.FormValue("invitee_ids")
-	if j == "ALL" {
-		rows, err := tp.DB.Query(`
-			SELECT follower_id FROM follow_requests
-			WHERE followed_id = ? AND status = 'accepted'`,
-			user.ID)
-		if err != nil {
-			help.JsonError(w, "DB error", http.StatusInternalServerError, err)
+	switch j := r.FormValue("invitee_ids"); {
+	case j == "ALL":
+		if err := InviteAllFollowers(groupID, user.ID); err != nil {
+			help.JsonError(w, "invite followers", 500, err)
 			return
 		}
-		defer rows.Close()
-
-		tx, err := tp.DB.Begin()
-		if err != nil {
-			help.JsonError(w, "Failed to begin transaction", http.StatusInternalServerError, err)
+	case j != "":
+		var ids []string
+		if err := json.Unmarshal([]byte(j), &ids); err != nil {
+			help.JsonError(w, "Invalid invitee_ids", 400, err)
 			return
 		}
-		stmt, err := tx.Prepare(`
-    		INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
-    		VALUES (?, ?, ?)`)
-		if err != nil {
-			tx.Rollback()
-			help.JsonError(w, "Failed to prepare statement", http.StatusInternalServerError, err)
+		if err := InviteFollowers(groupID, ids); err != nil {
+			help.JsonError(w, "invite list", 500, err)
 			return
-		}
-		defer stmt.Close()
-
-		for rows.Next() {
-			var id string
-			if err := rows.Scan(&id); err == nil {
-				_, err := stmt.Exec(uuid.Must(uuid.NewV4()).String(), groupID, id)
-				if err != nil {
-					tx.Rollback()
-					help.JsonError(w, "Insert failed", http.StatusInternalServerError, err)
-					return
-				}
-			}
-		}
-
-		if err := tx.Commit(); err != nil {
-			help.JsonError(w, "Failed to commit transaction", http.StatusInternalServerError, err)
-			return
-		}
-	} else if j != "" {
-		if err := json.Unmarshal([]byte(j), &inviteeIDs); err != nil {
-			help.JsonError(w, "Invalid invitee_ids", http.StatusBadRequest, err)
-			return
-		}
-		for _, v := range inviteeIDs {
-			_, _ = tp.DB.Exec(`
-			  INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
-			  VALUES (?,?,?)`, uuid.Must(uuid.NewV4()).String(), groupID, v)
 		}
 	}
 

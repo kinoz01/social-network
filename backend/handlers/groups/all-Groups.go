@@ -10,7 +10,8 @@ import (
 	tp "social-network/handlers/types"
 )
 
-// GET /api/groups/available
+// Select all groups that the user is not a member of and has not been invited to.
+// This includes groups that the user has already sent a join request to.
 func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
@@ -54,10 +55,10 @@ func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
              WHERE gi.group_id  = g.id
                AND gi.invitee_id = ?
       )
-	`, user.ID, /* for CASE (join‑request)        */
-		user.ID, /* for LEFT JOIN (member check)   */
-		user.ID, /* for owner <> ?                 */
-		user.ID) /* for NOT EXISTS (invitation)    */
+	`, user.ID,  /*  for CASE (join‑request)        */
+		user.ID, /*  for LEFT JOIN (member check)   */
+		user.ID, /*  for owner <> ?                 */
+		user.ID) /*  for NOT EXISTS (invitation)    */
 	if err != nil {
 		help.JsonError(w, "DB error", http.StatusInternalServerError, err)
 		return
@@ -67,7 +68,7 @@ func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
 
 	var list []tp.Group
 	for rows.Next() {
-		var req sql.NullString
+		var req sql.NullString // To correctly scan nulled string
 		var g tp.Group
 
 		if err := rows.Scan(

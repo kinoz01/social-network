@@ -12,6 +12,10 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// Handles the acceptance of an invitation to join a group.
+// It checks if the invitation is valid and if the user is authorized to accept it.
+// If the invitation is valid, it adds the user to the group and deletes the invitation.
+// If the invitation is not valid or if the user is not authorized, it returns an error.
 func AcceptInvitationHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {

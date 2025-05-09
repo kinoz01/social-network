@@ -10,7 +10,8 @@ import (
 	tp "social-network/handlers/types"
 )
 
-// inserts a *pending* row into group_requests (if it isn't there already)
+// This is used when a user wants to join a group
+// Inserts a row into group_requests (if it isn't there already)
 func JoinRequestHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
@@ -26,6 +27,23 @@ func JoinRequestHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if user is already in the group (handled in front but for safety)
+	var exists bool
+	err = tp.DB.QueryRow(`
+		SELECT EXISTS(
+			SELECT 1 FROM group_users WHERE group_id = ? AND users_id = ?
+		)`, body.GroupID, user.ID,
+	).Scan(&exists)
+	if err != nil {
+		help.JsonError(w, "DB error", http.StatusInternalServerError, err)
+		return
+	}
+	if exists {
+		help.JsonError(w, "You are already a member of this group", http.StatusConflict, nil)
+		return
+	}
+
+	// Proceed with join request
 	_, err = tp.DB.Exec(`
 		INSERT OR IGNORE INTO group_requests (id, group_id, requester_id)
 		VALUES (?, ?, ?)`,

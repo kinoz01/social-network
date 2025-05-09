@@ -9,6 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// Select groups that the user is a member of.
 func GetJoinedGroups(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {

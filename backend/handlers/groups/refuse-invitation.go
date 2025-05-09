@@ -9,6 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// Handles the refusal of a group invitation.
 func RefuseInvitationHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {

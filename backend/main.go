@@ -11,7 +11,7 @@ func main() {
 	// Handle shutdown
 	go server.Shutdown()
 	// db cleanup routines
-	go server.ResetDBRoutine()
+	go server.ResetDBRoutines()
 	// Start the server
 	server.Serve(server.Router)
 }
