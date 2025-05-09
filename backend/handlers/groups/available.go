@@ -14,7 +14,7 @@ import (
 func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 
@@ -64,19 +64,11 @@ func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	type group struct {
-		ID          string `json:"id"`
-		GroupName   string `json:"group_name"`
-		GroupPic    string `json:"group_pic"`
-		Description string `json:"description"`
-		Request     string `json:"request"` // "pending" or ""
-		Members     int    `json:"members"`
-	}
 
-	var list []group
+	var list []tp.Group
 	for rows.Next() {
 		var req sql.NullString
-		var g group
+		var g tp.Group
 
 		if err := rows.Scan(
 			&g.ID,

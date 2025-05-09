@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    domains: ["https://myflywebsite.com", "localhost"],
     remotePatterns: [
       {
         protocol: "https",
@@ -20,6 +19,14 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "myflywebsite.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
   },

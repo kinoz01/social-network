@@ -2,7 +2,6 @@ package groups
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	auth "social-network/handlers/authentication"
@@ -11,7 +10,6 @@ import (
 )
 
 func RefuseInvitationHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("RefuseInvitationHandler")
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

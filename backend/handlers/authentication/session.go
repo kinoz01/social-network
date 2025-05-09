@@ -60,7 +60,22 @@ func GetUser(r *http.Request) (*tp.User, error) {
 
 	// Fetch the user associated with the session from DB
 	var user tp.User
-	err = tp.DB.QueryRow(`SELECT id, email, username, profile_pic FROM users WHERE id = ?`, session.UserID).Scan(&user.ID, &user.Email, &user.Username, &user.ProfilePic)
+	err = tp.DB.QueryRow(`
+  		SELECT id, email, username, first_name, last_name, birthday, profile_pic, about_me, account_type
+  		FROM users
+  		WHERE id = ?`,
+		session.UserID,
+	).Scan(
+		&user.ID,
+		&user.Email,
+		&user.Username,
+		&user.FirstName,
+		&user.LastName,
+		&user.Bday,
+		&user.ProfilePic,
+		&user.AboutMe,
+		&user.AccountType,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("user not found")
 	}

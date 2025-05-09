@@ -79,15 +79,24 @@ export default function GroupCard({
 
     const handleRefuse = async (id: string) => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/groups/refuse-invitation`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({ invitation_id: id }),
-            });
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/refuse-invitation`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ invitation_id: id }),
+                }
+            );
             if (!res.ok) throw new Error();
-            refreshInvitations();
-        } catch (err) { console.error(err); }
+
+            /* --- instant UI update: drop the card locally --- */
+            setGroups(prev => prev.filter(g => g.invitation_id !== id));
+
+            /* no need to fetch again; server already stored rejected */
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     /* ---------- join request ---------- */

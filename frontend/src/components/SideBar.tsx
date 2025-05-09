@@ -19,8 +19,6 @@ export default function SideBar() {
 
   const { handleLogout } = useLogout();
 
-
-
   return (
     <div
       className="sideBar"

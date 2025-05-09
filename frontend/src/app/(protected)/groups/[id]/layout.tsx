@@ -9,28 +9,7 @@ export default async function GroupLayout({
 }>) {
     return (
         <div className="mainContent group">
-            <LeftMenu type="groups" />
             {children}
         </div >
     );
 }
-
-
-// export default function RootLayout({
-//     children,
-// }: Readonly<{
-//     children: React.ReactNode;
-// }>) {
-//     return (
-//         <html lang="en">
-//             <body className={`${geistSans.variable} ${geistMono.variable}`}>
-//                 <main className={styles.main}>
-//                     <SideBar />
-//                     {/* <div className="mainContent"> */}
-//                     {children}
-//                     {/* </div> */}
-//                 </main>
-//             </body>
-//         </html>
-//     );
-// }

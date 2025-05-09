@@ -32,21 +32,23 @@ func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 
 	/* ---------- build SQL Query ---------- */
 	base := `
-		SELECT u.id, u.first_name, u.last_name, u.profile_pic
-		FROM follow_requests f
-		JOIN users u ON u.id = f.follower_id
-		WHERE f.followed_id = ? AND f.status = ?`
+    SELECT u.id, u.first_name, u.last_name, u.profile_pic
+      FROM follow_requests f
+      JOIN users u ON u.id = f.follower_id
+     WHERE f.followed_id = ? AND f.status = ?`
 
 	args := []any{user.ID, status}
 
 	if q != "" {
+		/* match columns that START with the query */
 		base += ` AND (
-			   u.first_name LIKE ? COLLATE NOCASE OR
-			   u.last_name  LIKE ? COLLATE NOCASE OR
-			   u.username   LIKE ? COLLATE NOCASE
-			)`
-		pattern := "%" + q + "%"
-		args = append(args, pattern, pattern, pattern)
+            u.first_name LIKE ? COLLATE NOCASE OR
+            u.last_name  LIKE ? COLLATE NOCASE OR
+            u.username   LIKE ? COLLATE NOCASE OR
+			(u.first_name || ' ' || u.last_name) LIKE ? COLLATE NOCASE
+        )`
+		pattern := q + "%" //  ← prefix-only match
+		args = append(args, pattern, pattern, pattern, pattern)
 	}
 
 	base += ` ORDER BY u.first_name, u.last_name`

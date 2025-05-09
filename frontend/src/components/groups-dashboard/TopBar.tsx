@@ -3,22 +3,14 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "./style/groups.module.css";
-import { getUser } from "@/lib/user";
+import { useUser } from "@/context/UserContext";
 
 export default function TopBar() {
-    const [profilePic, setProfilePic] = useState<string | null>(null);
 
-    useEffect(() => {
-        async function fetchUser() {
-            const user = await getUser();
-            if (user && user.profile_pic) {
-                setProfilePic(`${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${user.profile_pic}`);
-            }
-        }
-        fetchUser();
-    }, []);
+    const { user } = useUser();
+    if (!user) return null;    
 
-    if (!profilePic) return null;
+    const profilePic = `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${user.profile_pic}`;
 
     return (
         <div className={styles.topBar}>

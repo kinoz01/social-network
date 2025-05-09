@@ -5,7 +5,6 @@ export default async function GroupPage() {
     return (
         <>
             <Feed type="group"/>
-            <RightMenu />
         </>
     );
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	auth "social-network/handlers/authentication"
+	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
 
@@ -12,7 +13,7 @@ import (
 func GetOwnedGroups(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 
@@ -23,7 +24,7 @@ func GetOwnedGroups(w http.ResponseWriter, r *http.Request) {
         ORDER BY created_at DESC
     `, user.ID)
 	if err != nil {
-		http.Error(w, "Database error", http.StatusInternalServerError)
+		help.JsonError(w, "Database error", http.StatusInternalServerError, err)
 		return
 	}
 	defer rows.Close()

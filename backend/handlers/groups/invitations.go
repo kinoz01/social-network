@@ -17,13 +17,14 @@ func InvitationsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rows, err := tp.DB.Query(`
-		SELECT g.id, g.group_name, g.group_pic, g.description,
-		       gi.id    AS invitation_id,
-		       gi.status AS invitation_status,
-		       (SELECT COUNT(*) FROM group_users gu WHERE gu.group_id = g.id) AS members
-		  FROM group_invitations gi
-		  JOIN groups g ON g.id = gi.group_id
-		 WHERE gi.invitee_id = ?
+    	SELECT g.id, g.group_name, g.group_pic, g.description,
+           	gi.id AS invitation_id,
+           	gi.status AS invitation_status,
+           	(SELECT COUNT(*) FROM group_users gu WHERE gu.group_id = g.id) AS members
+      	FROM group_invitations gi
+      	JOIN groups g ON g.id = gi.group_id
+    	WHERE gi.invitee_id = ?
+       		AND gi.status = 'pending'
 	`, user.ID)
 	if err != nil {
 		help.JsonError(w, "DB error", 500, err)

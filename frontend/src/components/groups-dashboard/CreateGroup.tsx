@@ -69,11 +69,22 @@ export default function CreateGroupModal({ onClose }: Props) {
     const runSearch = async (q: string) => {
         try {
             setSearching(true);
+
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/followers?status=accepted&query=${encodeURIComponent(q)}`,
-                { credentials: 'include' }
+                `${process.env.NEXT_PUBLIC_API_URL}/api/followers` +
+                `?status=accepted&query=${encodeURIComponent(q)}`,
+                { credentials: "include" }
             );
-            if (!res.ok) throw new Error('search failed');
+
+            /* --- 404 means “no match” – clear the list ------------------- */
+            if (res.status === 404) {
+                setResults([]);
+                if (hasFollowers === null) setHasFollowers(false);   // first check
+                return;                                              // ← skip .json()
+            }
+
+            if (!res.ok) throw new Error("search failed");
+
             const list: Follower[] = await res.json();
             setResults(list);
 
@@ -83,11 +94,9 @@ export default function CreateGroupModal({ onClose }: Props) {
                 list.forEach(f => next.set(f.id, f));
                 return next;
             });
-
-            /* first request tells us whether the user has any followers at all */
-            if (hasFollowers === null) setHasFollowers(list.length > 0);
-        } catch (e) {
-            console.error(e);
+        } catch (err) {
+            console.error(err);
+            setResults([]);               // keep UI in sync on other errors
         } finally {
             setSearching(false);
         }
