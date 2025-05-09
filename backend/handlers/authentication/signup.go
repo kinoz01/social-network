@@ -15,11 +15,11 @@ import (
 )
 
 const (
-	maxEmailSize    = 20
+	maxEmailSize    = 30
 	maxUsernameSize = 16
 	maxNameSize     = 16
 	maxPasswordSize = 30
-	maxPicSize      = 1 << 20 // 1 MB for profile pic
+	maxPicSize      = 2 << 20 // 2 MB for profile pic
 	maxAboutMeSize  = 400
 	maxDateSize     = 15
 )
@@ -168,7 +168,7 @@ func ValidateSignUp(user tp.User) error {
 	if match, _ := regexp.MatchString(emailRegex, user.Email); !match {
 		return fmt.Errorf("invalid email format")
 	}
-	if len(user.Email) > 20 {
+	if len(user.Email) > maxEmailSize {
 		return fmt.Errorf("email is too long")
 	}
 

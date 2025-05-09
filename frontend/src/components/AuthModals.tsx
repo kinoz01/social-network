@@ -69,9 +69,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                 credentials: "include",
             });
 
-            if (!res.ok) {
-                if (!res.ok) throw new Error((await res.json()).msg || "signup failed");
-            }
+            if (!res.ok) throw new Error((await res.json()).msg || "signup failed");
 
             localStorage.setItem("showWelcome", "true")
             await handleLogin(e)
@@ -243,7 +241,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                                     </button>
                                 ))}
                             </div>
-
+                            {/* //emani */}
                             <div className="file-upload-container">
                                 <label htmlFor="signupImage" className="file-upload">
                                     <span className="upload-icon">

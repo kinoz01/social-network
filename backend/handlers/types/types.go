@@ -18,3 +18,12 @@ type User struct {
 	AboutMe     string `json:"about_me"`
 	AccountType string `json:"account_type"`
 }
+
+type Post struct {
+	ID         string `json:"id"`
+	UserID     string
+	Content    string         `json:"content"`
+	Imag_post  sql.NullString `json:"imag_post"`
+	Visibility string         `json:"visibility"`
+	VipUsers   []string       `json:"vipUsers"`
+}
