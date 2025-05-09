@@ -1,9 +1,10 @@
-"use client";
-
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
+// This function handles the logout process
 export function useLogout() {
     const router = useRouter();
+    const { clear } = useUser();
 
     const handleLogout = async () => {
         try {
@@ -16,7 +17,8 @@ export function useLogout() {
                 console.error("Logout failed");
                 return;
             }
-
+            // Clear user context and redirect to login
+            clear();
             router.push("/login");
         } catch (error) {
             console.error("Logout error:", error);

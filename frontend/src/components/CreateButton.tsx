@@ -10,9 +10,6 @@ function CreateButton() {
   const [newPost, setNewPost] = useState(false);
   const [newGroup, setNewGroup] = useState(false);
 
-  console.log("create: ", create);
-  console.log("newPost: ", newPost);
-
   const close = () => {
     newPost ?
       setNewPost(false) : setNewGroup(false)
@@ -29,7 +26,7 @@ function CreateButton() {
             setCreate(!create);
           }}
         >
-          <CreateIcon />
+        <CreateIcon />
         </button>
         {create ? (
           <div className="createButtons">

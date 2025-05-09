@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const isFly = process.env.FLY_APP_NAME !== undefined; // Detect if running on Fly.io
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: false, // Disable double-invocation in dev (note safe)
+
   env: {
     NEXT_PUBLIC_API_URL: isFly
       ? "https://mywebsite.com" // Fly.io uses production API
@@ -19,6 +20,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.pexels.com",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
   },
