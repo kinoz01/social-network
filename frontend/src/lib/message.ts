@@ -12,23 +12,29 @@ export interface Messages {
 }
 
 export async function fetchMessages(user: User)  {
-    const userData = await getUser()
-    console.log(userData);
-    if (!userData || !userData.id) {
-        console.error("User data is not valid", userData);
-        return [];  // Return empty array if userData is not valid
+  try {
+    const currentUser = await getUser()
+    console.log(currentUser?.id, user.id);
+    if (!currentUser?.id || !currentUser?.id) {
+        console.error("User data is not valid", currentUser);
+        return [];  // Return empty array if currentUser is not valid
     }
     const messageRequest = await fetch("http://localhost:8080/api/fetchMessages", {
         method: "POST", 
         headers: {
           "Content-Type" : "application/json"
         },
-        body: JSON.stringify({sender_id : userData?.id, receiver_id : user.id})
+        body: JSON.stringify({sender_id : currentUser.id, receiver_id : user.id})
       })
-      
       console.log(messageRequest);
+      if(!messageRequest.ok){
+        throw new Error(`HTTP error! status: ${messageRequest.status}`);
+      }
       const messages = await messageRequest.json()
-      // return messages
-    //   console.log(messages);
       return messages
+  }catch(error) {
+    console.log("error fetvhing messages: ", error);
+    return []
+    
+  }
 }

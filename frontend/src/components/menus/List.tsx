@@ -4,8 +4,8 @@ import ListItem from "./ListItem";
 import FetchUsers from "../chat/fetchUsers";
 import {  User } from "@/lib/user";
 // import { fetchMessages } from "@/lib/message";
-import Chat from "../chat/Chat";
-import { useState } from "react";
+// import Chat from "../chat/Chat";
+// import { useState } from "react";
 
 
 
@@ -13,6 +13,7 @@ import { useState } from "react";
 function List({
   type,
   title,
+  selectedUser
 }: {
   type:
     | "friendRequests"
@@ -24,10 +25,11 @@ function List({
     | "groups"
     | "event";
   title: string;
+  selectedUser?: (user:User) => void;
 }) {
   const users = FetchUsers()
   console.log(users);
-  const [userCliked, setUserClicked] = useState<User | null>(null)
+  // const [userCliked, setUserClicked] = useState<User | null>(null)
   
   return (
     <div className={`${styles.List} ${styles[type]} `}>
@@ -57,11 +59,11 @@ function List({
                 key={user.id} 
                 type={type}
                 name={user.first_name +" " + user.last_name} 
-                click={() => setUserClicked(user)}
-              />
-            );
-          })}
-          {userCliked && <Chat user={userCliked}/>}
+                click={() => selectedUser?.(user)}
+                />
+              );
+            })}
+            {/* {userCliked && <Chat user={userCliked}/>} */}
           </>
         
         ) : type === "groups" ? (

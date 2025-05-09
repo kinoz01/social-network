@@ -1,11 +1,13 @@
 import styles from "./menus.module.css";
 import ProfileCard from "./ProfileCrad";
 import List from "./List";
+import { User } from "@/lib/user";
 
 const LeftMenu = ({
-  type,
+  type, selectedUser
 }: {
   type: "home" | "chat" | "profile" | "group" | "groups";
+  selectedUser?: (user: User) => void;
 }) => {
   return (
     <div className={`${styles.leftMenu} ${styles[type]}`}>
@@ -16,7 +18,7 @@ const LeftMenu = ({
         </>
       ) : type === "chat" ? (
         <>
-            <List type="chat" title="Chat" />
+            <List type="chat" title="Chat" selectedUser={selectedUser}/>
         </>
       ) : type === "groups" ? (
         <>

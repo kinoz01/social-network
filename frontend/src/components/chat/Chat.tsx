@@ -5,30 +5,36 @@ import { User } from "@/lib/user";
 import { fetchMessages, Messages } from "@/lib/message";
 import { useEffect, useState } from "react";
 
-function Chat({user}:{user: User}) {
+function Chat({user}:{user?: User}) {
     console.log(user);
-    
+
     const [messages, setMessages] = useState<Messages[]>([])
     useEffect(() => {
+        if(!user?.id) return
         const getMessages = async() => {
             const msgs =  await fetchMessages(user)
             setMessages(msgs)
         }
         getMessages()
-    }, [user])
-  console.log(messages);
-  console.log("ddddd",messages);
-  
+    },[user] )
+
+
+    console.log(messages);
+    console.log("ddddd",messages);
+    
+
+
     return (
         <div className={styles.chat}>
+
             <div className={styles.messages}>
                 {messages.map(msg => {
-                    console.log("Rendering message: ", msg.receiver_id, user.id);
+                    console.log("Rendering message: ", msg.receiver_id, user?.id);
                     return (
                         
                         <Message
                             key= {msg.id}
-                         type={msg.receiver_id == user.id ? "receiver" : "sender"} 
+                         type={msg.receiver_id === user?.id ? "receiver" : "sender"} 
                          message={msg.content}
                          />
                     )
