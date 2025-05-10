@@ -1,15 +1,21 @@
-import Feed from "@/components/posts/Feed";
-import RightMenu from "@/components/menus/RightMenu";
-import LeftMenu from "@/components/menus/LeftMenu";
+import { checkMembership } from "@/lib/auth";
+import { GroupSidebar } from "@/components/groups/GroupSidebar";
+import styles from "@/components/groups/style/groupLayout.module.css";
 
 export default async function GroupLayout({
+    params,
     children,
-}: Readonly<{
+}: {
+    params: { id: string };
     children: React.ReactNode;
-}>) {
+}) {
+   // await checkMembership(params.id); // server-side check if user is a member of the group
     return (
-        <div className="mainContent group">
-            {children}
-        </div >
+        <div className={styles.wrapper}>
+            <div >{children}</div>
+            <aside className={styles.sidebar}>
+                <GroupSidebar  />
+            </aside>
+        </div>
     );
 }

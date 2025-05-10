@@ -26,6 +26,6 @@ type Group struct {
 	GroupPic    string `json:"group_pic"`
 	Description string `json:"description"`
 	CreatedAt   string `json:"created_at"`
-	Request     string `json:"request"`
+	Request     string `json:"request"` // when rendering all groups (if pending)
 	Members     int    `json:"members"`
 }

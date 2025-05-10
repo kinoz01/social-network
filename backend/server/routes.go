@@ -5,8 +5,8 @@ import (
 	"time"
 
 	auth "social-network/handlers/authentication"
-	grps "social-network/handlers/groups"
 	flw "social-network/handlers/follows"
+	grps "social-network/handlers/groups"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 )
@@ -30,7 +30,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
 
-	// Groups:
+	// Groups-dashboard:
 	mux.HandleFunc("/api/groups/create", grps.CreateGroupHandler)
 	mux.HandleFunc("/api/groups/owned", grps.GetOwnedGroups)
 	mux.HandleFunc("/api/groups/joined", grps.GetJoinedGroups)
@@ -39,6 +39,9 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/groups/accept-invitation", grps.AcceptInvitationHandler)
 	mux.HandleFunc("/api/groups/refuse-invitation", grps.RefuseInvitationHandler)
 	mux.HandleFunc("/api/groups/invitations", grps.InvitationsHandler)
+	// Groups:
+	mux.HandleFunc("/api/groups/is-member", grps.IsGroupMember)
+	mux.HandleFunc("/api/groups/groupInfo", grps.GetGroupInfoHandler)
 
 	// Following:
 	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)

@@ -9,7 +9,6 @@ export const metadata: Metadata = {
     description: "Social platform",
 };
 
-
 export default async function HomeLayout({
     children,
 }: {
