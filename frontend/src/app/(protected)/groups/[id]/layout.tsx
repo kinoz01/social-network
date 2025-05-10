@@ -9,12 +9,12 @@ export default async function GroupLayout({
     params: { id: string };
     children: React.ReactNode;
 }) {
-   // await checkMembership(params.id); // server-side check if user is a member of the group
+    await checkMembership(params.id); // server-side check if user is a member of the group
     return (
         <div className={styles.wrapper}>
             <div >{children}</div>
             <aside className={styles.sidebar}>
-                <GroupSidebar  />
+                <GroupSidebar />
             </aside>
         </div>
     );

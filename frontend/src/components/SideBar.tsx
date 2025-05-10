@@ -45,7 +45,7 @@ export default function SideBar() {
             </Link>
           ) : null}
         </div>
-        <Link href="/groups-dashboard" className="navSection">
+        <Link href="/groups" className="navSection">
           <GroupsIcon />
           {hover ? <span>Groups</span> : null}
         </Link>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { CreateIcon } from "./icons";
 import AddPost from "./posts/AddPost";
-import CreateGroupModal from "./groups-dashboard/CreateGroup";
+import CreateGroupModal from "./groups/CreateGroup";
 
 function CreateButton() {
   const [create, setCreate] = useState(false);
