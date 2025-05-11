@@ -29,20 +29,20 @@ function Chat({user}:{user?: User}) {
 
             <div className={styles.messages}>
                 {messages.map(msg => {
-                    console.log("Rendering message: ", msg.receiver_id, user?.id);
+                    const isReceiver = msg.receiver_id === user?.id
+                    const name = `${msg.first_name} ${msg.last_name}`
+                  
+                    console.log("Rendering message: ", isReceiver, name);
                     return (
                         
                         <Message
                             key= {msg.id}
-                         type={msg.receiver_id === user?.id ? "receiver" : "sender"} 
-                         message={msg.content}
+                            type={isReceiver ? "receiver" : "sender"} 
+                            message={msg.content}
+                            username= {name}
                          />
                     )
                 })}
-                {/* <Message type="sender" />
-                <Message type="receiver" />
-                <Message type="sender" />
-                <Message type="receiver" /> */}
             </div>
             <form className={styles.chatForm}>
                 <input type="text" placeholder="Send a message..." />
@@ -54,5 +54,6 @@ function Chat({user}:{user?: User}) {
     )
 
 }
+
 
 export default Chat

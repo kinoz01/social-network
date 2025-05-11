@@ -7,8 +7,8 @@ import (
 	"net/http"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
+	"time"
 )
-
 
 func FetchMessages(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -26,16 +26,18 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("yes2")
 	type Messages struct {
-		Id string `json:"id"`
-		Sender_id   string `json:"sender_id"`
-		Receiver_id string `json:"receiver_id"`
-		Content     string `json:"content"`
-		Is_read      int    `json:"is_read"`
-		Created_at  string `json:"created_at"`
+		Id          string    `json:"id"`
+		Sender_id   string    `json:"sender_id"`
+		Receiver_id string    `json:"receiver_id"`
+		Content     string    `json:"content"`
+		Is_read     bool       `json:"is_read"`
+		Created_at  time.Time `json:"created_at"`
+		First_name  string    `json:"first_name"`
+		Last_name   string    `json:"last_name"`
 	}
 	msgs := []Messages{}
 	fmt.Println(user)
-	query := "SELECT * FROM private_chats where (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)  ORDER BY created_at DESC LIMIT ? OFFSET ?"
+	query := "SELECT p.id, p.sender_id, p.receiver_id, p.content, p.is_read, p.created_at, u.first_name, u.last_name FROM private_chats p inner join users u on u.id = p.sender_id where (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)  ORDER BY p.created_at DESC LIMIT ? OFFSET ?"
 	rows, err := tp.DB.Query(query, user.Sender_id, user.Receiver_id, user.Receiver_id, user.Sender_id, 10, 0)
 	fmt.Println("errr,,,", err)
 	if err != nil {
@@ -46,7 +48,11 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		msg := Messages{}
 		// id := ""
-		rows.Scan(&msg.Id, &msg.Sender_id, &msg.Receiver_id, &msg.Content, &msg.Is_read, &msg.Created_at)
+		err := rows.Scan(&msg.Id, &msg.Sender_id, &msg.Receiver_id, &msg.Content, &msg.Is_read, &msg.Created_at, &msg.First_name, &msg.Last_name)
+		if err != nil {
+			fmt.Println("Scan error:", err)
+			continue
+		}
 		msgs = append(msgs, msg)
 	}
 	fmt.Println(msgs)

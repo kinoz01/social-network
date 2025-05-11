@@ -1,8 +1,8 @@
 import Image from "next/image";
 import styles from "./chat.module.css";
 
-function Message({ type, message }: { type: "sender" | "receiver" , message: string}) {
-
+function Message({ type, message, username}: { type: "sender" | "receiver" , message:string, username: string}) {
+    // console.log("gggg", username)
     return (
         <div className={`${styles.message} ${styles[type]}`}>
             <div className={styles.header}>
@@ -13,7 +13,7 @@ function Message({ type, message }: { type: "sender" | "receiver" , message: str
                     width={40}
                     height={40}
                 />
-                <span className={styles.ListItemName}>Wayne Burton</span>
+                <span className={styles.ListItemName}>{username}</span>
             </div>
             <div className={styles.messageContent}>
                 {message}

@@ -8,7 +8,9 @@ export interface Messages {
     receiver_id: string,
     content: string,
     is_read: number,
-    created_at: string
+    created_at: string,
+    first_name: string,
+    last_name: string
 }
 
 export async function fetchMessages(user: User)  {
