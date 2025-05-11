@@ -1,7 +1,7 @@
 import Image from "next/image";
 import styles from "./chat.module.css";
 
-function Message({ type, message, username}: { type: "sender" | "receiver" , message:string, username: string}) {
+function Message({ type, message, username, time}: { type: "sender" | "receiver" , message:string, username: string, time:string}) {
     // console.log("gggg", username)
     return (
         <div className={`${styles.message} ${styles[type]}`}>
@@ -19,7 +19,7 @@ function Message({ type, message, username}: { type: "sender" | "receiver" , mes
                 {message}
             </div>
             <div className={styles.messageDate}>
-                01/01/2025
+                {time}
             </div>
 
         </div >
