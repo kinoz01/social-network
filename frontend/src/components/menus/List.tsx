@@ -53,7 +53,7 @@ function List({
         {type === "chat" ? (
           <>
           {users?.map((user) => {
-            console.log(user.id, "dgdgdddddddddddgdfgd");
+            // console.log(user.id, "dgdgdddddddddddgdfgd");
             return (
               <ListItem
                 key={user.id} 
@@ -63,7 +63,6 @@ function List({
                 />
               );
             })}
-            {/* {userCliked && <Chat user={userCliked}/>} */}
           </>
         
         ) : type === "groups" ? (

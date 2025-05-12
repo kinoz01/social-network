@@ -1,13 +1,14 @@
 "use client"
 import Chat from "@/components/chat/Chat"
-// import FetchUsers from "@/components/chat/fetchUsers"
 import LeftMenu from "@/components/menus/LeftMenu"
 import RightMenu from "@/components/menus/RightMenu"
+import { Messages } from "@/lib/message";
 import { User } from "@/lib/user";
 import { useState, useRef, useEffect } from "react";
 
 function ChatPage() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [receiveMsg, setReceiveMsg] = useState<Messages | null>(null)
     const socketRef = useRef<WebSocket| null>(null)
 
     useEffect(() => {
@@ -20,16 +21,8 @@ function ChatPage() {
             console.log("messages from server:", event.data)
             const data = JSON.parse(event.data)
             console.log(data);
-            
-            // const date = new Date()
-            // const data = {
-            //     type : "message",
-            //     message: "yes, it is!!",
-            //     sender_id : "137cc52b-edf7-4e0b-a62d-9f2863438f66",
-            //     receiver_id: "048e5917-c6d5-4913-a224-3e482507ecd5",
-            //     time: `${date}`
-            // }
-            // socketRef.current?.send(JSON.stringify(data))
+            setReceiveMsg(data)
+        
         }
 
         socketRef.current.onclose = () => {
@@ -47,7 +40,7 @@ function ChatPage() {
     return (
         <div className="mainContent chat">
             <LeftMenu type="chat" selectedUser={setSelectedUser}/>
-            {selectedUser ? <Chat user={selectedUser} socket={socketRef}/> :<div>Select a user to start chat</div>}
+            {selectedUser ? <Chat user={selectedUser} socket={socketRef} msg={receiveMsg}/> :<div>Select a user to start chat</div>}
             <RightMenu/>
         </div>
     )

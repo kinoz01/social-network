@@ -1,23 +1,40 @@
 import styles from "./chat.module.css";
 import {  SendIcon } from "../icons";
 import Message from "./Message";
-import { User } from "@/lib/user";
+import { getUser, User } from "@/lib/user";
 import { fetchMessages, Messages } from "@/lib/message";
 import { useEffect, useState } from "react";
 // import { create } from "domain";
 
-function Chat({user, socket}:{user?: User, socket:React.MutableRefObject<WebSocket | null>}) {
+function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<WebSocket | null>, msg:Messages| null}) {
     console.log(user);
     const [message, setMessage] = useState<string>("")
     const [messages, setMessages] = useState<Messages[]>([])
+    const [currentUser, setCurrentUser] = useState<User|null>(null)
+
     useEffect(() => {
-        if(!user?.id) return
+        const getCurrentUser = async() => {
+            const loggedUser = await getUser()
+            setCurrentUser(loggedUser)
+        }
+        getCurrentUser()
+    },[])
+    useEffect(() => {
+        console.log("msg",msg);
+        
+        if(msg && msg.receiver_id && msg.content) {
+            setMessages(prev => [...prev, msg])
+        }
+        
+    }, [msg])
+    useEffect(() => {
+        if(!user?.id || !currentUser?.id) return
         const getMessages = async() => {
-            const msgs =  await fetchMessages(user)
+            const msgs =  await fetchMessages(user, currentUser)
             setMessages(msgs)
         }
         getMessages()
-    },[user] )
+    },[user, currentUser] )
     
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -25,19 +42,15 @@ function Chat({user, socket}:{user?: User, socket:React.MutableRefObject<WebSock
         console.log("message", message);
         
         const objMessage = {
-            id: Date.now().toString(),
+            // id: Date.now().toString(),
             type: "message",
-            sender_id: "137cc52b-edf7-4e0b-a62d-9f2863438f66",
+            sender_id: currentUser?.id,
             receiver_id: user?.id,
-            message: message,
+            content: message,
             is_read: 0,
             created_at: new Date().toISOString(),
-            first_name: "mostafa",
-            last_name: "stof"
     
         }
-        console.log(objMessage.created_at);
-        
         setMessage("")
         socket.current?.send(JSON.stringify(objMessage))
     
@@ -51,8 +64,8 @@ function Chat({user, socket}:{user?: User, socket:React.MutableRefObject<WebSock
                 {messages.map(msg => {
                     const isReceiver = msg.receiver_id === user?.id
                     const name = `${msg.first_name} ${msg.last_name}`
-                  
-                    // console.log("Rendering message: ", isReceiver, name);
+                    console.log(msg);
+                    
                     return (
                         
                         <Message

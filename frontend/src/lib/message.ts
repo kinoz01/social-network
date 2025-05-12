@@ -1,6 +1,6 @@
 "use client"
 
-import { getUser, User } from "./user";
+import {  User } from "./user";
 
 export interface Messages {
     id: string,
@@ -13,11 +13,11 @@ export interface Messages {
     last_name: string
 }
 
-export async function fetchMessages(user: User)  {
+export async function fetchMessages(user: User, currentUser:User)  {
   try {
-    const currentUser = await getUser()
+    // const currentUser = await getUser()
     console.log(currentUser?.id, user.id);
-    if (!currentUser?.id || !currentUser?.id) {
+    if (!currentUser?.id || !user.id) {
         console.error("User data is not valid", currentUser);
         return [];  // Return empty array if currentUser is not valid
     }
@@ -26,7 +26,7 @@ export async function fetchMessages(user: User)  {
         headers: {
           "Content-Type" : "application/json"
         },
-        body: JSON.stringify({sender_id : currentUser.id, receiver_id : user.id})
+        body: JSON.stringify({sender_id : currentUser?.id, receiver_id : user.id})
       })
       console.log(messageRequest);
       if(!messageRequest.ok){

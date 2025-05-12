@@ -34,7 +34,7 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/fetchMessages", ch.FetchMessages)
 
 	//WebSocket Connection
-	mux.HandleFunc("/ws",ch.HandleConnection)
+	mux.HandleFunc("/ws", ch.HandleConnection)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

@@ -55,7 +55,7 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 		}
 		msgs = append(msgs, msg)
 	}
-	fmt.Println(msgs)
+	// fmt.Println(msgs)
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(&msgs); err != nil {
 		log.Fatal("can not encode data!!")
