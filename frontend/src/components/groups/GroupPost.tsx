@@ -1,54 +1,56 @@
 "use client";
 
 import Image from "next/image";
-import styles from "./style/groupFeed.module.css"
-import { useState } from "react";
+import styles from "./style/groupFeed.module.css";
 
-export default function GroupPost() {
-    const [showComments, setComments] = useState(false);
+type Post = {
+    post_id: string;
+    body: string;
+    img_post: string | null;
+    created_at: string; // ISO
+    first_name: string;
+    last_name: string;
+    profile_pic: string | null;
+};
 
+export default function GroupPost({ p }: { p: Post }) {
     return (
-        <div className={styles.post}>
-            {/* HEADER */}
-            <div className={styles.postHeader}>
+        <article className={styles.post}>
+            {/* ─── header ─── */}
+            <header className={styles.postHeader}>
                 <Image
-                    className={styles.userIcon}
-                    src="https://images.unsplash.com/photo-1742626157100-a25483dda2ea?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDM0fGJvOGpRS1RhRTBZfHxlbnwwfHx8fHw%3D"
+                    src={
+                        p.profile_pic
+                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${p.profile_pic}`
+                            : "/img/default-avatar.png"
+                    }
                     alt=""
                     width={40}
                     height={40}
+                    className={styles.userIcon}
                 />
                 <div className={styles.postInfo}>
-                    <div className={styles.postUser}>John</div>
-                    <div className={styles.postCreationDate}>01/01/2000</div>
+                    <span className={styles.postUser}>
+                        {p.first_name} {p.last_name}
+                    </span>
+                    <time className={styles.postCreationDate}>
+                        {new Date(p.created_at).toLocaleString()}
+                    </time>
                 </div>
-            </div>
-            {/* CONTENT */}
-            <div className={styles.postDesc}>
+            </header>
+
+            {/* ─── body ─── */}
+            <p className={styles.postContent}>{p.body}</p>
+
+            {p.img_post && (
                 <Image
-                    className={styles.postImage}
-                    src="https://images.unsplash.com/photo-1740768081811-e3adf4af4efe?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDExOHxibzhqUUtUYUUwWXx8ZW58MHx8fHx8"
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_posts/${p.img_post}`}
                     alt=""
-                    width={450}
-                    height={450}
+                    className={styles.postImage}
+                    width={500}
+                    height={500}
                 />
-                <div className={styles.postContent}>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Accusantium
-                    et laudantium fugiat, sequi quam hic atque optio temporibus at
-                    incidunt animi in quos corporis dolores qui voluptatem facere
-                    blanditiis molestias!
-                </div>
-                <button
-                    className={styles.commentsBtn}
-                    onClick={
-                        !showComments ? () => setComments(true) : () => setComments(false)
-                    }
-                >
-                    comments
-                </button>
-            </div>
-            {/* COMMENTS */}
-            
-        </div>
+            )}
+        </article>
     );
 }

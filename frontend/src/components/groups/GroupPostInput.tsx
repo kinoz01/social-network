@@ -5,6 +5,8 @@ import Image from "next/image";
 import styles from "./style/groupPostInput.module.css";
 import { useUser } from "@/context/UserContext";
 import { useParams } from "next/navigation";
+import { useGroupFeed } from "@/context/GroupFeedContext";
+
 
 export default function GroupPostInput() {
     const groupId = useParams().id as string;
@@ -14,6 +16,7 @@ export default function GroupPostInput() {
     const [loading, setLoad] = useState(false);
     const [errMsg, setErr] = useState("");
     const fileRef = useRef<HTMLInputElement>(null);
+    const { refreshFeed } = useGroupFeed();
     
     if (!user) return null;
     
@@ -36,11 +39,13 @@ export default function GroupPostInput() {
                 body: fd,
                 credentials: "include",
             });
-            if (!r.ok) throw new Error();
+            if (!r.ok) throw new Error((await r.json()).msg || "Could not post");
+
             setText("");
             setImg(null);
-        } catch {
-            setErr("Could not post");
+            refreshFeed();
+        } catch (err: any) {
+            setErr(err.message || "Could not post");
         } finally { setLoad(false); }
     };
 

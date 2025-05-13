@@ -10,6 +10,7 @@ import (
 	grpsD "social-network/handlers/groups/dashboard"
 	grpsInvite "social-network/handlers/groups/invitations"
 	grpsRequest "social-network/handlers/groups/joinRequests"
+	grpsPost "social-network/handlers/groups/posts"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 )
@@ -45,12 +46,14 @@ func Routes() http.Handler {
 	// Groups:
 	mux.HandleFunc("/api/groups/is-member", grps.IsGroupMember)
 	mux.HandleFunc("/api/groups/groupInfo", grps.GetGroupInfoHandler)
-	mux.HandleFunc("api/groups/create-post", grps.CreatePostHandler)
 	mux.HandleFunc("/api/groups/members", grps.MembersListHandler)
 	mux.HandleFunc("/api/groups/invite", grpsInvite.InviteFollowersHandler)
 	mux.HandleFunc("/api/groups/requests", grpsRequest.ListJoinRequestsHandler)
 	mux.HandleFunc("/api/groups/accept-request", grpsRequest.AcceptJoinRequestHandler)
 	mux.HandleFunc("/api/groups/refuse-request", grpsRequest.RefuseJoinRequestHandler)
+	// Groups posts:
+	mux.HandleFunc("/api/groups/posts", grpsPost.GroupPostsHandler)
+	mux.HandleFunc("/api/groups/create-post", grpsPost.CreatePostHandler)
 
 	// Following:
 	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)

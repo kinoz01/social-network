@@ -35,7 +35,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	body := strings.TrimSpace(r.FormValue("body"))
 
 	if groupID == "" || len(body) == 0 || len(body) > 10000 {
-		help.JsonError(w, "bad payload", http.StatusBadRequest, err)
+		help.JsonError(w, "Invalid text", http.StatusBadRequest, err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 			help.JsonError(w, "unsupported image format", http.StatusBadRequest, nil)
 			return
 		}
-		if p, err := help.SaveImg(buff, "posts/"); err == nil {
+		if p, err := help.SaveImg(buff, "groups_posts/"); err == nil {
 			imgPath.String = p
 			imgPath.Valid = true
 		}

@@ -6,6 +6,8 @@ CREATE TABLE posts (
     img_post CHECK(img_post IS NULL OR
      img_post LIKE '%.jpg' OR
      img_post LIKE '%.png' OR
+     img_post LIKE '%.jpeg' OR
+     img_post LIKE '%.gif' OR
      img_post LIKE '%.webp'),
     visibility TEXT NOT NULL DEFAULT 'public' CHECK(visibility IN ('public', 'private', 'group')),
     created_at TIMESTAMP DEFAULT (DATETIME ('now', 'localtime')),

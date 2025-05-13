@@ -3,15 +3,6 @@
     flex-direction: column;
     gap: 1rem;
     overflow-y: auto;
-    max-height: 80vh;
-}
-
-/* FEED */
-.feed {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    overflow-y: auto;
     max-height: 90vh;
     padding-right: 0.5rem;
     scrollbar-width: none;
@@ -142,4 +133,10 @@
     -ms-overflow-style: none;
     /* IE 10+ */
     scrollbar-width: none;
+}
+
+.status {
+    text-align: center;
+    color: #555;
+    margin-top: 1rem;
 }

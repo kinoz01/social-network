@@ -4,6 +4,7 @@
     gap: 1rem;
     align-items: flex-start;
     background-color: whitesmoke;
+    width: 100%;
 }
 
 /* Left and Right Menus */
