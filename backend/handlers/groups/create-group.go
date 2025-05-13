@@ -10,6 +10,7 @@ import (
 	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
+	grpInvite "social-network/handlers/groups/invitations"
 
 	"github.com/gofrs/uuid"
 )
@@ -85,8 +86,8 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	/* ---------- invitations ---------- */
 	switch j := r.FormValue("invitee_ids"); {
 	case j == "ALL":
-		if err := InviteAllFollowers(groupID, user.ID); err != nil {
-			help.JsonError(w, "invite followers", 500, err)
+		if err := grpInvite.InviteAllFollowers(groupID, user.ID); err != nil {
+			help.JsonError(w, "invite followers", http.StatusInternalServerError, err)
 			return
 		}
 	case j != "":
@@ -95,8 +96,8 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 			help.JsonError(w, "Invalid invitee_ids", 400, err)
 			return
 		}
-		if err := InviteFollowers(groupID, ids); err != nil {
-			help.JsonError(w, "invite list", 500, err)
+		if err := grpInvite.InviteFollowers(groupID, ids); err != nil {
+			help.JsonError(w, "invite list", http.StatusInternalServerError, err)
 			return
 		}
 	}

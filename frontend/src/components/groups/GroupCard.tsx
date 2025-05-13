@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./style/groups.module.css";
 import LoadingSpinner from "@/components/Loading";
-import CreateGroupModal from "./CreateGroup";
+import CreateGroupModal from "../groups/CreateGroup";
 
 interface Group {
     id: string;
@@ -137,7 +137,7 @@ export default function GroupCard({
                 <div className={styles.groupIcon}>
                     <Image
                         src={g.group_pic
-                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/group_pics/${g.group_pic}`
+                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_avatars/${g.group_pic}`
                             : "/img/default-group.jpg"}
                         alt={g.group_name}
                         width={50} height={50} style={{ borderRadius: "50%", objectFit: "cover" }}

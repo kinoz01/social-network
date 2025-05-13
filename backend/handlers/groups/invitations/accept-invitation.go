@@ -34,7 +34,7 @@ func AcceptInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get group_id and make sure this invitation is really for the current user
+	// Get group_id and inviteee_id from the invitations table
 	var groupID string
 	err = tx.QueryRow(`
 		SELECT group_id FROM group_invitations
@@ -56,19 +56,30 @@ func AcceptInvitationHandler(w http.ResponseWriter, r *http.Request) {
 		uuid.Must(uuid.NewV4()).String(), groupID, user.ID)
 	if err != nil {
 		tx.Rollback()
-		help.JsonError(w, "insert", 500, err)
+		help.JsonError(w, "insert failed", 500, err)
+		return
+	}
+
+	// Cleanup any join request
+	_, err = tx.Exec(`
+		DELETE FROM group_requests
+		WHERE group_id = ? AND requester_id = ?`,
+		groupID, user.ID)
+	if err != nil {
+		tx.Rollback()
+		help.JsonError(w, "delete join request failed", 500, err)
 		return
 	}
 
 	_, err = tx.Exec(`DELETE FROM group_invitations WHERE id = ?`, body.InvitationID)
 	if err != nil {
 		tx.Rollback()
-		help.JsonError(w, "delete", 500, err)
+		help.JsonError(w, "delete failed", 500, err)
 		return
 	}
 
 	if err := tx.Commit(); err != nil {
-		help.JsonError(w, "commit", 500, err)
+		help.JsonError(w, "commit failed", 500, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)

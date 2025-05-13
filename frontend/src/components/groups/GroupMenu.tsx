@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";  // ✅ Import useParams
+import { useParams } from "next/navigation";
 import Image from "next/image";
-import styles from "./style/groupLayout.module.css";
+import styles from "./style/groupMenu.module.css";
 import LoadingSpinner from "@/components/Loading";
+import { useGroupSync } from "@/context/GroupSyncContext";
 
 interface Info {
     id: string;
@@ -14,16 +15,18 @@ interface Info {
     members: number;
 }
 
-export function GroupSidebar() {
-    const params = useParams();
-    const id = params.id as string;  // ✅ Extract group ID
+export default function GroupMenu() {
+    const id = useParams().id as string;
+    const isOwner = true
 
     const [data, setData] = useState<Info | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const { version } = useGroupSync();
+
 
     useEffect(() => {
-        if (!id) return;  // Guard if no ID
+        if (!id) return;
 
         let isMounted = true;
 
@@ -44,24 +47,28 @@ export function GroupSidebar() {
             }
         })();
 
-        return () => { isMounted = false; };
-    }, [id]);
+        return () => {
+            isMounted = false;
+        };
+    }, [id, version]);
 
     if (loading) return <LoadingSpinner />;
     if (error || !data) return <p className={styles.error}>{error}</p>;
 
     return (
-        <>
+        <div className={styles.groupMenu}>
             <div className={styles.header}>
                 <Image
-                    src={data.group_pic || "/img/default-group.jpg"}
+                    src={data.group_pic
+                        ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_avatars/${data.group_pic}`
+                        : "/img/default-group.jpg"}
                     alt="group avatar"
                     width={160}
                     height={160}
                     className={styles.avatar}
                 />
                 <h2 className={styles.name}>{data.group_name}</h2>
-                <p className={styles.memberCount}>{data.members} Members</p>
+                <p className={styles.memberCount}>{data.members} Member{data.members > 1 ? "s" : ""}</p>
                 <p className={styles.about}>{data.description}</p>
             </div>
 
@@ -78,11 +85,17 @@ export function GroupSidebar() {
                     <Image src="/img/menu-events.svg" alt="" width={22} height={22} />
                     <span className={styles.label}>Events</span>
                 </button>
-                <button className={styles.menuItem}>
+                <button className={`${styles.menuItem} ${styles.responsiveOnly}`}>
                     <Image src="/img/menu-invite.svg" alt="" width={22} height={22} />
                     <span className={styles.label}>Invite</span>
                 </button>
+                {isOwner && (
+                    <button className={`${styles.menuItem} ${styles.responsiveOnly}`}>
+                        <Image src="/img/menu-requests.svg" alt="" width={22} height={22} />
+                        <span className={styles.label}>Join Requests</span>
+                    </button>
+                )}
             </nav>
-        </>
+        </div>
     );
 }

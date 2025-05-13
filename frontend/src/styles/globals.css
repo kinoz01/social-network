@@ -69,11 +69,11 @@ body {
 }
 
 ::selection {
-    background-color: #161616;
+    background-color: #414141;
     color: white;
 }
 
 ::-moz-selection {
-    background-color: #161616;
+    background-color: #464646;
     color: white;
 }

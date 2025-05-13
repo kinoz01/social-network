@@ -13,8 +13,8 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
     // route-aware view
     const router = useRouter();
     const pathname = usePathname();
-    const [isLogin, setIsLogin] = useState(pathname !== "/signup");
-    useEffect(() => setIsLogin(pathname !== "/signup"), [pathname]);
+    const [isLogin, setIsLogin] = useState(pathname === "/login");
+    useEffect(() => setIsLogin(pathname === "/login"), [pathname]);
 
     // ui state
     const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +37,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         setFormData(p => ({ ...p, [e.target.name]: e.target.value }));
 
     const handleAccountType = (t: "private" | "public") =>
-        setFormData(p => ({ ...p, accountType: t }));
+        setFormData(p => ({ ...p, accountType: t })); // overwrite account type
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0];
@@ -78,7 +78,8 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         }
     };
 
-
+    // React.FormEvent React's built-in type for form events (like onSubmit, onChange, etc.).
+    // <HTMLFormElement> sub-type that specifies this event comes from a <form> element
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {

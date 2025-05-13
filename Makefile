@@ -1,3 +1,6 @@
+default: check-npm check-nextjs kill-ports run-backend run-frontend
+	@echo "Live and running!"
+
 # Check if npm is installed
 check-npm:
 	@command -v npm >/dev/null 2>&1 || { \
@@ -44,7 +47,7 @@ run: check-npm check-nextjs kill-ports run-backend run-frontend
 
 
 #------------------------- Docker -------------------------#
-buildDocker: kill-ports
+buildDocker:
 	-docker-compose down --volumes --remove-orphans
 	docker-compose up --build
 
@@ -61,7 +64,6 @@ deepClean:
 	-docker rm $$(docker ps -aq)
 	-docker rmi $$(docker images -q)
 	-docker system prune -a -f --volumes
-
 #------------------------- Docker -------------------------#
 
 #------------------------ Migration -----------------------#

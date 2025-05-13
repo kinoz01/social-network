@@ -26,7 +26,7 @@ func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
         g.group_pic,
         g.description,
 
-        /* "pending" if the user already sent a join-request */
+        /* "pending" if the user already sent a join-request else null*/
         CASE
             WHEN EXISTS (
                 SELECT 1
@@ -48,14 +48,15 @@ func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
 
     WHERE g.group_owner <> ?          -- not the owner
       AND gu.users_id IS NULL         -- not a member
-      /* exclude groups where the user already has an invitation */
+      /* exclude groups where the user already has a pending invitation */
       AND NOT EXISTS (
-            SELECT 1
-              FROM group_invitations gi
-             WHERE gi.group_id  = g.id
-               AND gi.invitee_id = ?
-      )
-	`, user.ID,  /*  for CASE (join‑request)        */
+     	 SELECT 1
+        	FROM group_invitations gi
+       		WHERE gi.group_id  = g.id
+         	AND gi.invitee_id = ?
+         	AND gi.status = 'pending'
+	)
+	`, user.ID, /*  for CASE (join‑request)        */
 		user.ID, /*  for LEFT JOIN (member check)   */
 		user.ID, /*  for owner <> ?                 */
 		user.ID) /*  for NOT EXISTS (invitation)    */
@@ -64,7 +65,6 @@ func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer rows.Close()
-
 
 	var list []tp.Group
 	for rows.Next() {

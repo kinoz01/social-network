@@ -1,0 +1,128 @@
+.groupMenu {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background-color: #fff;
+    overflow-y: auto;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    max-width: 320px;
+    position: sticky;
+    top: 1rem;
+    overflow-wrap: anywhere;
+    margin-top: 30px;
+    margin-left: 20px;
+    scrollbar-width: none;
+    font-family: 'Zain', sans-serif;
+
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.avatar {
+    border-radius: 50%;
+    border: 2px solid #000;
+    width: 100px !important;
+    height: 100px !important;
+    object-fit: cover;
+}
+
+.name {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 0.8;
+    margin-bottom: 10px;
+}
+
+.memberCount {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.about {
+    font-size: 1.2rem;
+    color: #aaa;
+    text-align: center;
+    line-height: 0.8;
+    margin-bottom: 10px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.menuItem {
+    background: #000;
+    color: #fff;
+    border: 1px solid #000;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.menuItem:hover {
+    background: #fff;
+    color: #000;
+    border-color: #000;
+    box-shadow: inset 0 0 0 2px #000;
+}
+
+.label {
+    display: inline-block;
+}
+
+/* Responsive Collapse */
+@media (max-width: 900px) {
+    .groupMenu {
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 0.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .menu {
+        flex-direction: row;
+        gap: 0.5rem;
+        width: auto;
+    }
+
+    .menuItem {
+        flex-direction: column;
+        padding: 0.4rem;
+    }
+
+    .label {
+        display: none;
+    }
+}
+
+.responsiveOnly {
+    display: none;
+}
+
+@media (max-width: 1000px) {
+    .responsiveOnly {
+        display: flex;
+    }
+}

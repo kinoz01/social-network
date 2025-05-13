@@ -50,6 +50,7 @@ export async function redirectToHome() {
 // check if user is member of the group
 export async function checkMembership(groupId: string) {
     const cookieStore = await cookies();
+    
     // back-end call
     const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/groups/is-member?id=${groupId}`,
@@ -60,7 +61,7 @@ export async function checkMembership(groupId: string) {
     );
 
     if (!res.ok) {
-        redirect("/groups-dashboard");
+        redirect("/groups");
     }
 
     return true;

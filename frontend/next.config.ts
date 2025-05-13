@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: isFly
       ? "https://myflywebsite.com" // Fly.io uses production API
       : "http://localhost:8080", // Local development
+    NEXT_PUBLIC_WS_URL: isFly
+      ? "wss://yourdomain.com"
+      : "ws://localhost:8080",
   },
 
   images: {

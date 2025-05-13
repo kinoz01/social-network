@@ -1,21 +1,37 @@
+import GroupMenu from "@/components/groups/GroupMenu";
+import MembersMenu from "@/components/groups/MembersMenu";
+import InviteMenu from "@/components/groups/InviteMenu";
+import RequestsMenu from "@/components/groups/RequestsMenu";
 import { checkMembership } from "@/lib/auth";
-import { GroupSidebar } from "@/components/groups/GroupSidebar";
-import styles from "@/components/groups/style/groupLayout.module.css";
+import style from "@/components/groups/style/groupLayout.module.css";
+import { GroupSyncProvider } from "@/context/GroupSyncContext";
+
 
 export default async function GroupLayout({
-    params,
+    params: paramsPromise,
     children,
 }: {
-    params: { id: string };
+    params: Promise<{ id: string }>;
     children: React.ReactNode;
 }) {
-    await checkMembership(params.id); // server-side check if user is a member of the group
+    const { id } = await paramsPromise;
+    await checkMembership(id);
+
     return (
-        <div className={styles.wrapper}>
-            <div >{children}</div>
-            <aside className={styles.sidebar}>
-                <GroupSidebar />
-            </aside>
-        </div>
+        <GroupSyncProvider>
+            <div className={style.groupLayout}>
+                <div className={style.menuLayout}>
+                    <GroupMenu />
+                    <RequestsMenu />
+                </div>
+                <div className={style.contentLayout}>
+                    {children}
+                </div>
+                <div className={style.menuLayout}>
+                    <MembersMenu />
+                    <InviteMenu />
+                </div>
+            </div>
+        </GroupSyncProvider>
     );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "./style/groups.module.css";
 import { useUser } from "@/context/UserContext";
