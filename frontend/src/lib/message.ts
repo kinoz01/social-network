@@ -13,7 +13,7 @@ export interface Messages {
     last_name: string
 }
 
-export async function fetchMessages(user: User, currentUser:User)  {
+export async function fetchMessages(user: User, currentUser:User, msgNum: number)  {
   try {
     // const currentUser = await getUser()
     console.log(currentUser?.id, user.id);
@@ -26,7 +26,7 @@ export async function fetchMessages(user: User, currentUser:User)  {
         headers: {
           "Content-Type" : "application/json"
         },
-        body: JSON.stringify({sender_id : currentUser?.id, receiver_id : user.id})
+        body: JSON.stringify({sender_id : currentUser?.id, receiver_id : user.id, msgNbr: msgNum})
       })
       console.log(messageRequest);
       if(!messageRequest.ok){

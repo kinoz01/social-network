@@ -18,6 +18,7 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 	type UsersId struct {
 		Sender_id   string `json:"sender_id"`
 		Receiver_id string `json:"receiver_id"`
+		MsgNbr      int    `json:"msgNum"`
 	}
 	user := UsersId{}
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -30,7 +31,7 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 		Sender_id   string    `json:"sender_id"`
 		Receiver_id string    `json:"receiver_id"`
 		Content     string    `json:"content"`
-		Is_read     bool       `json:"is_read"`
+		Is_read     bool      `json:"is_read"`
 		Created_at  time.Time `json:"created_at"`
 		First_name  string    `json:"first_name"`
 		Last_name   string    `json:"last_name"`
@@ -38,7 +39,7 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 	msgs := []Messages{}
 	fmt.Println(user)
 	query := "SELECT p.id, p.sender_id, p.receiver_id, p.content, p.is_read, p.created_at, u.first_name, u.last_name FROM private_chats p inner join users u on u.id = p.sender_id where (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)  ORDER BY p.created_at DESC LIMIT ? OFFSET ?"
-	rows, err := tp.DB.Query(query, user.Sender_id, user.Receiver_id, user.Receiver_id, user.Sender_id, 10, 0)
+	rows, err := tp.DB.Query(query, user.Sender_id, user.Receiver_id, user.Receiver_id, user.Sender_id, 4, user.MsgNbr)
 	fmt.Println("errr,,,", err)
 	if err != nil {
 		fmt.Println("fffff")

@@ -1,19 +1,16 @@
+"use client"
 import Link from "next/link";
 import styles from "./menus.module.css";
 import ListItem from "./ListItem";
 import FetchUsers from "../chat/fetchUsers";
-import {  User } from "@/lib/user";
-// import { fetchMessages } from "@/lib/message";
-// import Chat from "../chat/Chat";
-// import { useState } from "react";
-
-
-
+import {  getUser, User } from "@/lib/user";
+import { useEffect, useState } from "react";
 
 function List({
   type,
   title,
-  selectedUser
+  selectedUser,
+  // currentUser
 }: {
   type:
     | "friendRequests"
@@ -28,8 +25,17 @@ function List({
   selectedUser?: (user:User) => void;
 }) {
   const users = FetchUsers()
-  console.log(users);
-  // const [userCliked, setUserClicked] = useState<User | null>(null)
+  console.log(users);  
+  const [currentUser, setCurrentUser] = useState<User|null>(null)
+      
+          useEffect(() => {
+              const getCurrentUser = async() => {
+                  const loggedUser = await getUser()
+                  setCurrentUser(loggedUser)
+              }
+              getCurrentUser()
+          },[])
+  const filterdUsers = users?.filter(user => user.id != currentUser?.id)
   
   return (
     <div className={`${styles.List} ${styles[type]} `}>
@@ -52,8 +58,8 @@ function List({
       <div className={type !== "groups" ? styles.users : styles.groups}>
         {type === "chat" ? (
           <>
-          {users?.map((user) => {
-            // console.log(user.id, "dgdgdddddddddddgdfgd");
+          {filterdUsers?.map((user) => {
+
             return (
               <ListItem
                 key={user.id} 

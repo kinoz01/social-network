@@ -17,7 +17,11 @@
   overflow-y: auto;
   scrollbar-width: none;
 }
-
+.messages{
+  background: red;
+  overflow-y: auto;
+  height: 100%;
+}
 .message {
   margin: 1rem 0;
   padding: 1rem;
@@ -27,6 +31,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
+
 }
 
 .header {

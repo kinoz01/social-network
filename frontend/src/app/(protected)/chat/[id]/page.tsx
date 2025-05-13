@@ -3,13 +3,14 @@ import Chat from "@/components/chat/Chat"
 import LeftMenu from "@/components/menus/LeftMenu"
 import RightMenu from "@/components/menus/RightMenu"
 import { Messages } from "@/lib/message";
-import { User } from "@/lib/user";
+import {  User } from "@/lib/user";
 import { useState, useRef, useEffect } from "react";
 
 function ChatPage() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [receiveMsg, setReceiveMsg] = useState<Messages | null>(null)
     const socketRef = useRef<WebSocket| null>(null)
+
 
     useEffect(() => {
         socketRef.current = new WebSocket("ws://localhost:8080/ws")
