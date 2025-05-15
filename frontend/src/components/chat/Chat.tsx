@@ -27,6 +27,7 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
         
         if(msg && msg.receiver_id && msg.content) {
             setMessages(prev => [...prev, msg])
+            displayNotification(msg.first_name + msg.last_name)
             setTimeout(() => {
                 const container = messageContainer.current
             if(container) container.scrollTop = container.scrollHeight
@@ -170,6 +171,18 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): (..
     };
 }
 
+const displayNotification = (username: string) => {
+    const containerNotification = document.createElement('div')
+    const messageNotification = document.createElement('div')
+    const timerNotification = document.createElement('div')
+    containerNotification.classList.add('messageNotification')
+    messageNotification.innerHTML = `${username} has sent you a new message`
+    containerNotification.append(messageNotification, timerNotification)
+    document.body.appendChild(containerNotification)
+
+    setTimeout(() => containerNotification.remove(), 5000)
+    
+}
 
 export default Chat
 

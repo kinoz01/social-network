@@ -1,3 +1,6 @@
+body{
+  position: relative;
+}
 .chat {
   background-color: var(--color2);
   width: 60%;
@@ -44,7 +47,15 @@
   justify-content: flex-start;
   gap: 0.5rem;
 }
-
+.messageNotification{
+  background: red;
+  padding: 20px;
+  position: absolute;
+  top:  20px;
+  right: 20px;
+  height: 300px;
+  text-align: center;
+}
 .userIcon {
   width: 30px;
   height: 30px;
@@ -58,10 +69,7 @@
   text-align: end;
   width: 100%;
 }
-.messageContent{
-  background: red;
-  display: block;
-}
+
 
 .sender {
   border-radius: 0 25px 25px 25px;
