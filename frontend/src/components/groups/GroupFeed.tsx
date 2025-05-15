@@ -38,6 +38,7 @@ export default function Feed() {
         setLoadingFirst(true);
         try {
             const page = await fetchPage(0);
+            if (!page || !page.length) return         
             setPosts(page);
             setOffset(page.length);
             setHasMore(page.length === PAGE_SIZE);
@@ -55,7 +56,7 @@ export default function Feed() {
         setLoadingMore(true);
         try {
             const next = await fetchPage(offset);
-            if (!next.length) {
+            if (!next || !next.length) {
                 setHasMore(false);
                 return;
             }
@@ -90,7 +91,7 @@ export default function Feed() {
 
     // UI States
     if (loadingFirst) return <Loading />;
-    if (!posts.length) {
+    if (!posts || !posts.length) {
         return (
             <div className={styles.status}>
                 <p>No posts yet.</p>

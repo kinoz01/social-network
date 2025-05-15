@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, FormEvent } from "react";
 import Image from "next/image";
 import styles from "./style/createGroup.module.css";
-import LoadingSpinner from "@/components/Loading";
+import Loading from "@/components/Loading";
 
 interface Follower {
     id: string;
@@ -76,7 +76,7 @@ export default function CreateGroupModal({ onClose }: Props) {
                 { credentials: "include" }
             );
 
-            /* --- 404 means “no match” – clear the list ------------------- */
+            /* --- 404 means "no match" - clear the list ------------------- */
             if (res.status === 404) {
                 setResults([]);
                 if (hasFollowers === null) setHasFollowers(false);   // first check
@@ -303,7 +303,7 @@ export default function CreateGroupModal({ onClose }: Props) {
                         />
                     </label>
 
-                    {searching && <LoadingSpinner />}
+                    {searching && <Loading />}
                     {!searching && query.trim() !== '' && results.length === 0 && (
                         <p className={styles.loadingText}>User not found.</p>
                     )}

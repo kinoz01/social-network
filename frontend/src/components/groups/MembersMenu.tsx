@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./style/membersMenu.module.css";
-import LoadingSpinner from "../Loading";
+import Loading from "@/components/Loading";
 import { useGroupSync } from "@/context/GroupSyncContext";
 
 
@@ -45,7 +45,7 @@ export default function MembersMenu() {
         return () => { live = false; };
     }, [groupId, version]);
 
-    if (loading) return <LoadingSpinner />;
+    if (loading) return <Loading />;
     if (err) return <p className={styles.error}>{err}</p>;
     if (!members.length) return null;
 
