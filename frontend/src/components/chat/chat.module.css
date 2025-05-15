@@ -18,9 +18,12 @@
   scrollbar-width: none;
 }
 .messages{
-  background: red;
+  background: rgba(56, 54, 54, 0.459);
   overflow-y: auto;
   height: calc(100% - 7rem);
+}
+.messages::-webkit-scrollbar{
+  width: 0;
 }
 .message {
   margin: 0.5rem 0;
