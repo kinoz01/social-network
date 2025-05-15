@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, startTransition } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./style/groups.module.css";
-import LoadingSpinner from "@/components/Loading";
+import Loading from "@/components/Loading";
 import CreateGroupModal from "../groups/CreateGroup";
 
 interface Group {
@@ -219,7 +219,7 @@ export default function GroupCard({
                 </div>
 
                 <div className={styles.groupCardContent}>
-                    {loading ? <LoadingSpinner /> : (
+                    {loading ? <Loading /> : (
                         groups.length === 0 ? (
                             <div className={styles.emptyState}>
                                 <Image src="/img/empty.svg" alt="empty" width={150} height={150} />

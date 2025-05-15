@@ -2,6 +2,9 @@
 
 import Image from "next/image";
 import styles from "./style/groupFeed.module.css";
+import TimeAgo from "./TimeAgo";
+import { useState } from "react";
+import CommentsModal from "./PostComments";
 
 type Post = {
     post_id: string;
@@ -14,6 +17,8 @@ type Post = {
 };
 
 export default function GroupPost({ p }: { p: Post }) {
+    const [open, setOpen] = useState(false);
+
     return (
         <article className={styles.post}>
             {/* ─── header ─── */}
@@ -31,16 +36,12 @@ export default function GroupPost({ p }: { p: Post }) {
                 />
                 <div className={styles.postInfo}>
                     <span className={styles.postUser}>
-                        {p.first_name} {p.last_name}
+                        {p.first_name} {p.last_name} &nbsp;
                     </span>
-                    <time className={styles.postCreationDate}>
-                        {new Date(p.created_at).toLocaleString()}
-                    </time>
+                    <TimeAgo dateStr={p.created_at} />
                 </div>
-            </header>
 
-            {/* ─── body ─── */}
-            <p className={styles.postContent}>{p.body}</p>
+            </header>
 
             {p.img_post && (
                 <Image
@@ -51,6 +52,16 @@ export default function GroupPost({ p }: { p: Post }) {
                     height={500}
                 />
             )}
+            {/* ─── text ─── */}
+            <p className={styles.postContent}>{p.body}</p>
+            {/* —— comment button —— */}
+            <div className={styles.cmtBtnContainer}>
+                <div className={styles.cmtBtn} onClick={() => setOpen(true)}>
+                    <Image src="/img/comment.svg" alt="comments" width={25} height={25} />
+                </div>
+            </div>
+
+            {open && <CommentsModal postId={p.post_id} onClose={() => setOpen(false)} />}
         </article>
     );
 }

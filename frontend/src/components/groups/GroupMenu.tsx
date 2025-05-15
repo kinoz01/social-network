@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import styles from "./style/groupMenu.module.css";
-import LoadingSpinner from "@/components/Loading";
+import Loading from "@/components/Loading";
 import { useGroupSync } from "@/context/GroupSyncContext";
 
 interface Info {
@@ -52,7 +52,7 @@ export default function GroupMenu() {
         };
     }, [id, version]);
 
-    if (loading) return <LoadingSpinner />;
+    if (loading) return <Loading />;
     if (error || !data) return <p className={styles.error}>{error}</p>;
 
     return (

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	auth "social-network/handlers/authentication"
@@ -38,6 +39,10 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "Invalid text", http.StatusBadRequest, err)
 		return
 	}
+
+	// remove consecutive more than three consecutive new lines to just two.
+	re := regexp.MustCompile(`(\r\n|\r|\n){3,}`)
+	body = re.ReplaceAllString(body, "\n\n")
 
 	// verify membership
 	var exists int

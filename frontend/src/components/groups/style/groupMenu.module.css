@@ -9,7 +9,7 @@
     align-items: center;
     padding: 1.5rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    max-width: 320px;
+    max-width: 600px;
     position: sticky;
     top: 1rem;
     overflow-wrap: anywhere;
@@ -37,7 +37,7 @@
 .name {
     font-size: 1.6rem;
     font-weight: 600;
-    line-height: 0.8;
+    line-height: 1;
     margin-bottom: 10px;
 }
 
@@ -51,7 +51,7 @@
     font-size: 1.2rem;
     color: #aaa;
     text-align: center;
-    line-height: 0.8;
+    line-height: 1;
     margin-bottom: 10px;
 }
 

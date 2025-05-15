@@ -76,8 +76,8 @@ func Shutdown() {
 	os.Exit(0)
 }
 
-// Reallow users to send group invitations after 10 days.
-// Reallow users to send group requests after 10 days.
+// Reallow users to send group invitations after 15 days.
+// Reallow users to send group requests after 15 days.
 func ResetDBRoutines() {
 	for {
 		time.Sleep(48 * time.Hour) // Run every 2 days
@@ -85,11 +85,11 @@ func ResetDBRoutines() {
 		log.Println("Running DB rejects cleanup...")
 		_, err1 := db.DB.Exec(`
 			DELETE FROM group_invitations
-			WHERE status = 'rejected' AND invited_at <= DATETIME('now', '-10 days')
+			WHERE status = 'rejected' AND invited_at <= DATETIME('now', '-15 days')
 		`)
 		_, err2 := db.DB.Exec(`
 			DELETE FROM group_requests
-			WHERE status = 'rejected' AND created_at <= DATETIME('now', '-10 days')
+			WHERE status = 'rejected' AND created_at <= DATETIME('now', '-15 days')
 		`)
 		if err1 != nil || err2 != nil {
 			log.Println("Cleanup errors:", err1, err2)
