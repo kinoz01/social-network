@@ -2,13 +2,13 @@
   background-color: var(--color2);
   width: 60%;
   height: calc(100%-1.5rem);
-  padding: 0 1rem;
+  /* padding: 0 1rem; */
   border-radius: 25px;
-  display: flex;
+  /* display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  gap: 1rem;
+  align-items: center; */
+  /* gap: 1rem; */
   transition: all 0.3s ease;
   background-color: var(--color1);
   color: var(--color2);
@@ -21,6 +21,8 @@
   background: rgba(56, 54, 54, 0.459);
   overflow-y: auto;
   height: calc(100% - 7rem);
+  display: flex;
+  flex-direction: column;
 }
 .messages::-webkit-scrollbar{
   width: 0;
@@ -28,11 +30,10 @@
 .message {
   margin: 0.5rem 0;
   padding: 1rem;
-  width: 60%;
+  width: fit-content;
   height: auto;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 1rem;
 
 }
@@ -41,7 +42,6 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  align-items: center;
   gap: 0.5rem;
 }
 
@@ -58,6 +58,10 @@
   text-align: end;
   width: 100%;
 }
+.messageContent{
+  background: red;
+  display: block;
+}
 
 .sender {
   border-radius: 0 25px 25px 25px;
@@ -69,7 +73,7 @@
   background-color: var(--color4);
   border-radius: 25px 25px 0 25px;
   color: var(--color1);
-  float: right;
+  align-self: flex-end;
 }
 
 .chatForm {

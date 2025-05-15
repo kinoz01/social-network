@@ -27,6 +27,10 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
         
         if(msg && msg.receiver_id && msg.content) {
             setMessages(prev => [...prev, msg])
+            setTimeout(() => {
+                const container = messageContainer.current
+            if(container) container.scrollTop = container.scrollHeight
+            }, 100)
             
         }
         

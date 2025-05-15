@@ -72,10 +72,18 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 				log.Println("sent sucessfully from backend")
 
 			}
-			if err != nil {
-				log.Printf("Error writing to client %s: %v", user.ID, err)
-				break
+			if conn, exists := Clients[msg.Sender_id]; exists {
+				if err := conn.WriteJSON(msg); err != nil {
+					log.Println("Error sending message:", err)
+					return
+				}
+				log.Println("sent sucessfully from backend")
+
 			}
+			// if err != nil {
+			// 	log.Printf("Error writing to client %s: %v", user.ID, err)
+			// 	break
+			// }
 
 		} else {
 			log.Println("message does not inserted in database!!!")
