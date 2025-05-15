@@ -26,7 +26,7 @@ export async function fetchMessages(user: User, currentUser:User, msgNum: number
         headers: {
           "Content-Type" : "application/json"
         },
-        body: JSON.stringify({sender_id : currentUser?.id, receiver_id : user.id, msgNbr: msgNum})
+        body: JSON.stringify({sender_id : currentUser?.id, receiver_id : user.id, msgNum: msgNum})
       })
       console.log(messageRequest);
       if(!messageRequest.ok){

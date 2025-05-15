@@ -10,8 +10,6 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
     const [message, setMessage] = useState<string>("")
     const [messages, setMessages] = useState<Messages[]>([])
     const [currentUser, setCurrentUser] = useState<User|null>(null)
-    // const [msgNum, setMsgNum] = useState<number>(0)
-    // const [loading, setLoading] = useState<boolean>(false);
     const [moreMessages, setMoreMessages] = useState<boolean>(true)
     const messageContainer = useRef<HTMLDivElement>(null)
     const msgNumRef = useRef<number>(0)
@@ -37,13 +35,17 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
     useEffect(() => {
         if(!user?.id || !currentUser?.id) return
         const getMessages = async() => {
-            const msgs =  await fetchMessages(user, currentUser, msgNumRef.current)
-            setMessages(prev => msgNumRef.current === 0 ? msgs : [...msgs, ...prev])
-            msgNumRef.current += 4
+            const msgs =  await fetchMessages(user, currentUser, 0)
+            msgs.sort().reverse()
+            setMessages(msgs)
             setMoreMessages(msgs.length > 0)
-           
-            const container = messageContainer.current
-            if (container) container.
+            setTimeout(() => {
+                const container = messageContainer.current;
+                if (container) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }, 100); 
+            if (msgs.length > 0) msgNumRef.current = 4
 
         }
         getMessages()
@@ -51,10 +53,6 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
 
     const handleScroll = debounce(() => {
         const container = messageContainer.current
-        console.log("msgNum", msgNumRef.current);
-        console.log("scroll", messageContainer.current?.scrollTop);
-        console.log("container",container);
-        
         if (!container || !moreMessages) return
 
         if(container.scrollTop < 10) {
@@ -65,12 +63,25 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
 
     const getMoreMessages = async() => {
         if(!moreMessages || !user || !currentUser) return
-        const msgs =  await fetchMessages(user, currentUser, msgNumRef.current)
+        const currentMsgNum = msgNumRef.current;
+        const msgs =  await fetchMessages(user, currentUser, currentMsgNum)
+        const container = messageContainer.current;
+    if (!container) return;
+        const oldScroll = container.scrollHeight;
+        // console.log(previousScrollHeight, "previous");
+        
         if(msgs.length === 0) {
             setMoreMessages(false)
         } else {
+            msgs.sort().reverse()
             setMessages(prev => [...msgs, ...prev]);
-            msgNumRef.current += 4
+            if(msgs.length > 0) msgNumRef.current =  currentMsgNum + 4
+            setTimeout(() => {
+                if (container) {
+                    container.scrollTop = container.scrollHeight - oldScroll - 20; // 3. Scroll delta
+                    
+                }
+            }, 100);
         }
     }
     
