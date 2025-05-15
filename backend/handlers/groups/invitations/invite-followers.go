@@ -102,34 +102,6 @@ func InviteAllFollowers(groupID, ownerID string) error {
 	return tx.Commit()
 }
 
-func SLOWInviteAllFollowers(groupID, ownerID string) error {
-	rows, err := tp.DB.Query(`
-		SELECT fr.follower_id
-		  FROM follow_requests fr
-		  LEFT JOIN group_users gu
-		         ON gu.group_id = ? AND gu.users_id = fr.follower_id
-		 WHERE fr.followed_id = ?
-		   AND fr.status      = 'accepted'
-		   AND gu.users_id IS NULL`, groupID, ownerID)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		fmt.Println("inserted--------------------------")
-		var uid string
-		if rows.Scan(&uid) == nil {
-			_, _ = tp.DB.Exec(`
-				INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
-				VALUES (?, ?, ?)`,
-				uuid.Must(uuid.NewV4()).String(), groupID, uid)
-		}
-	}
-
-	return nil
-}
-
 
 // Invites follwer to join a group if they are not already a member
 func InviteFollowers(groupID string, ids []string) error {

@@ -86,7 +86,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	/* ---------- invitations ---------- */
 	switch j := r.FormValue("invitee_ids"); {
 	case j == "ALL":
-		if err := grpInvite.SLOWInviteAllFollowers(groupID, user.ID); err != nil {
+		if err := grpInvite.InviteAllFollowers(groupID, user.ID); err != nil {
 			help.JsonError(w, "invite followers", http.StatusInternalServerError, err)
 			return
 		}
