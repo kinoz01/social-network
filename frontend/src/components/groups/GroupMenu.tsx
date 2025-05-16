@@ -6,6 +6,7 @@ import Image from "next/image";
 import styles from "./style/groupMenu.module.css";
 import Loading from "@/components/Loading";
 import { useGroupSync } from "@/context/GroupSyncContext";
+import InviteMenu from "@/components/groups/InviteMenu";
 
 interface Info {
     id: string;
@@ -23,6 +24,7 @@ export default function GroupMenu() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const { version } = useGroupSync();
+    const [inviteOpen, setInviteOpen] = useState(false);
 
 
     useEffect(() => {
@@ -55,47 +57,58 @@ export default function GroupMenu() {
     if (loading) return <Loading />;
     if (error || !data) return <p className={styles.error}>{error}</p>;
 
+    if (loading) return <Loading />;
+    if (error || !data) return <p className={styles.error}>{error}</p>;
+
     return (
-        <div className={styles.groupMenu}>
-            <div className={styles.header}>
-                <Image
-                    src={data.group_pic
-                        ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_avatars/${data.group_pic}`
-                        : "/img/default-group.jpg"}
-                    alt="group avatar"
-                    width={160}
-                    height={160}
-                    className={styles.avatar}
-                />
-                <h2 className={styles.name}>{data.group_name}</h2>
-                <p className={styles.memberCount}>{data.members} Member{data.members > 1 ? "s" : ""}</p>
-                <p className={styles.about}>{data.description}</p>
+        <>
+            <div className={styles.groupMenu}>
+                <div className={styles.header}>
+                    <Image
+                        src={data.group_pic
+                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_avatars/${data.group_pic}`
+                            : "/img/default-group.jpg"}
+                        alt="group avatar"
+                        width={160}
+                        height={160}
+                        className={styles.avatar}
+                    />
+                    <h2 className={styles.name}>{data.group_name}</h2>
+                    <p className={styles.memberCount}>{data.members} Member{data.members > 1 ? "s" : ""}</p>
+                    <p className={styles.about}>{data.description}</p>
+                </div>
+
+                <nav className={styles.menu}>
+                    <button className={styles.menuItem}>
+                        <Image src="/img/menu-posts.svg" alt="" width={22} height={22} />
+                        <span className={styles.label}>Posts</span>
+                    </button>
+                    <button className={styles.menuItem}>
+                        <Image src="/img/menu-chat.svg" alt="" width={22} height={22} />
+                        <span className={styles.label}>Chat</span>
+                    </button>
+                    <button className={styles.menuItem}>
+                        <Image src="/img/menu-events.svg" alt="" width={22} height={22} />
+                        <span className={styles.label}>Events</span>
+                    </button>
+                    <button
+                        className={`${styles.menuItem} ${styles.responsiveOnly}`}
+                        onClick={() => setInviteOpen(true)}
+                    >
+                        <Image src="/img/menu-invite.svg" alt="" width={22} height={22} />
+                        <span className={styles.label}>Invite</span>
+                    </button>
+                    {isOwner && (
+                        <button className={`${styles.menuItem} ${styles.responsiveOnly}`}>
+                            <Image src="/img/menu-requests.svg" alt="" width={22} height={22} />
+                            <span className={styles.label}>Join Requests</span>
+                        </button>
+                    )}
+                </nav>
             </div>
 
-            <nav className={styles.menu}>
-                <button className={styles.menuItem}>
-                    <Image src="/img/menu-posts.svg" alt="" width={22} height={22} />
-                    <span className={styles.label}>Posts</span>
-                </button>
-                <button className={styles.menuItem}>
-                    <Image src="/img/menu-chat.svg" alt="" width={22} height={22} />
-                    <span className={styles.label}>Chat</span>
-                </button>
-                <button className={styles.menuItem}>
-                    <Image src="/img/menu-events.svg" alt="" width={22} height={22} />
-                    <span className={styles.label}>Events</span>
-                </button>
-                <button className={`${styles.menuItem} ${styles.responsiveOnly}`}>
-                    <Image src="/img/menu-invite.svg" alt="" width={22} height={22} />
-                    <span className={styles.label}>Invite</span>
-                </button>
-                {isOwner && (
-                    <button className={`${styles.menuItem} ${styles.responsiveOnly}`}>
-                        <Image src="/img/menu-requests.svg" alt="" width={22} height={22} />
-                        <span className={styles.label}>Join Requests</span>
-                    </button>
-                )}
-            </nav>
-        </div>
+            {/* Invite Modal */}
+            {inviteOpen && <InviteMenu modal={true} onClose={() => setInviteOpen(false)} />}
+        </>
     );
 }

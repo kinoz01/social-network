@@ -38,7 +38,7 @@ export default function InviteMenu({
         setTimeout(() => { setMsg(""); setCls(""); }, 8000);
     };
 
-    /* 📥 initial load of ALL accepted followers */
+    /* initial load of ALL accepted followers */
     useEffect(() => {
         (async () => {
             try {
@@ -57,7 +57,7 @@ export default function InviteMenu({
         })();
     }, []);
 
-    /* 🔍 live search */
+    /* live search */
     const runSearch = async (q: string) => {
         if (!q.trim()) { setResults([]); return; }
         setSearch(true);
@@ -111,7 +111,7 @@ export default function InviteMenu({
             );
             if (!r.ok) throw new Error();
             setSel(new Set());
-            flash("Invitations sent ✓", true);
+            flash("Sending succeeded", true);
         } catch {
             flash("Sending failed", false);
         }

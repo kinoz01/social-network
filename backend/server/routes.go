@@ -54,6 +54,9 @@ func Routes() http.Handler {
 	// Groups posts:
 	mux.HandleFunc("/api/groups/posts", grpsPost.GroupPostsHandler)
 	mux.HandleFunc("/api/groups/create-post", grpsPost.CreatePostHandler)
+	mux.HandleFunc("/api/groups/comments", grpsPost.GetCommentsHandler)
+	mux.HandleFunc("/api/groups/create-comment", grpsPost.CreateCommentHandler)
+	
 
 	// Following:
 	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)

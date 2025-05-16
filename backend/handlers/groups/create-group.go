@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"regexp"
 	"strings"
 
 	auth "social-network/handlers/authentication"
+	grpInvite "social-network/handlers/groups/invitations"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
-	grpInvite "social-network/handlers/groups/invitations"
 
 	"github.com/gofrs/uuid"
 )
@@ -44,18 +45,18 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 	/* ---------- Save group image ---------- */
 	var picPath string
-	if file, _, _ := r.FormFile("group_pic"); file != nil {
+	if file, hdr, _ := r.FormFile("group_pic"); file != nil {
 		defer file.Close()
 		buff, err := help.LimitRead(file, 2<<20) // 2 MB
 		if err != nil {
 			help.JsonError(w, "Group picture too large", http.StatusBadRequest, err)
 			return
 		}
-		if help.IsSVG(buff) {
-			help.JsonError(w, "SVG images aren't supported", http.StatusBadRequest, nil)
+		ext := strings.ToLower(filepath.Ext(hdr.Filename))
+		if ext != ".jpg" && ext != ".png" && ext != ".webp" && ext != ".jpeg" && ext != ".gif" {
+			help.JsonError(w, "unsupported image format", http.StatusBadRequest, nil)
 			return
 		}
-
 		picPath, err = help.SaveImg(buff, "group_pics/")
 		if err != nil {
 			help.JsonError(w, "Failed to save picture", http.StatusInternalServerError, err)

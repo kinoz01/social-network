@@ -3,7 +3,6 @@ package groups
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -21,8 +20,7 @@ func GroupPostsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	
-	fmt.Println("limit:", limit, "offset:", offset)
+
 	rows, err := tp.DB.Query(`
 	    SELECT
 	        p.post_id,

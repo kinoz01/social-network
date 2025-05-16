@@ -17,9 +17,9 @@ export default function GroupPostInput() {
     const [errMsg, setErr] = useState("");
     const fileRef = useRef<HTMLInputElement>(null);
     const { refreshFeed } = useGroupFeed();
-    
+
     if (!user) return null;
-    
+
     const onPick = (e: React.ChangeEvent<HTMLInputElement>) => {
         setImg(e.target.files?.[0] ?? null);
     };
@@ -83,9 +83,10 @@ export default function GroupPostInput() {
                     placeholder="Share your thoughts..."
                     className={styles.input}
                     rows={2}
+                    maxLength={1500}
                 />
                 <button type="submit" disabled={loading} className={styles.postButtonIcon}>
-                    <Image src="/img/arrow-up.svg" alt="Send" width={20} height={20} />
+                    <Image src="/img/arrow-up.svg" alt="Send" width={18} height={18} />
                 </button>
             </div>
 
@@ -98,16 +99,24 @@ export default function GroupPostInput() {
                     hidden
                     onChange={onPick}
                 />
+                {image && <span className={styles.fileName}>{truncateFileName(image.name, 50)}</span>}
                 <button
                     type="button"
                     className={styles.imageButton}
                     onClick={() => fileRef.current?.click()}
                 >
-                    <Image src="/img/image-icon.svg" alt="Add image" width={20} height={20} />
-                    Image
+                    <Image src="/img/upload.svg" alt="Add image" width={25} height={25} />
                 </button>
-                {image && <span className={styles.fileName}>{image.name}</span>}
             </div>
         </form>
     );
+}
+
+function truncateFileName(name: string, max: number = 30): string {
+    if (name.length <= max) return name;
+    const dotIndex = name.lastIndexOf(".");
+    if (dotIndex <= 0) return name.slice(0, max - 3) + "...";
+    const ext = name.slice(dotIndex);
+    const base = name.slice(0, max - ext.length - 3);
+    return base + "..." + ext;
 }

@@ -7,10 +7,12 @@ import {
     FormEvent,
     ChangeEvent,
 } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import Loading from "@/components/Loading";
 import styles from "./style/comments.module.css";
 import { createPortal } from "react-dom";
+import { useUser } from "@/context/UserContext";
 
 /* ───────── types ───────── */
 export type CommentT = {
@@ -60,6 +62,9 @@ export default function PostComments({
     const [text, setText] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const fileInput = useRef<HTMLInputElement>(null);
+    const [error, setError] = useState("");
+    const { user } = useUser();
+    if (!user) return null;   
 
     /* ─ first page ─ */
     useEffect(() => {
@@ -67,7 +72,7 @@ export default function PostComments({
         (async () => {
             try {
                 const page = await fetchComments(postId, 0);
-                if (!live) return;
+                if (!page || !live) return;
                 setItems(page);
                 setOff(page.length);
                 setMore(page.length === PAGE);
@@ -94,7 +99,11 @@ export default function PostComments({
             setLoad(true);
             try {
                 const next = await fetchComments(postId, offset);
-                setItems((prev) => [...prev, ...next]);
+                setItems((prev) => {
+                    const map = new Map(prev.map(item => [item.comment_id, item]));
+                    next.forEach(item => map.set(item.comment_id, item));
+                    return Array.from(map.values());
+                });
                 setOff((o) => o + next.length);
                 setMore(next.length === PAGE);
             } catch (e) {
@@ -120,16 +129,17 @@ export default function PostComments({
 
         try {
             const r = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/comment`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/create-comment`,
                 { method: "POST", body: fd, credentials: "include" }
             );
-            if (!r.ok) throw new Error();
+            if (!r.ok) throw new Error((await r.json()).msg || "Something went wrong");
             const added: CommentT = await r.json();
             setItems((prev) => [added, ...prev]);
             setText("");
             setFile(null);
-        } catch (e) {
-            alert("couldn’t comment");
+            setError("");
+        } catch (e: any) {
+            setError(e.message);
             console.error(e);
         }
     };
@@ -156,25 +166,27 @@ export default function PostComments({
                     ) : (
                         items.map((c) => (
                             <div key={c.comment_id} className={styles.item}>
-                                <Image
-                                    src={
-                                        c.profile_pic
-                                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${c.profile_pic}`
-                                            : "/img/default-avatar.png"
-                                    }
-                                    alt=""
-                                    width={32}
-                                    height={32}
-                                    className={styles.avt}
-                                />
                                 <div className={styles.bubble}>
-                                    <span className={styles.name}>
-                                        {c.first_name} {c.last_name}
-                                    </span>
+                                    <div className={styles.headerRow}>
+                                        <Link href={`/profile/${c.user_id}`} className={styles.linkWrapper}>
+                                            <Image
+                                                src={c.profile_pic ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${c.profile_pic}` : "/img/default-avatar.png"}
+                                                alt=""
+                                                width={40}
+                                                height={40}
+                                                className={styles.avt}
+                                            />
+                                        </Link>
+                                        <Link href={`/profile/${c.user_id}`} className={styles.nameLink}>
+                                            <span className={styles.name}>
+                                                {c.first_name} {c.last_name}
+                                            </span>
+                                        </Link>
+                                    </div>
                                     <p>{c.content}</p>
                                     {c.img_comment && (
                                         <Image
-                                            src={`${process.env.NEXT_PUBLIC_API_URL}/api/storage/comments/${c.img_comment}`}
+                                            src={`${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_comments/${c.img_comment}`}
                                             alt=""
                                             width={200}
                                             height={200}
@@ -187,23 +199,29 @@ export default function PostComments({
                     )}
 
                     {loadingMore && <Loading />}
-                    {!hasMore && items.length > 0 && <p className={styles.end}>END</p>}
+                    {!hasMore && offset > PAGE && <p className={styles.end}>No More Comments</p>}
                 </div>
 
                 {/* composer */}
                 <form className={styles.inputRow} onSubmit={send}>
                     <Image
-                        src="/img/default-avatar.png"
+                        src={
+                            user.profile_pic
+                                ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${user.profile_pic}`
+                                : `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/avatar.webp`
+                        }
                         alt=""
                         width={32}
                         height={32}
                         className={styles.avatar}
+                        unoptimized
                     />
                     <textarea
                         className={styles.text}
                         rows={3}
                         placeholder="Write a comment…"
                         value={text}
+                        maxLength={500}
                         onChange={(e) => setText(e.target.value)}
                         onInput={(e) => {
                             const ta = e.currentTarget;
@@ -227,24 +245,29 @@ export default function PostComments({
                             setFile(e.target.files?.[0] ?? null)
                         }
                     />
-                    <button
-                        type="button"
-                        className={styles.imgBtn}
-                        onClick={() => fileInput.current?.click()}
-                    >
-                        <Image src="/img/image-icon.svg" alt="" width={20} height={20} />
-                    </button>
+                    <div className={styles.btnGroup}>
+                        <button
+                            type="button"
+                            className={styles.imgBtn}
+                            onClick={() => fileInput.current?.click()}
+                        >
+                            <Image src="/img/upload.svg" alt="" width={30} height={30} />
+                        </button>
 
-                    <button
-                        type="submit"
-                        className={styles.send}
-                        disabled={!text.trim() && !file}
-                    >
-                        <Image src="/img/arrow-up.svg" alt="" width={18} height={18} />
-                    </button>
+                        <button
+                            type="submit"
+                            className={styles.send}
+                            disabled={!text.trim() && !file}
+                        >
+                            <Image src="/img/arrow-up.svg" alt="" width={18} height={18} />
+                        </button>
+                    </div>
                 </form>
+                <div className={styles.errorSlot}>
+                    {error && error}
+                </div>
             </div>
-        </div>
+        </div >
     );
 
     return createPortal(modal, document.body);

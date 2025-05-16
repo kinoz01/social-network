@@ -35,7 +35,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	groupID := r.FormValue("group_id")
 	body := strings.TrimSpace(r.FormValue("body"))
 
-	if groupID == "" || len(body) == 0 || len(body) > 10000 {
+	if groupID == "" || len(body) == 0 || len(body) > 2000 {
 		help.JsonError(w, "Invalid text", http.StatusBadRequest, err)
 		return
 	}

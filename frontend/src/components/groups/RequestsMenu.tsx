@@ -32,7 +32,7 @@ function useRequests(groupId: string) {
             if (!r.ok) throw new Error();
             setList(await r.json());
         } catch {
-            setList([]);               // hide on error
+            setList([]);
         } finally {
             setLoad(false);
         }
@@ -60,7 +60,7 @@ function useRequests(groupId: string) {
             }
         ).catch(() => console.warn(`${route} failed`));
 
-        refresh();                     
+        refresh();
     };
 
     return { list, loading, act };
@@ -76,11 +76,18 @@ function RequestsList({
 }) {
     return (
         <>
-            <h4 className={styles.heading}>JOIN&nbsp;REQUESTS</h4>
+            <h4 className={styles.heading}>JOIN REQUESTS</h4>
 
             <ul className={styles.list}>
                 {list.map(r => (
-                    <li key={r.id} className={styles.item}>
+                    <li
+                        key={r.id}
+                        className={styles.item}
+                        onClick={() => {
+                            window.location.href = `/profile/${r.user_id}`;
+                        }}
+                        style={{ cursor: "pointer" }}
+                    >
                         <Image
                             src={
                                 r.profile_pic
@@ -99,18 +106,24 @@ function RequestsList({
                         <div className={styles.buttons}>
                             <button
                                 className={styles.iconButton}
-                                onClick={() => onAct("accept", r.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAct("accept", r.id);
+                                }}
                                 title="Accept"
                             >
-                                <Image src="/img/accept.svg" alt="" width={20} height={20} />
+                                <Image src="/img/accept.svg" alt="Accept" width={20} height={20} />
                             </button>
 
                             <button
                                 className={styles.iconButton}
-                                onClick={() => onAct("refuse", r.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAct("refuse", r.id);
+                                }}
                                 title="Refuse"
                             >
-                                <Image src="/img/refuse.svg" alt="" width={20} height={20} />
+                                <Image src="/img/refuse.svg" alt="Refuse" width={20} height={20} />
                             </button>
                         </div>
                     </li>

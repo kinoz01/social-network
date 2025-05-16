@@ -93,17 +93,18 @@
     border: none;
     cursor: pointer;
     color: var(--color6);
+    margin-right: 5px;
 }
 
 .imageButton:focus {
     outline: none;
-    border: 1px solid #000 !important;
     border-radius: 6px;
 }
 
 /* Display Selected File Name */
 .fileName {
     font-size: .8rem;
+    color: grey;
 }
 
 /* ——— small screens ——— */
