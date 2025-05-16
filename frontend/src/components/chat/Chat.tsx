@@ -27,15 +27,20 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
         
         if(msg && msg.receiver_id && msg.content) {
             setMessages(prev => [...prev, msg])
-            displayNotification(msg.first_name + msg.last_name)
+            // displayNotification(msg.first_name + msg.last_name)
             setTimeout(() => {
                 const container = messageContainer.current
             if(container) container.scrollTop = container.scrollHeight
             }, 100)
+            if(msg.receiver_id === currentUser?.id) {
+                console.log("exactly");
+                
+                displayNotification(`${msg.first_name} ${msg.last_name}`)
+            }
             
         }
         
-    }, [msg])
+    }, [msg, currentUser])
 
     useEffect(() => {
         if(!user?.id || !currentUser?.id) return
@@ -172,14 +177,16 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): (..
 }
 
 const displayNotification = (username: string) => {
+    const chat = document.querySelector('.chat')
     const containerNotification = document.createElement('div')
     const messageNotification = document.createElement('div')
     const timerNotification = document.createElement('div')
-    containerNotification.classList.add('messageNotification')
+    containerNotification.className = styles.messageNotification
+    timerNotification.className = styles.timer
     messageNotification.innerHTML = `${username} has sent you a new message`
     containerNotification.append(messageNotification, timerNotification)
-    document.body.appendChild(containerNotification)
-
+    chat?.appendChild(containerNotification)
+    console.log("suuuure");
     setTimeout(() => containerNotification.remove(), 5000)
     
 }
