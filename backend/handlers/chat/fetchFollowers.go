@@ -20,7 +20,7 @@ func FetchFollowers(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
-	query := `SELECT u.first_name, u.last_name,
+	query := `SELECT u.first_name, u.last_name, u.profile_pic,
 			(SELECT COUNT(*) FROM follow_requests WHERE follower_id = u.id) AS following,
 			(SELECT COUNT(*) FROM follow_requests WHERE followed_id = u.id) AS followed,
 			(SELECT COUNT(*) FROM posts WHERE user_id = u.id) AS postNum FROM users u
@@ -30,12 +30,13 @@ func FetchFollowers(w http.ResponseWriter, r *http.Request) {
 	type Followers struct {
 		First_name     string `json:"first_name"`
 		Last_name      string `json:"last_name"`
+		Image          string `json:"image"`
 		TotalFollowers int    `json:"totalFollowers"`
 		TotalFollowing int    `json:"totalFollowing"`
 		TotalPosts     int    `json:"totalPosts"`
 	}
 	follow := Followers{}
-	err = row.Scan(&follow.First_name, &follow.Last_name, &follow.TotalFollowers, &follow.TotalFollowing, &follow.TotalPosts)
+	err = row.Scan(&follow.First_name, &follow.Last_name, &follow.Image, &follow.TotalFollowers, &follow.TotalFollowing, &follow.TotalPosts)
 	if err != nil {
 		fmt.Println("trueeeeeeeeeeeeeeee")
 		log.Fatal("Error in scaninf followers!!")

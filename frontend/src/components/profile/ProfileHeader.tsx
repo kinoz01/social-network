@@ -5,11 +5,12 @@ import styles from "./profile.module.css";
 import { useEffect, useState } from "react";
 
 export interface Followers {
+  first_name: string,
+  last_name: string,
+  image: string,
   totalFollowers: number,
   totalFollowing: number,
   totalPosts: number,
-  first_name: string,
-  last_name: string
 }
 function ProfileHeader() {
   const [followingAction, setFollowingAction] = useState(false);
@@ -47,7 +48,7 @@ function ProfileHeader() {
     <div className={styles.profileHeader}>
       <div className={styles.userInfo}>
         <Image
-          src="https://images.unsplash.com/photo-1740768081811-e3adf4af4efe?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDExOHxibzhqUUtUYUUwWXx8ZW58MHx8fHx8"
+          src={`/backend/storage/avatars/${followers?.image}` || "/backend/storage/posts/876c77be-7dab-42f4-9b04-ff0d5084b53a.jpg"}
           alt="User Image"
           className={styles.userImage}
           width={150}
