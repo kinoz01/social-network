@@ -94,3 +94,24 @@
     color: #d00;
     font-size: .85rem;
 }
+
+.item {
+    position: relative;
+}
+
+/* online = normal opacity + green dot aligned right */
+.item.online::after {
+    content: "";
+    flex-shrink: 0;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background: #28c76f;
+    margin-left: auto;
+}
+
+/* offline = faded look */
+.item.offline {
+    opacity: 0.45;
+    filter: grayscale(0.3);
+}

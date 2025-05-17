@@ -57,9 +57,6 @@ export default function GroupMenu() {
     if (loading) return <Loading />;
     if (error || !data) return <p className={styles.error}>{error}</p>;
 
-    if (loading) return <Loading />;
-    if (error || !data) return <p className={styles.error}>{error}</p>;
-
     return (
         <>
             <div className={styles.groupMenu}>

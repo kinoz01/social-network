@@ -88,7 +88,7 @@
 }
 
 /* Responsive Collapse */
-@media (max-width: 1000px) {
+@media (max-width: 970px) {
     .groupMenu {
         width: 100%;
         max-width: none;
@@ -128,8 +128,8 @@
     }
 
     .avatar {
-        width: 50px !important;
-        height: 50px !important;
+        width: 60px !important;
+        height: 60px !important;
     }
 
     .name {

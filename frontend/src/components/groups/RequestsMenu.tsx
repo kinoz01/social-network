@@ -29,7 +29,7 @@ function useRequests(groupId: string) {
                 `${process.env.NEXT_PUBLIC_API_URL}/api/groups/requests?group_id=${groupId}`,
                 { credentials: "include", cache: "no-store" }
             );
-            if (!r.ok) throw new Error();
+            if (!r.ok) return
             setList(await r.json());
         } catch {
             setList([]);

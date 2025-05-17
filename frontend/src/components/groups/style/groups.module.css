@@ -12,6 +12,7 @@
     padding: 2rem;
     background-color: #f9fafb;
     min-height: 100vh;
+    padding-top: 1rem;
 }
 
 @media (max-width: 450px) {
@@ -168,6 +169,11 @@
     background: #1f2937;
 }
 
+@media (max-width: 1000px) {
+    .groupGrid {
+        grid-template-columns: 1fr;
+    }
+}
 
 .pendingText {
     color: #6b7280;
