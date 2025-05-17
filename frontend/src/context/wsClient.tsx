@@ -63,7 +63,6 @@ export function WSProvider({ children }: { children: ReactNode }) {
         };
 
         ws.onclose = () => console.log("[WS] closed");
-        ws.onerror = (e) => console.error("[WS] error", e);
 
         return () => ws.close();
     }, []);

@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./style/groupMenu.module.css";
 import Loading from "@/components/Loading";
 import { useGroupSync } from "@/context/GroupSyncContext";
 import InviteMenu from "@/components/groups/InviteMenu";
+import { RequestsModal } from "@/components/groups/RequestsMenu";
+
 
 interface Info {
     id: string;
@@ -25,7 +28,7 @@ export default function GroupMenu() {
     const [loading, setLoading] = useState(true);
     const { version } = useGroupSync();
     const [inviteOpen, setInviteOpen] = useState(false);
-
+    const [requestsOpen, setRequestsOpen] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -76,18 +79,18 @@ export default function GroupMenu() {
                 </div>
 
                 <nav className={styles.menu}>
-                    <button className={styles.menuItem}>
+                    <Link href={`/groups/${id}`} className={styles.menuItem}>
                         <Image src="/img/menu-posts.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Posts</span>
-                    </button>
-                    <button className={styles.menuItem}>
+                    </Link>
+                    <Link href={`/groups/${id}/chat`} className={styles.menuItem}>
                         <Image src="/img/menu-chat.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Chat</span>
-                    </button>
-                    <button className={styles.menuItem}>
+                    </Link>
+                    <Link href={`/groups/${id}/events`} className={styles.menuItem}>
                         <Image src="/img/menu-events.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Events</span>
-                    </button>
+                    </Link>
                     <button
                         className={`${styles.menuItem} ${styles.responsiveOnly}`}
                         onClick={() => setInviteOpen(true)}
@@ -96,7 +99,10 @@ export default function GroupMenu() {
                         <span className={styles.label}>Invite</span>
                     </button>
                     {isOwner && (
-                        <button className={`${styles.menuItem} ${styles.responsiveOnly}`}>
+                        <button
+                            className={`${styles.menuItem} ${styles.responsiveOnly}`}
+                            onClick={() => setRequestsOpen(true)}
+                        >
                             <Image src="/img/menu-requests.svg" alt="" width={22} height={22} />
                             <span className={styles.label}>Join Requests</span>
                         </button>
@@ -106,6 +112,9 @@ export default function GroupMenu() {
 
             {/* Invite Modal */}
             {inviteOpen && <InviteMenu modal={true} onClose={() => setInviteOpen(false)} />}
+            {requestsOpen && (
+                <RequestsModal modal onClose={() => setRequestsOpen(false)} />
+            )}
         </>
     );
 }

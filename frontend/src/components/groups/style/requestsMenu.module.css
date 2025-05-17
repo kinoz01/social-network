@@ -72,14 +72,10 @@
     transform: scale(1.1)
 }
 
-/* ───────── mobile stack ─────────── */
-@media(max-width:900px) {
+
+@media(max-width:970px) {
     .menu {
-        flex: 1 1 100%;
-        max-width: none;
-        position: sticky;
-        top: 0;
-        z-index: 49;
+       display: none;
     }
 }
 
@@ -91,7 +87,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 10000;
 }
 
 .modal {

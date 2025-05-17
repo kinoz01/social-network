@@ -1,11 +1,9 @@
 import Chat from "@/components/chat/Chat"
 
-function GroupChatPage() {
+export default function GroupChatPage() {
     return (
         <>
             <Chat />
         </>
     )
 }
-
-export default GroupChatPage

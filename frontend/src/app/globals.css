@@ -39,6 +39,7 @@ main {
   flex-wrap: nowrap;
   justify-content: space-between;
   height: 100vh;
+  overflow-x: scroll;
 }
 
 body {

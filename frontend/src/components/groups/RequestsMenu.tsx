@@ -1,3 +1,4 @@
+// src/components/groups/RequestsMenu.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -6,22 +7,24 @@ import Image from "next/image";
 import styles from "./style/requestsMenu.module.css";
 import { useGroupSync } from "@/context/GroupSyncContext";
 
-/* ────────────────── types ────────────────── */
+/* ─────────── types ─────────── */
 type Req = {
-    id: string;           // row id (group_requests.id)
+    id: string;
     user_id: string;
     first_name: string;
     last_name: string;
     profile_pic: string | null;
 };
 
-/* ────────────────── data hook ────────────── */
+/* ─────────── data hook ─────────── */
+/* ─────────── data hook ─────────── */
+/* ─────────── data hook ─────────── */
 function useRequests(groupId: string) {
     const { version, refresh } = useGroupSync();
     const [list, setList] = useState<Req[]>([]);
     const [loading, setLoad] = useState(true);
 
-    /* fetch wrapper (memoised so it can be a dep) */
+    /* 1. fetch from backend */
     const fetchRequests = useCallback(async () => {
         try {
             setLoad(true);
@@ -29,8 +32,8 @@ function useRequests(groupId: string) {
                 `${process.env.NEXT_PUBLIC_API_URL}/api/groups/requests?group_id=${groupId}`,
                 { credentials: "include", cache: "no-store" }
             );
-            if (!r.ok) return
-            setList(await r.json());
+            if (r.ok) setList(await r.json());
+            else setList([]);
         } catch {
             setList([]);
         } finally {
@@ -38,35 +41,37 @@ function useRequests(groupId: string) {
         }
     }, [groupId]);
 
-    /* initial + whenever the version changes */
+    /* 2. run on mount and whenever GroupSync version bumps */
     useEffect(() => { fetchRequests(); }, [fetchRequests, version]);
 
-    /* optimistic action + bump version */
+    /* 3. optimistic accept / refuse */
     const act = async (route: "accept" | "refuse", id: string) => {
-        setList(prev => prev.filter(x => x.id !== id));      // optimistic
+        setList(prev => prev.filter(x => x.id !== id));   // optimistic
 
         const endpoint =
             route === "accept"
                 ? "/api/groups/accept-request"
                 : "/api/groups/refuse-request";
 
-        fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`,
-            {
+        try {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
-                body: JSON.stringify({ request_id: id })
-            }
-        ).catch(() => console.warn(`${route} failed`));
-
-        refresh();
+                body: JSON.stringify({ request_id: id }),
+            });
+        } catch {
+            console.warn(`${route} failed — will resync`);
+        } finally {
+            refresh();     // triggers members refresh + refetch here
+        }
     };
 
     return { list, loading, act };
 }
 
-/* ────── visual list (used by sidebar & modal) ────── */
+
+/* ─────────── shared list UI ─────────── */
 function RequestsList({
     list,
     onAct,
@@ -77,15 +82,12 @@ function RequestsList({
     return (
         <>
             <h4 className={styles.heading}>JOIN REQUESTS</h4>
-
             <ul className={styles.list}>
-                {list.map(r => (
+                {list.map((r) => (
                     <li
                         key={r.id}
                         className={styles.item}
-                        onClick={() => {
-                            window.location.href = `/profile/${r.user_id}`;
-                        }}
+                        onClick={() => (window.location.href = `/profile/${r.user_id}`)}
                         style={{ cursor: "pointer" }}
                     >
                         <Image
@@ -102,7 +104,6 @@ function RequestsList({
                         <span className={styles.name}>
                             {r.first_name} {r.last_name}
                         </span>
-
                         <div className={styles.buttons}>
                             <button
                                 className={styles.iconButton}
@@ -114,7 +115,6 @@ function RequestsList({
                             >
                                 <Image src="/img/accept.svg" alt="Accept" width={20} height={20} />
                             </button>
-
                             <button
                                 className={styles.iconButton}
                                 onClick={(e) => {
@@ -133,13 +133,12 @@ function RequestsList({
     );
 }
 
-/* ─────────────── sidebar variant ─────────────── */
+/* ─────────── sidebar variant (default export) ─────────── */
 export default function RequestsMenu() {
-    const { id: groupId } = useParams() as { id: string };
-    const { list, loading, act } = useRequests(groupId);
+    const { id } = useParams() as { id: string };
+    const { list, loading, act } = useRequests(id);
 
-    if (!list || loading || list.length === 0) return null;   // nothing to show
-
+    if (loading || !list || list.length === 0) return null;
     return (
         <div className={styles.menu}>
             <RequestsList list={list} onAct={act} />
@@ -147,38 +146,35 @@ export default function RequestsMenu() {
     );
 }
 
-/* ─────────────── modal variant (optional) ────── */
-export function RequestsModal({ trigger }: { trigger: React.ReactNode }) {
-    const { id: groupId } = useParams() as { id: string };
-    const { list, loading, act } = useRequests(groupId);
-    const [open, setOpen] = useState(false);
+/* ─────────── modal variant (Invite-style) ─────────── */
+export function RequestsModal({
+    modal = false,
+    onClose,
+}: {
+    modal?: boolean;
+    onClose?: () => void;
+}) {
+    const { id } = useParams() as { id: string };
+    const { list, loading, act } = useRequests(id);
 
     if (loading) return null;
 
+    /* sidebar vs modal */
+    if (!modal) return <RequestsMenu />;   // defensive fallback
+
     return (
-        <>
-            <span onClick={() => setOpen(true)} style={{ display: "inline-block" }}>
-                {trigger}
-            </span>
-
-            {open && (
-                <div className={styles.backdrop} onClick={() => setOpen(false)}>
-                    <div
-                        className={`${styles.menu} ${styles.modal}`}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button className={styles.close} onClick={() => setOpen(false)}>
-                            ×
-                        </button>
-
-                        {list.length === 0 ? (
-                            <p className={styles.empty}>No pending requests</p>
-                        ) : (
-                            <RequestsList list={list} onAct={act} />
-                        )}
-                    </div>
-                </div>
-            )}
-        </>
+        <div className={styles.backdrop} onClick={onClose}>
+            <div
+                className={styles.modal}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button className={styles.close} onClick={onClose}>×</button>
+                {!list || list.length === 0 ? (
+                    <p className={styles.empty}>No pending requests</p>
+                ) : (
+                    <RequestsList list={list} onAct={act} />
+                )}
+            </div>
+        </div>
     );
 }

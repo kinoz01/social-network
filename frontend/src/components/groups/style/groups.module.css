@@ -15,6 +15,13 @@
     padding-top: 1rem;
 }
 
+@media (max-width: 500px) {
+    .groupsContent {
+        padding: 0.5rem;
+    }
+}
+
+
 @media (max-width: 450px) {
     .emptyState img {
         width: 130px;

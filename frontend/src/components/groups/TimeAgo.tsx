@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 export function formatTimeAgo(dateStr: string) {
     const date = new Date(dateStr);
 
-    // Shift date back by 2 hours, trusting client clock
+    // Shift date back by 2 hours
     date.setHours(date.getHours() - 2);
 
     const now = new Date();

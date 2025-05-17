@@ -108,7 +108,7 @@ func sendGroupSnapshot(c *client, gid string) {
 	if err != nil {
 		return
 	}
-	out := map[string]interface{}{
+	out := map[string]any{
 		"type":    "groupMembers",
 		"groupId": gid,
 		"members": members,
@@ -159,7 +159,7 @@ func broadcastOnlineStatus() {
 		ids = append(ids, id)
 	}
 
-	payload := map[string]interface{}{
+	payload := map[string]any{
 		"type":  "onlineStatus",
 		"users": ids,
 	}
