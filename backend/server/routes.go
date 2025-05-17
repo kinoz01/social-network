@@ -33,6 +33,9 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/fetchUsers", ch.FetchUsers)
 	mux.HandleFunc("/api/fetchMessages", ch.FetchMessages)
 
+	//Fetching Followers
+	mux.HandleFunc("/api/followers", ch.FetchFollowers)
+
 	//WebSocket Connection
 	mux.HandleFunc("/ws", ch.HandleConnection)
 

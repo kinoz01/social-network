@@ -2,11 +2,18 @@
 
 import Image from "next/image";
 import styles from "./profile.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+export interface Followers {
+  totalFollowers: number,
+  totalFollowing: number,
+  totalPosts: number,
+  first_name: string,
+  last_name: string
+}
 function ProfileHeader() {
   const [followingAction, setFollowingAction] = useState(false);
-
+  const [followers, setFollowers] = useState<Followers | null>(null)
   const handelClick = async () => {
     // e.preventDefault();
 
@@ -29,7 +36,13 @@ function ProfileHeader() {
       console.log("fetch error", error);
     }
   };
-
+  useEffect(() => {
+    const getTotalFollwers = async() => {
+      const followers = await fetchFollowers()
+      setFollowers(followers)
+    }
+    getTotalFollwers()
+  }, [])
   return (
     <div className={styles.profileHeader}>
       <div className={styles.userInfo}>
@@ -40,12 +53,12 @@ function ProfileHeader() {
           width={150}
           height={150}
         />
-        <div className={styles.username}>Edward Gabriel May</div>
+        <div className={styles.username}>{`${followers?.first_name} ${followers?.last_name}`}</div>
         <div className={styles.numbers}>
-          <div className={styles.followersNumber}>Followers 500</div>
-          <div className={styles.followingNumber}>Following 50</div>
+          <div className={styles.followersNumber}>Followers {followers?.totalFollowers}</div>
+          <div className={styles.followingNumber}>Following {followers?.totalFollowing}</div>
 
-          <div className={styles.postsNumber}>Posts 50</div>
+          <div className={styles.postsNumber}>Posts {followers?.totalPosts}</div>
         </div>
       </div>
       <button
@@ -60,3 +73,18 @@ function ProfileHeader() {
   );
 }
 export default ProfileHeader;
+
+const fetchFollowers = async() => {
+  const followersRequest = await fetch('http://localhost:8080/api/followers', {
+    method: 'GET',
+    credentials: 'include'
+  })
+  console.log(followersRequest);
+  const followersRes = await followersRequest.json()
+  console.log(followersRes);
+  return followersRes
+  
+
+
+  
+}

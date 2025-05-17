@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  AddIcon,
+  // AddIcon,
   ChatsIcon,
   GroupsIcon,
   HomeIcon,
@@ -11,7 +11,7 @@ import {
   UserIcon,
 } from "./icons";
 import Link from "next/link";
-import AddPost from "./posts/AddPost";
+// import AddPost from "./posts/AddPost";
 import { useLogout } from "@/lib/logout";
 
 export default function SideBar() {

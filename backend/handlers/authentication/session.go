@@ -38,6 +38,7 @@ func CheckSession(w http.ResponseWriter, r *http.Request) {
 func GetUser(r *http.Request) (*tp.User, error) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
+		fmt.Println("token",cookie)
 		return nil, fmt.Errorf("no session token provided")
 	}
 
@@ -47,14 +48,18 @@ func GetUser(r *http.Request) (*tp.User, error) {
 		ExpiresAt time.Time
 	}
 
+	fmt.Println("tokenbbbbb",token)
 	// Select user_id, expires_at from DB based on token value.
 	err = tp.DB.QueryRow(`SELECT user_id, expires_at  FROM sessions WHERE token = ?`, token).Scan(&session.UserID, &session.ExpiresAt)
 	if err != nil {
+		fmt.Println("cccccccccccccc",token)
 		return nil, fmt.Errorf("invalid or expired session token")
 	}
 
 	// Check if the session is expired.
 	if time.Now().After(session.ExpiresAt) {
+		fmt.Println("aaaaaa",token)
+
 		return nil, fmt.Errorf("session expired")
 	}
 
@@ -62,6 +67,8 @@ func GetUser(r *http.Request) (*tp.User, error) {
 	var user tp.User
 	err = tp.DB.QueryRow(`SELECT id, email, username, profile_pic, first_name, last_name FROM users WHERE id = ?`, session.UserID).Scan(&user.ID, &user.Email, &user.Username, &user.ProfilePic, &user.FirstName, &user.LastName)
 	if err != nil {
+		fmt.Println("zzzzzzzzzzzzzz",token)
+		
 		return nil, fmt.Errorf("user not found")
 	}
 
