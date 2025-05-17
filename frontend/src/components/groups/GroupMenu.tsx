@@ -17,11 +17,11 @@ interface Info {
     description: string;
     group_pic: string;
     members: number;
+    isOwner: boolean;
 }
 
 export default function GroupMenu() {
     const id = useParams().id as string;
-    const isOwner = true
 
     const [data, setData] = useState<Info | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -98,7 +98,7 @@ export default function GroupMenu() {
                         <Image src="/img/menu-invite.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Invite</span>
                     </button>
-                    {isOwner && (
+                    {data.isOwner && (
                         <button
                             className={`${styles.menuItem} ${styles.responsiveOnly}`}
                             onClick={() => setRequestsOpen(true)}

@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	auth "social-network/handlers/authentication"
+	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 
 	"github.com/gorilla/websocket"
@@ -46,7 +47,7 @@ var upgrader = websocket.Upgrader{
 func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	u, err := auth.GetUser(r)
 	if err != nil {
-		http.Error(w, "unauth", 401)
+		help.JsonError(w, "unauth", 401, err)
 		return
 	}
 	conn, err := upgrader.Upgrade(w, r, nil)

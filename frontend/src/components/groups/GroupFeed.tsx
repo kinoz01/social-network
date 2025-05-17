@@ -7,6 +7,7 @@ import GroupPost from "./GroupPost";
 import styles from "./style/groupFeed.module.css";
 import Loading from "@/components/Loading";
 import { useGroupFeed } from "@/context/GroupFeedContext";
+// import { Post } from "./GroupPost";
 
 type Post = Parameters<typeof GroupPost>[0]["p"];
 const PAGE_SIZE = 20;

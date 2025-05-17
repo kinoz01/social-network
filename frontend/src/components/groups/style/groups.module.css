@@ -266,12 +266,11 @@
 
 .infoWrapper {
     position: relative;
-    /* anchor for absolute pop‑over */
     display: flex;
     align-items: center;
 }
 
-/* ---- pop‑over: now sits to the *left* of the icon ---- */
+/* ---- description pop‑over ---- */
 .descriptionPopover {
     width: max-content;
     position: absolute;
@@ -289,6 +288,7 @@
     overflow-y: auto;
     max-height: 60px;
     z-index: 100;
+    scrollbar-width: none;
 }
 
 .noLink {

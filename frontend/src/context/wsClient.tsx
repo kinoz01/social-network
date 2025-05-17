@@ -26,7 +26,7 @@ interface WSContextShape {
 }
 
 const WSContext = createContext<WSContextShape | null>(null);
-export const useWS = () => useContext(WSContext)!;
+export const useWS = () => useContext(WSContext)!; // consumption hook
 
 /* ───────── provider ───────── */
 export function WSProvider({ children }: { children: ReactNode }) {

@@ -7,8 +7,7 @@ import TimeAgo from "./TimeAgo";
 import { useState } from "react";
 import CommentsModal from "./PostComments";
 
-
-type Post = {
+export type Post = {
     post_id: string;
     user_id: string; 
     body: string;

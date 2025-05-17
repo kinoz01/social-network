@@ -2,7 +2,6 @@ package groups
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	auth "social-network/handlers/authentication"
@@ -102,11 +101,9 @@ func InviteAllFollowers(groupID, ownerID string) error {
 	return tx.Commit()
 }
 
-
 // Invites follwer to join a group if they are not already a member
 func InviteFollowers(groupID string, ids []string) error {
 	for _, uid := range ids {
-		fmt.Println("inserted--------------------------00000000000")
 		_, err := tp.DB.Exec(`
 			INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
 			SELECT ?, ?, ?

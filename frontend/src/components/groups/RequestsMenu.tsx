@@ -17,8 +17,6 @@ type Req = {
 };
 
 /* ─────────── data hook ─────────── */
-/* ─────────── data hook ─────────── */
-/* ─────────── data hook ─────────── */
 function useRequests(groupId: string) {
     const { version, refresh } = useGroupSync();
     const [list, setList] = useState<Req[]>([]);
