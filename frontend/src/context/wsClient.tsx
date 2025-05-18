@@ -43,6 +43,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
         socketRef.current = ws;
 
         ws.onopen = () => console.log("[WS] open");
+        (window as any)._globalWS = ws;
 
         ws.onmessage = (ev) => {
             const msg = JSON.parse(ev.data);
@@ -70,7 +71,20 @@ export function WSProvider({ children }: { children: ReactNode }) {
     /* 2. helpers */
     const send = (obj: object) => {
         const ws = socketRef.current;
-        if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+        if (!ws) return;
+
+        const payload = JSON.stringify(obj);
+
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(payload);
+        } else {
+            /* queue once, send when open */
+            const onOpen = () => {
+                ws.send(payload);
+                ws.removeEventListener("open", onOpen);
+            };
+            ws.addEventListener("open", onOpen);
+        }
     };
 
     const subscribeGroup = (groupId: string) =>

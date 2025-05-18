@@ -105,9 +105,9 @@ users:
   account_type, \
   created_at \
 ) VALUES" > users_insert.sql
-	@for i in $$(seq 1 100); do \
+	@for i in $$(seq 1 100000); do \
 		comma=","; \
-		[ "$$i" -eq 100 ] && comma=";"; \
+		[ "$$i" -eq 100000 ] && comma=";"; \
 		echo "  ( \
 'uuid-$$i', 'aaa$$i@example.com', 'aaa$$i', '\$$2b\$$10\$$z4Pf6EjZPcwJuGdH83zEIOXYOB6jzyOPlFqzAf9MiTzVJ7GyaH0Ca', \
 'aaaa', 'aaaa', '1995-01-01', '', 'avatar.webp', 'public', CURRENT_TIMESTAMP \
@@ -125,11 +125,11 @@ follows:
   status, \
   created_at \
 ) VALUES" > follow_requests.sql
-	@for i in $$(seq 1 100); do \
+	@for i in $$(seq 1 10000); do \
 		comma=","; \
-		[ "$$i" -eq 100 ] && comma=";"; \
+		[ "$$i" -eq 10000 ] && comma=";"; \
 		echo "  ( \
-'foll-$$i', 'uuid-$$i', 'aa85587c-5f2d-4498-8a72-55806a87cf99', 'accepted', CURRENT_TIMESTAMP \
+'foll-$$i', 'uuid-$$i', '664865fd-02be-4716-bfa7-21559ade511d', 'accepted', CURRENT_TIMESTAMP \
   )$$comma" >> follow_requests.sql; \
 	done
 	@echo "✅ follow_requests.sql generated with 100 accepted follow requests."

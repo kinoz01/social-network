@@ -103,18 +103,35 @@ func InviteAllFollowers(groupID, ownerID string) error {
 
 // Invites follwer to join a group if they are not already a member
 func InviteFollowers(groupID string, ids []string) error {
+	// Start transaction
+	tx, err := tp.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Prepare insert statement
+	stmt, err := tx.Prepare(`
+		INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
+		SELECT ?, ?, ?
+		WHERE NOT EXISTS (
+			SELECT 1 FROM group_users gu
+			WHERE gu.group_id = ? AND gu.users_id = ?
+		)`)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	// Loop through follower IDs
 	for _, uid := range ids {
-		_, err := tp.DB.Exec(`
-			INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
-			SELECT ?, ?, ?
-			WHERE NOT EXISTS (
-				SELECT 1 FROM group_users gu
-				WHERE gu.group_id = ? AND gu.users_id = ?
-			)`,
-			uuid.Must(uuid.NewV4()).String(), groupID, uid, groupID, uid)
+		_, err := stmt.Exec(uuid.Must(uuid.NewV4()).String(), groupID, uid, groupID, uid)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
-	return nil
+
+	// Commit transaction
+	return tx.Commit()
 }

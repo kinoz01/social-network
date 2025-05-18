@@ -54,10 +54,10 @@ func Routes() http.Handler {
 	// Groups posts:
 	mux.HandleFunc("/api/groups/posts", grpsPost.GroupPostsHandler)
 	mux.HandleFunc("/api/groups/create-post", grpsPost.CreatePostHandler)
+	mux.HandleFunc("/api/groups/chat", grps.ChatPage)
 	mux.HandleFunc("/api/groups/comments", grpsPost.GetCommentsHandler)
 	mux.HandleFunc("/api/groups/create-comment", grpsPost.CreateCommentHandler)
-	mux.HandleFunc("/api/ws", grps.GlobalWS)
-	
+	mux.HandleFunc("/api/ws", grps.GlobalWS)	
 
 	// Following:
 	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)

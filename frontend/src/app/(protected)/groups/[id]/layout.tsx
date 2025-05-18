@@ -5,6 +5,7 @@ import RequestsMenu from "@/components/groups/RequestsMenu";
 import { checkMembership } from "@/lib/auth";
 import style from "@/components/groups/style/groupLayout.module.css";
 import { GroupSyncProvider } from "@/context/GroupSyncContext";
+import { WSProvider } from "@/context/wsClient";     // ← NEW
 
 
 export default async function GroupLayout({
@@ -18,20 +19,22 @@ export default async function GroupLayout({
     await checkMembership(id);
 
     return (
-        <GroupSyncProvider>
-            <div className={style.groupLayout}>
-                <div className={style.menuLayout}>
-                    <GroupMenu />
-                    <RequestsMenu />
+        <WSProvider>
+            <GroupSyncProvider>
+                <div className={style.groupLayout}>
+                    <div className={style.menuLayout}>
+                        <GroupMenu />
+                        <RequestsMenu />
+                    </div>
+                    <div className={style.contentLayout}>
+                        {children}
+                    </div>
+                    <div className={style.menuLayout}>
+                        <MembersMenu />
+                        <InviteMenu />
+                    </div>
                 </div>
-                <div className={style.contentLayout}>
-                    {children}
-                </div>
-                <div className={style.menuLayout}>
-                    <MembersMenu />
-                    <InviteMenu />
-                </div>
-            </div>
-        </GroupSyncProvider>
+            </GroupSyncProvider>
+        </WSProvider>
     );
 }

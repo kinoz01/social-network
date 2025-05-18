@@ -43,7 +43,7 @@ export default function Feed() {
             setPosts(page);
             setOffset(page.length);
             setHasMore(page.length === PAGE_SIZE);
-            if (boxRef.current) boxRef.current.scrollTop = 0; // scroll to top on refresh
+            
         } catch (e) {
             console.error(e);
         } finally {

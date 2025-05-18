@@ -1,0 +1,119 @@
+package groups
+
+import (
+	"encoding/json"
+	"net/http"
+	"sync"
+	"time"
+
+	auth "social-network/handlers/authentication"
+	tp "social-network/handlers/types"
+
+	"github.com/gofrs/uuid"
+	"github.com/gorilla/websocket"
+)
+
+type chatMsg struct {
+	ID        string    `json:"id"`
+	GroupID   string    `json:"group_id"`
+	SenderID  string    `json:"sender_id"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Avatar    string    `json:"profile_pic"`
+}
+
+type chatInbound struct {
+	Type    string `json:"type"` // "chatMessage" | "history"
+	GroupID string `json:"groupId"`
+	Content string `json:"content,omitempty"`
+}
+
+// hub per group → broadcast chat
+var chatHubs = struct {
+	m  map[string]map[*websocket.Conn]string // conn → senderID
+	mu sync.RWMutex
+}{m: make(map[string]map[*websocket.Conn]string)}
+
+func GroupChatWS(w http.ResponseWriter, r *http.Request) {
+	u, err := auth.GetUser(r)
+	if err != nil {
+		http.Error(w, "unauth", 401)
+		return
+	}
+	gid := r.URL.Query().Get("group_id")
+	if gid == "" {
+		http.Error(w, "group_id required", 400)
+		return
+	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+
+	chatHubs.mu.Lock()
+	hub, ok := chatHubs.m[gid]
+	if !ok {
+		hub = make(map[*websocket.Conn]string)
+		chatHubs.m[gid] = hub
+	}
+	hub[conn] = u.ID
+	chatHubs.mu.Unlock()
+
+	// send last 30 messages history
+	sendHistory(conn, gid)
+
+	for {
+		_, raw, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+		var in chatInbound
+		if err := json.Unmarshal(raw, &in); err != nil {
+			continue
+		}
+		if in.Type == "chatMessage" && in.Content != "" {
+			msg := storeAndBuildMessage(gid, u, in.Content)
+			broadcastChat(gid, msg)
+		}
+	}
+
+	// cleanup
+	chatHubs.mu.Lock()
+	delete(chatHubs.m[gid], conn)
+	chatHubs.mu.Unlock()
+	conn.Close()
+}
+
+func sendHistory(c *websocket.Conn, gid string) {
+	rows, _ := tp.DB.Query(`
+        SELECT gc.id, gc.content, gc.created_at, u.id, u.first_name, u.last_name, u.profile_pic
+        FROM group_chats gc JOIN users u ON u.id = gc.sender_id
+        WHERE gc.group_id = ? ORDER BY gc.created_at DESC LIMIT 30`, gid)
+	defer rows.Close()
+
+	var history []chatMsg
+	for rows.Next() {
+		var m chatMsg
+		rows.Scan(&m.ID, &m.Content, &m.CreatedAt, &m.SenderID, &m.FirstName, &m.LastName, &m.Avatar)
+		history = append([]chatMsg{m}, history...) // reverse order
+	}
+	_ = c.WriteJSON(map[string]any{"type": "chatHistory", "groupId": gid, "messages": history})
+}
+
+func storeAndBuildMessage(gid string, u *tp.User, content string) chatMsg {
+	id := uuid.Must(uuid.NewV4()).String()
+	tp.DB.Exec(`INSERT INTO group_chats(id, group_id, sender_id, content) VALUES(?,?,?,?)`, id, gid, u.ID, content)
+	return chatMsg{ID: id, GroupID: gid, SenderID: u.ID, Content: content, CreatedAt: time.Now(), FirstName: u.FirstName, LastName: u.LastName, Avatar: u.ProfilePic}
+}
+
+func broadcastChat(gid string, m chatMsg) {
+	payload := map[string]any{"type": "chatMessage", "groupId": gid, "message": m}
+	chatHubs.mu.RLock()
+	for c := range chatHubs.m[gid] {
+		_ = c.WriteJSON(payload)
+	}
+	chatHubs.mu.RUnlock()
+}

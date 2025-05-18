@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import styles from "./style/inviteMenu.module.css";
+import Loading from "@/components/Loading";
 
 interface Follower {
     id: string;
@@ -27,6 +28,7 @@ export default function InviteMenu({
     const [results, setResults] = useState<Follower[]>([]);
     const [cache, setCache] = useState<Map<string, Follower>>(new Map());
     const [selected, setSel] = useState<Set<string>>(new Set());
+    const [submitting, setSubmitting] = useState(false);
 
     /* feedback */
     const [msg, setMsg] = useState("");
@@ -96,6 +98,7 @@ export default function InviteMenu({
     const onSubmit = async (e?: FormEvent) => {
         e?.preventDefault();
         if (selected.size === 0) return;
+        setSubmitting(true);
         try {
             const r = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/groups/invite`,
@@ -109,6 +112,7 @@ export default function InviteMenu({
                     }),
                 }
             );
+            setSubmitting(false);
             if (!r.ok) throw new Error();
             setSel(new Set());
             flash("Sending succeeded", true);
@@ -211,6 +215,28 @@ export default function InviteMenu({
             </div>
         </>
     );
+
+    if (submitting) {
+        const loadingContent = (
+            <div className={styles.menu}>
+                <Loading />
+            </div>
+        );
+
+        if (!modal) return loadingContent;
+
+        return (
+            <div className={styles.backdrop} onClick={onClose}>
+                <div
+                    className={`${styles.menu} ${styles.modal}`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button className={styles.close} onClick={onClose}>×</button>
+                    {loadingContent}
+                </div>
+            </div>
+        );
+    }
 
     /* sidebar vs modal */
     if (!modal) return <div className={styles.menu}>{body}</div>;

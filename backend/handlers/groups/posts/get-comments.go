@@ -33,7 +33,7 @@ func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
 		FROM comments c
 		JOIN users u ON u.id = c.user_id
 		WHERE c.post_id = ?
-		ORDER BY c.created_at DESC
+		ORDER BY c.created_at DESC, c.ROWID DESC
 		LIMIT ? OFFSET ?`, postID, limit, offset)
 	if err != nil {
 		help.JsonError(w, "DB error", 500, err)
