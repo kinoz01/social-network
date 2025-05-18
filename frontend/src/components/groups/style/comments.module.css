@@ -217,3 +217,10 @@
 .linkWrapper {
     max-width: fit-content;
 }
+
+.headerRow time {
+    font-size: 1rem;
+    color: #666666;
+    font-family: 'Zain', sans-serif;
+    margin-top: 4px;
+}

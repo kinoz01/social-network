@@ -117,7 +117,7 @@ export default function InviteMenu({
             setSel(new Set());
             flash("Sending succeeded", true);
         } catch {
-            flash("Sending failed", false);
+            flash("Sending failed (7000 invites limit)", false);
         }
     };
 

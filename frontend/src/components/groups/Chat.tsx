@@ -4,6 +4,8 @@ import { useParams } from "next/navigation";
 import styles from "./style/chat.module.css";
 import { useWS } from "@/context/wsClient";
 import { throttle } from "./GroupFeed";
+import Loading from "../Loading";
+import Image from "next/image";
 
 interface ChatMsg {
     id: string; sender_id: string; first_name: string; last_name: string;
@@ -29,10 +31,12 @@ export default function Chat() {
     const [hasMore, setHM] = useState(true);
     const [text, setText] = useState("");
     const [showEmojis, setEmojis] = useState(false);
+    const [loadingFirst, setLoadingFirst] = useState(true);
 
     const idSetRef = useRef<Set<string>>(new Set());
     const listRef = useRef<HTMLDivElement>(null);
     const prevH = useRef<number | null>(null);
+
 
     /* fetch page helper -------------------------------------------*/
     const fetchPage = async (o: number) => {
@@ -48,11 +52,14 @@ export default function Chat() {
     useEffect(() => {
         (async () => {
             if (!groupId) return;
-            const page = await fetchPage(0);
+            setLoadingFirst(true);                                       // 🔹
+            const pageRaw = await fetchPage(0);
+            const page = Array.isArray(pageRaw) ? pageRaw : [];          // 🔹
             idSetRef.current = new Set(page.map(m => m.id));
             setMsgs(page);
             setOff(page.length);
             setHM(page.length === PAGE);
+            setLoadingFirst(false);                                      // 🔹
         })();
     }, [groupId]);
 
@@ -113,7 +120,37 @@ export default function Chat() {
         send({ type: "chatMessage", groupId, content: text.trim() }); setText("");
     };
 
-    if (!groupId) return null; let lastDay = "";
+    if (!groupId) return null;
+    let lastDay = "";
+
+    if (loadingFirst) { 
+        return <Loading />;
+    }
+
+    if (!msgs || msgs.length === 0) {                     
+        return (
+            <div className={styles.emptyBox}>
+                <Image src="/img/empty.svg" alt="Empty chat" width={180} height={180} />
+                <p className={styles.status}>No messages yet — be the first!</p>
+                <div className={styles.inputRow}>
+                    <button className={styles.emojiBtn} onClick={() => setEmojis(!showEmojis)}>🙂</button>
+                    <input className={styles.input} placeholder="Type a message…"
+                        value={text} onChange={e => setText(e.target.value)}
+                        maxLength={700}
+                        onKeyDown={e => { e.key === "Enter" && sendMsg(); setEmojis(false); }} />
+                    <button className={styles.sendBtn} onClick={() => { sendMsg(); setEmojis(false); }}>Send</button>
+                    {showEmojis && (
+                        <div className={styles.emojiPicker}>
+                            {EMOJIS.map(e => (
+                                <button key={e} className={styles.emojiItem}
+                                    onClick={() => setText(t => t + e)}>{e}</button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
     return (
         <div className={styles.chatBox}>
             <div className={styles.messages} ref={listRef}>
@@ -149,6 +186,7 @@ export default function Chat() {
 
                 <input className={styles.input} placeholder="Type a message…"
                     value={text} onChange={e => setText(e.target.value)}
+                    maxLength={700}
                     onKeyDown={e => { e.key === "Enter" && sendMsg(); setEmojis(false) }} />
 
                 <button className={styles.sendBtn} onClick={() => { sendMsg(); setEmojis(false) }}>Send</button>

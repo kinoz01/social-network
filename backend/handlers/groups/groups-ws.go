@@ -63,10 +63,10 @@ var upgrader = websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return
 /*────────── Incoming message ─────────*/
 // client → server
 type inbound struct {
-	Type       string `json:"type"` // subscribeGroup | subscribeChat | chatMessage
-	GroupID    string `json:"groupId,omitempty"`
-	Content    string `json:"content,omitempty"`
-	Before string `json:"before,omitempty"` // RFC3339 for olderChat
+	Type    string `json:"type"` // subscribeGroup | subscribeChat | chatMessage
+	GroupID string `json:"groupId,omitempty"`
+	Content string `json:"content,omitempty"`
+	Before  string `json:"before,omitempty"` // RFC3339 for olderChat
 }
 
 /*────────── Entry point ─────────*/
@@ -142,7 +142,7 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		sendChatHistory(c, msg.GroupID)
 
 	case "chatMessage":
-		if msg.Content == "" {
+		if msg.Content == "" || len(msg.Content) > 500 {
 			return
 		}
 		m := storeAndBuildMessage(msg.GroupID, u, msg.Content)

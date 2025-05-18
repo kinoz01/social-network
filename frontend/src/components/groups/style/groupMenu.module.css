@@ -51,6 +51,26 @@
     .name {
         display: none;
     }
+    .groupMenu {
+        margin-top: 0px;
+    }
+}
+
+.nameTitle {
+    font-family: 'Zain', sans-serif;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #1f1f1f;
+    margin-top: 20px;
+}
+
+@media (min-width: 500px) {
+    .nameTitle {
+        display: none;
+    }
+    .avatar {
+        margin-right: 15px;
+    }
 }
 
 .memberCount {

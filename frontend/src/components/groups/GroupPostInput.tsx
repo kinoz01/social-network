@@ -40,13 +40,20 @@ export default function GroupPostInput() {
                 credentials: "include",
             });
             if (!r.ok) throw new Error((await r.json()).msg || "Could not post");
-
             setText("");
             setImg(null);
             refreshFeed();
+
+              // Reset textarea height
+            const ta = document.querySelector(`.${styles.input}`) as HTMLTextAreaElement;
+            if (ta) {
+                ta.style.height = "auto"; // reset height
+            }
         } catch (err: any) {
             setErr(err.message || "Could not post");
-        } finally { setLoad(false); }
+        } finally {
+            setLoad(false);
+        }
     };
 
     const onSubmit = (e?: FormEvent) => {

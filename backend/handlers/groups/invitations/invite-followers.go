@@ -2,6 +2,7 @@ package groups
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	auth "social-network/handlers/authentication"
@@ -10,6 +11,8 @@ import (
 
 	"github.com/gofrs/uuid"
 )
+
+const maxInvitees = 7000
 
 func InviteFollowersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -55,7 +58,7 @@ func InviteFollowersHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if len(ids) > 0 {
 			if err := InviteFollowers(body.GroupID, ids); err != nil {
-				help.JsonError(w, "DB error", 500, err)
+				help.JsonError(w, err.Error(), http.StatusBadRequest, err)
 				return
 			}
 		}
@@ -66,6 +69,19 @@ func InviteFollowersHandler(w http.ResponseWriter, r *http.Request) {
 
 // Invite every user follower who is NOT already a member
 func InviteAllFollowers(groupID, ownerID string) error {
+	var count int
+	err := tp.DB.QueryRow(`
+    SELECT COUNT(*)
+    FROM follow_requests fr
+    LEFT JOIN group_users gu ON gu.group_id = ? AND gu.users_id = fr.follower_id
+    WHERE fr.followed_id = ? AND fr.status = 'accepted' AND gu.users_id IS NULL
+`, groupID, ownerID).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count > maxInvitees {
+		return fmt.Errorf("%d wow too many invites (7000 limit)", count)
+	}
 	rows, err := tp.DB.Query(`
 		SELECT fr.follower_id
 		  FROM follow_requests fr
@@ -77,6 +93,7 @@ func InviteAllFollowers(groupID, ownerID string) error {
 	if err != nil {
 		return err
 	}
+
 	defer rows.Close()
 
 	tx, err := tp.DB.Begin()
@@ -103,6 +120,9 @@ func InviteAllFollowers(groupID, ownerID string) error {
 
 // Invites follwer to join a group if they are not already a member
 func InviteFollowers(groupID string, ids []string) error {
+	if len(ids) > maxInvitees {
+		return fmt.Errorf("too many invitees (max 7000)")
+	}
 	// Start transaction
 	tx, err := tp.DB.Begin()
 	if err != nil {

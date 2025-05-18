@@ -43,6 +43,26 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	groupID := uuid.Must(uuid.NewV4()).String()
+	/* ---------- invitations ---------- */
+	switch j := r.FormValue("invitee_ids"); {
+	case j == "ALL":
+		if err := grpInvite.InviteAllFollowers(groupID, user.ID); err != nil {
+			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
+			return
+		}
+	case j != "":
+		var ids []string
+		if err := json.Unmarshal([]byte(j), &ids); err != nil {
+			help.JsonError(w, "Invalid invitee_ids", 400, err)
+			return
+		}
+		if err := grpInvite.InviteFollowers(groupID, ids); err != nil {
+			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
+			return
+		}
+	}
+
 	/* ---------- Save group image ---------- */
 	var picPath string
 	if file, hdr, _ := r.FormFile("group_pic"); file != nil {
@@ -53,11 +73,11 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ext := strings.ToLower(filepath.Ext(hdr.Filename))
-		if ext != ".jpg" && ext != ".png" && ext != ".webp" && ext != ".jpeg" && ext != ".gif" {
+		if ext != ".jpg" && ext != ".png" && ext != ".webp" && ext != ".jpeg" {
 			help.JsonError(w, "unsupported image format", http.StatusBadRequest, nil)
 			return
 		}
-		picPath, err = help.SaveImg(buff, "group_pics/")
+		picPath, err = help.SaveImg(buff, "groups_avatars/")
 		if err != nil {
 			help.JsonError(w, "Failed to save picture", http.StatusInternalServerError, err)
 			return
@@ -65,7 +85,6 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* ---------- create group ---------- */
-	groupID := uuid.Must(uuid.NewV4()).String()
 	_, err = tp.DB.Exec(`
 		INSERT INTO groups (id, group_name, group_owner, description, group_pic)
 		VALUES (?,?,?,?,?)`,
@@ -84,32 +103,13 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* ---------- invitations ---------- */
-	switch j := r.FormValue("invitee_ids"); {
-	case j == "ALL":
-		if err := grpInvite.InviteAllFollowers(groupID, user.ID); err != nil {
-			help.JsonError(w, "invite followers", http.StatusInternalServerError, err)
-			return
-		}
-	case j != "":
-		var ids []string
-		if err := json.Unmarshal([]byte(j), &ids); err != nil {
-			help.JsonError(w, "Invalid invitee_ids", 400, err)
-			return
-		}
-		if err := grpInvite.InviteFollowers(groupID, ids); err != nil {
-			help.JsonError(w, "invite list", http.StatusInternalServerError, err)
-			return
-		}
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, `{"id":"%s"}`, groupID)
 }
 
 // Checks if the group name and description are valid.
 func ValidatePayload(groupName string, description string) error {
-	validInputRegex := regexp.MustCompile(`^[\p{L}\p{N}\s.,!?'_@\-]+$`)
+	validInputRegex := regexp.MustCompile(`^[\p{L}\p{N}\s.,!?'_@\-\(\)]+$`)
 	exists := false
 	err := tp.DB.QueryRow(`
 		SELECT EXISTS(SELECT 1 FROM groups WHERE group_name = ?)`, groupName).Scan(&exists)
@@ -131,10 +131,10 @@ func ValidatePayload(groupName string, description string) error {
 	if len(description) > 150 {
 		return fmt.Errorf("description too long")
 	}
-	if len(groupName) < 6 {
+	if len(groupName) < 3 {
 		return fmt.Errorf("group name too short")
 	}
-	if len(description) < 10 {
+	if len(description) < 8 {
 		return fmt.Errorf("description too short")
 	}
 	if !validInputRegex.MatchString(groupName) {

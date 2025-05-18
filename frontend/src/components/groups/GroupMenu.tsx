@@ -62,6 +62,7 @@ export default function GroupMenu() {
 
     return (
         <>
+            <h2 className={styles.nameTitle}>{data.group_name}</h2>
             <div className={styles.groupMenu}>
                 <div className={styles.header}>
                     <Image
@@ -72,6 +73,7 @@ export default function GroupMenu() {
                         width={160}
                         height={160}
                         className={styles.avatar}
+                        unoptimized
                     />
                     <h2 className={styles.name}>{data.group_name}</h2>
                     <p className={styles.memberCount}>{data.members} Member{data.members > 1 ? "s" : ""}</p>

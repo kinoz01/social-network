@@ -3,6 +3,8 @@
     min-height: 100vh;
     width: 100%;
     overflow-y: scroll;
+    background-color:  #f9fafb;
+    min-width: 350px;
 }
 
 /**************************************** Groups GRID CARDS *********************************************/
@@ -17,7 +19,7 @@
 
 @media (max-width: 500px) {
     .groupsContent {
-        padding: 0.5rem;
+        padding: 1rem;
     }
 }
 
@@ -287,7 +289,7 @@
     line-height: 1.4;
     overflow-y: auto;
     max-height: 60px;
-    z-index: 100;
+    z-index: 10;
     scrollbar-width: none;
 }
 

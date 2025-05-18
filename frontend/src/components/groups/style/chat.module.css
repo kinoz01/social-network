@@ -60,6 +60,7 @@
     padding: .6rem;
     display: flex;
     gap: .6rem;
+    width: 100%;
 }
 
 .input {
@@ -158,4 +159,27 @@
 
 .inputRow {
     position: relative;
+}
+
+.status {
+    text-align: center;
+    font-size: .9rem;
+    color: #666;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.emptyBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 1rem;
+    background: #fff;
+    margin-top: 30px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    overflow-y: scroll;
 }

@@ -12,3 +12,5 @@ CREATE TABLE
         account_type TEXT NOT NULL DEFAULT 'public' CHECK (account_type IN ('public', 'private')),
         created_at TIMESTAMP DEFAULT (DATETIME ('now', 'localtime'))
     );
+
+CREATE INDEX IF NOT EXISTS idx_users_name ON users (first_name, last_name, username);

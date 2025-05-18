@@ -13,6 +13,7 @@ import Loading from "@/components/Loading";
 import styles from "./style/comments.module.css";
 import { createPortal } from "react-dom";
 import { useUser } from "@/context/UserContext";
+import  TimeAgo  from "./TimeAgo";
 
 /* ───────── types ───────── */
 export type CommentT = {
@@ -64,7 +65,7 @@ export default function PostComments({
     const fileInput = useRef<HTMLInputElement>(null);
     const [error, setError] = useState("");
     const { user } = useUser();
-    if (!user) return null;   
+    if (!user) return null;
 
     /* ─ first page ─ */
     useEffect(() => {
@@ -99,6 +100,10 @@ export default function PostComments({
             setLoad(true);
             try {
                 const next = await fetchComments(postId, offset);
+                if (!next || !next.length) {
+                    setMore(false);
+                    return;
+                }
                 setItems((prev) => {
                     const map = new Map(prev.map(item => [item.comment_id, item]));
                     next.forEach(item => map.set(item.comment_id, item));
@@ -182,6 +187,7 @@ export default function PostComments({
                                                 {c.first_name} {c.last_name}
                                             </span>
                                         </Link>
+                                        <TimeAgo dateStr={c.created_at} />
                                     </div>
                                     <p>{c.content}</p>
                                     {c.img_comment && (

@@ -17,8 +17,8 @@ export default function TopBar() {
             <Image
                 src={profilePic}
                 alt="Profile"
-                width={80}
-                height={80}
+                width={70}
+                height={70}
                 className={styles.profilePic}
                 unoptimized
             />
