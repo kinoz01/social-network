@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import styles from "./style/chat.module.css";
 import { useWS } from "@/context/wsClient";
+import { throttle } from "./GroupFeed";
 
 interface ChatMsg {
     id: string; sender_id: string; first_name: string; last_name: string;
@@ -10,12 +11,6 @@ interface ChatMsg {
 }
 
 const PAGE = 20;
-const throttle = (fn: (...a: any[]) => void, w = 250) => {
-    let wait = false, save: any[] | null = null;
-    const t = () => { if (!save) { wait = false; return; } fn(...save); save = null; setTimeout(t, w); }
-    return (...a: any[]) => { if (wait) { save = a; return; } fn(...a); wait = true; setTimeout(t, w); }
-};
-
 const EMOJIS = [
     "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍", "😘", "😗", "😙", "😚", "🙂", "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮", "🤐", "😯", "😪", "😫", "🥱",
     "😴", "😌", "😛", "😜", "😝", "🤤", "😒", "😓", "😔", "😕", "🙃", "🤑", "😲", "☹️", "🙁", "😖", "😞", "😟", "😤", "😢", "😭", "😦", "😧", "😨", "😩", "🤯", "😬", "😰", "😱", "🥵", "🥶", "😳", "🤪", "😵", "🥴",
@@ -33,7 +28,7 @@ export default function Chat() {
     const [offset, setOff] = useState(0);
     const [hasMore, setHM] = useState(true);
     const [text, setText] = useState("");
-    const [showPicker, setShowPicker] = useState(false);
+    const [showEmojis, setEmojis] = useState(false);
 
     const idSetRef = useRef<Set<string>>(new Set());
     const listRef = useRef<HTMLDivElement>(null);
@@ -149,22 +144,22 @@ export default function Chat() {
                 <button
                     type="button"
                     className={styles.emojiBtn}
-                    onClick={() => setShowPicker(p => !p)}
-                >😊</button>
+                    onClick={() => setEmojis(p => !p)}
+                >🙂</button>
 
                 <input className={styles.input} placeholder="Type a message…"
                     value={text} onChange={e => setText(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && sendMsg()} />
+                    onKeyDown={e => { e.key === "Enter" && sendMsg(); setEmojis(false) }} />
 
-                <button className={styles.sendBtn} onClick={sendMsg}>Send</button>
+                <button className={styles.sendBtn} onClick={() => { sendMsg(); setEmojis(false) }}>Send</button>
 
-                {showPicker && (
+                {showEmojis && (
                     <div className={styles.emojiPicker}>
                         {EMOJIS.map(e => (
                             <button
                                 key={e}
                                 className={styles.emojiItem}
-                                onClick={() => { setText(t => t + e); setShowPicker(false); }}
+                                onClick={() => { setText(t => t + e); }}
                             >
                                 {e}
                             </button>

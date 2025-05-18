@@ -111,7 +111,7 @@ export default function Feed() {
 }
 
 // Throttle helper
-const throttle = (fn: (...a: any[]) => void, wait = 300) => {
+export const throttle = (fn: (...a: any[]) => void, wait = 300) => {
     let waiting = false, saved: any[] | null = null;
     const timer = () => {
         if (!saved) { waiting = false; return; }

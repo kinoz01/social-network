@@ -3,12 +3,20 @@
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    height: calc(90vh - 120px);
-    max-width: 600px;
+    height: 90vh;
     margin: 0 auto;
     background: #fff;
+    margin-top: 30px;
+    width: 100%;
+    font-family: 'Zain', sans-serif;
 }
 
+@media (max-width: 970px) {
+    .chatBox {
+        margin-top: 20px;
+        height: calc(90vh - 120px);
+    }
+}
 
 .msg {
     display: flex;
@@ -27,20 +35,24 @@
     background: #f5f5f5;
     border-radius: 12px;
     padding: .6rem .8rem;
-    max-width: 80%;
+    width: 95%;
+    padding-top: 0rem;
 }
 
 .name {
-    font-size: .78rem;
+    font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: .2rem;
+    color: rgb(63, 63, 63);
+    margin-bottom: 5px;
 }
 
 .content {
     margin: 0;
-    font-size: .9rem;
+    font-size: 1.2rem;
     white-space: pre-wrap;
     word-break: break-word;
+    color: rgb(63, 63, 63);
 }
 
 .inputRow {
@@ -56,6 +68,11 @@
     border: 1px solid #ccc;
     border-radius: 20px;
     font-size: .9rem;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #000;
 }
 
 .sendBtn {
@@ -80,18 +97,12 @@
     color: #666;
 }
 
-.name {
-    font-size: .78rem;
-    font-weight: 600;
-}
-
 .time {
     font-weight: 400;
     font-size: .75rem;
-    color: #555;
+    color: #707070;
     margin-left: .4rem;
 }
-
 
 .messages {
     overflow-y: auto;
@@ -148,4 +159,3 @@
 .inputRow {
     position: relative;
 }
-

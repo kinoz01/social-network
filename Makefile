@@ -91,45 +91,20 @@ migrate-sqlite:
 
 
 users:
-	@echo "Generating users_insert.sql with static IDs (uuid-1 to uuid-100)..."
-	@echo "INSERT INTO users ( \
-  id, \
-  email, \
-  username, \
-  password, \
-  first_name, \
-  last_name, \
-  birthday, \
-  about_me, \
-  profile_pic, \
-  account_type, \
-  created_at \
-) VALUES" > users_insert.sql
+	@echo "Generating users_insert.sql with static IDs (uuid-1 to uuid-x)..."
+	@echo "INSERT INTO users (id, email, username, password, first_name, last_name, birthday, about_me, profile_pic, account_type, created_at) VALUES" > users_insert.sql
 	@for i in $$(seq 1 100000); do \
-		comma=","; \
-		[ "$$i" -eq 100000 ] && comma=";"; \
-		echo "  ( \
-'uuid-$$i', 'aaa$$i@example.com', 'aaa$$i', '\$$2b\$$10\$$z4Pf6EjZPcwJuGdH83zEIOXYOB6jzyOPlFqzAf9MiTzVJ7GyaH0Ca', \
-'aaaa', 'aaaa', '1995-01-01', '', 'avatar.webp', 'public', CURRENT_TIMESTAMP \
-  )$$comma" >> users_insert.sql; \
+		end=$$(test $$i -eq 100000 && echo ";" || echo ","); \
+		echo "('uuid-$$i','aaa$$i@example.com','aaa$$i','\$$2b\$$10\$$z4Pf6EjZPcwJuGdH83zEIOXYOB6jzyOPlFqzAf9MiTzVJ7GyaH0Ca','aaaa','aaaa','1995-01-01','','avatar.webp','public',CURRENT_TIMESTAMP)$$end" >> users_insert.sql; \
 	done
-	@echo "✅ users_insert.sql generated with 100 static UUIDs."
+	@echo "✅ users_insert.sql generated with x static UUIDs."
 
 
-follows:
-	@echo "Generating follow_requests.sql with uuid-1 to uuid-100 as followers..."
-	@echo "INSERT INTO follow_requests ( \
-  id, \
-  follower_id, \
-  followed_id, \
-  status, \
-  created_at \
-) VALUES" > follow_requests.sql
+followers:
+	@echo "Generating follow_requests.sql with uuid-1 to uuid-x as followers..."
+	@echo "INSERT INTO follow_requests (id, follower_id, followed_id, status, created_at) VALUES" > follow_requests.sql
 	@for i in $$(seq 1 10000); do \
-		comma=","; \
-		[ "$$i" -eq 10000 ] && comma=";"; \
-		echo "  ( \
-'foll-$$i', 'uuid-$$i', '664865fd-02be-4716-bfa7-21559ade511d', 'accepted', CURRENT_TIMESTAMP \
-  )$$comma" >> follow_requests.sql; \
+		end=$$(test $$i -eq 10000 && echo ";" || echo ","); \
+		echo "('foll-$$i','uuid-$$i','664865fd-02be-4716-bfa7-21559ade511d','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
 	done
-	@echo "✅ follow_requests.sql generated with 100 accepted follow requests."
+	@echo "✅ follow_requests.sql generated with x accepted follow requests."
