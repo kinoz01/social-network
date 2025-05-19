@@ -13,9 +13,9 @@ import {
 import Link from "next/link";
 import AddPost from "./posts/AddPost";
 import { useLogout } from "@/lib/logout";
-
 export default function SideBar() {
   const [hover, setHover] = useState(false);
+
   const { handleLogout } = useLogout();
 
   return (

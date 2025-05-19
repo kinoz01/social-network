@@ -3,9 +3,9 @@ import styles from "../posts/posts.module.css";
 
 export default function AddComment() {
   return (
-    <div className={styles.addComment}>
+    <div >
       {/* FORM */}
-      <form className={styles.commentForm}>
+      <form >
         <input
           type="text"
           name="comment"

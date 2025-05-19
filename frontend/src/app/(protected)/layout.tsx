@@ -3,7 +3,6 @@ import "../globals.css";
 import { requireSession } from "@/lib/auth";
 import SideBar from "@/components/SideBar";
 import CreateButton from "@/components/CreateButton";
-import { UserProvider } from "@/context/UserContext";
 
 export const metadata: Metadata = {
     title: "Social Network",
@@ -20,11 +19,9 @@ export default async function HomeLayout({
 
     return (
         <>
-            <UserProvider>
-                <SideBar />
-                {children}
-                <CreateButton />
-            </UserProvider>
+            <SideBar />
+            {children}
+            {/* <CreateButton /> */}
         </>
     );
 }

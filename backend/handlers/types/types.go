@@ -2,6 +2,7 @@ package types
 
 import (
 	"database/sql"
+	"time"
 )
 
 var DB *sql.DB
@@ -17,4 +18,46 @@ type User struct {
 	ProfilePic  string `json:"profile_pic"`
 	AboutMe     string `json:"about_me"`
 	AccountType string `json:"account_type"`
+}
+type Users struct {
+	Users []User
+}
+
+type Post struct {
+	ID         string         `json:"id"`
+	UserID     string         `json:"userID"`
+	Content    string         `json:"content"`
+	Imag_post  sql.NullString `json:"imag_post"`
+	Visibility string         `json:"visibility"`
+	VipUsers   []string       `json:"vipUsers"`
+}
+
+// type
+
+type PostData struct {
+	PostID     string         `json:"id"`
+	UserID     string         `json:"userID"`
+	Content    string         `json:"content"`
+	Imag_post  sql.NullString `json:"imag_post"`
+	Visibility string         `json:"visibility"`
+	VipUsers   []string       `json:"vipUsers"`
+	FirstName  string         `json:"firstName"`
+	LastName   string         `json:"lastName"`
+	ProfilePic string         `json:"profile_pic"`
+	CreatedAt  string         `json:"createdAt"`
+}
+type Comment struct {
+	ID          string `json:"id,omitempty"`
+	Firstname   string `json:"firstname"`
+	Lastname    string `json:"lastname"`
+	Profile_pic string `json:"profile_pic"`
+	// Username   string    `json:"username,omitempty"`
+	Postid  string    `json:"postid"`
+	Content string    `json:"content"`
+	Userid  string    `json:"userid"`
+	Creatat time.Time `json:"creatat,omitempty"`
+}
+
+type Errorcomment struct {
+	Content string `json:"content"`
 }

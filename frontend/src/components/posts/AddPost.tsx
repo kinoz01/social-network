@@ -1,44 +1,105 @@
 "use client";
 
-import { CreateIcon } from "../icons";
+import React from "react";
 import styles from "./posts.module.css";
+import { MainDiv } from "./creation/mainDiv";
+import { ShowUsers } from "./creation/users";
+import { PostAudience } from "./creation/audience";
+import { useEffect, useState } from "react";
+import { Post, User } from "./Feed";
+import { HandleCreation } from "@/apiService/posts/savePost";
 
-export default function AddPost({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+type PostParams = {
+  isOpen?: boolean;
+  onClose: () => void;
+  onSubmit: (post: Omit<Post, "id">) => void;
+}
+
+async function getUser(): Promise<User | null> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userInfo`, {
+      credentials: "include",
+      cache: "no-store",
+    })
+
+    if (!res.ok) {
+      console.error("failed to fetch user", res.status)
+      return null
+    }
+
+    const data: User = await res.json()
+    return data
+  } catch (error) {
+    console.error("Error fetching user", error)
+    return null
+  }
+}
+
+export const NewPOst = ({ onClose, onSubmit }: PostParams) => {
+  const [showAudiance, setShow] = useState(false)
+  const [showUsers, setUsers] = useState(false)
+  const [privacy, setPrivacy] = useState("public")
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getUser()
+      setUser(userData)
+    }
+    fetchUser()
+  }, [])
+  console.log("------->", user)
+  if (!user) {
+    // throw new Error("user not exist")
+    return
+  }
+  const showUsersList = () => {
+    setShow(showAudiance)
+    setUsers(!showUsers)
+  }
+
+  const showCHoice = () => {
+    setShow(true)
+    // setUsers(true)
+  }
+
+  const handleBack = () => {
+    setShow(false)
+    setUsers(false)
+  }
+
+  const handleOnChange = (value: string) => {
+    setPrivacy(value)
+    if (value === "private") {
+      showUsersList()
+    }
+  }
 
   return (
     <>
-      {isOpen && (
+      {(
         <div className={styles.formContainer}>
-          {/* FORM */}
-          <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-            <button className={styles.closeBtn} onClick={onClose}>
-              <CreateIcon />
-            </button>
-            <textarea
-              name="content"
-              className={styles.postContentInput}
-              placeholder="Content of the post..."
-            />
-            <div className={styles.postOptions}>
-              <input type="radio" name="privacy" id="private" value="private" />
-              <label htmlFor="private">Private</label>
-              <input
-                type="radio"
-                name="privacy"
-                id="semi-public"
-                value="semi-public"
-              />
-              <label htmlFor="semi-public">Semi Public</label>
-              <input type="radio" name="privacy" id="public" value="public" />
-              <label htmlFor="public">Public</label>
+          <form className={styles.form} onSubmit={(e) => HandleCreation({ e, onClose, onSubmit, user })}>
+            {/* {!showAudiance ? */}
+            <input type="hidden" name="privacy" value={privacy} />
+
+            <div style={{ display: showAudiance || showUsers ? "none" : "block", width: "100%", boxSizing: "border-box", padding: "20px", overflow: "auto" }}>
+              <MainDiv onClose={onClose} privacy={privacy} showCHoice={showCHoice} />
             </div>
-            <input type="file" name="file" className={styles.uploadImgBtn} />
-            <button type="submit" className={styles.submitBtn}>
-              Create
-            </button>
+
+            <div style={{ display: showAudiance && !showUsers ? "block" : "none", overflow: "auto" }}>
+              <PostAudience onBack={handleBack} selectedPrivacy={privacy} onPrivacyChange={handleOnChange} />
+            </div>
+
+            <div style={{ display: showUsers ? "block" : "none", overflow: "auto" }}>
+              <ShowUsers onBack={handleBack} onUserCHange={setSelectedUsers} />
+            </div>
+
           </form>
-        </div>
-      )}
+        </div >
+      )
+      }
     </>
-  );
+  )
 }

@@ -1,8 +1,10 @@
 import Image from "next/image";
 import styles from "./menus.module.css";
+// import { fetchUsers } from "@/apiService/users/apiUsers";
 
 
 const ProfileCard = () => {
+  // fetchUsers()
   return (
     <div className={styles.profileCard}>
       <div className={styles.profileCardHeader}>

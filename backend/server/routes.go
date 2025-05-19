@@ -5,6 +5,10 @@ import (
 	"time"
 
 	auth "social-network/handlers/authentication"
+	"social-network/handlers/posts"
+	"social-network/handlers/users"
+	comment "social-network/handlers/comments"
+
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 )
@@ -27,6 +31,13 @@ func Routes() http.Handler {
 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
+
+	//posts
+	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
+	mux.Handle("/api/allPosts/", rl.RateLimitMW(http.HandlerFunc(posts.AllPosts)))
+	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))
+	mux.HandleFunc("/api/addcomment", comment.AddComment)
+	mux.HandleFunc("/api/comments", comment.GetComments)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }
