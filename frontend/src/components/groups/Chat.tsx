@@ -111,10 +111,14 @@ export default function Chat() {
     }, [msgs]);
 
     /* helpers */
-    const t = (iso: string) => new Date(iso)
-        .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const d = (iso: string) => new Date(iso)
-        .toLocaleDateString([], { day: "2-digit", month: "short", year: "numeric" });
+    const t = (iso: string) =>  {
+        const dateStr = iso.endsWith('Z') ? iso.slice(0, -1) : iso;
+        return new Date(dateStr).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    const d = (iso: string) => {
+        const dateStr = iso.endsWith('Z') ? iso.slice(0, -1) : iso;
+        return new Date(dateStr).toLocaleDateString([], { day: "2-digit", month: "short", year: "numeric" });
+    }
 
     const sendMsg = () => {
         if (!text.trim()) return;

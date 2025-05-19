@@ -1,17 +1,13 @@
 "use client";
-import { log } from "console";
 import { useState, useEffect } from "react";
 
-export function formatTimeAgo(dateStr: string) {
-    const date = new Date(dateStr);
-console.log(dateStr, date);
-
-    // Shift date back by 1 hours
-     date.setUTCHours(date.getUTCHours()-1);
+// Input date in local time (but ends with Z)
+export function formatTimeAgo(dateStr: string) {    
+    const dStr = dateStr.endsWith('Z') ? dateStr.slice(0, -1) : dateStr;
+    const date = new Date(dStr); // if UTC converts to local time, if local time keeps it
 
     const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    console.log('seconds', seconds);
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000); // getTime() references UTC time
 
     if (seconds < 1) return 'just now';
     if (seconds < 60) return 'seconds ago';
