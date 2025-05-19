@@ -24,7 +24,7 @@ const EMOJIS = [
 
 export default function Chat() {
     const { id: groupId } = useParams() as { id: string };
-    const { send } = useWS();
+    const { socket, send } = useWS();
 
     const [msgs, setMsgs] = useState<ChatMsg[]>([]);
     const [offset, setOff] = useState(0);
@@ -36,24 +36,24 @@ export default function Chat() {
     const idSetRef = useRef<Set<string>>(new Set());
     const listRef = useRef<HTMLDivElement>(null);
     const prevH = useRef<number | null>(null);
-
-
+    
+    
     /* fetch page helper -------------------------------------------*/
     const fetchPage = async (o: number) => {
         const qs = `group_id=${groupId}&limit=${PAGE}&offset=${o}`;
         const r = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/groups/chat?${qs}`,
             { credentials: "include", cache: "no-store" });
-        if (!r.ok) return [];
-        return await r.json() as ChatMsg[];
-    };
-
-    /* initial load ------------------------------------------------*/
-    useEffect(() => {
-        (async () => {
-            if (!groupId) return;
-            setLoadingFirst(true);                                       // 🔹
-            const pageRaw = await fetchPage(0);
+            if (!r.ok) return [];
+            return await r.json() as ChatMsg[];
+        };
+        
+        /* initial load ------------------------------------------------*/
+        useEffect(() => {
+            (async () => {
+                if (!groupId) return;
+                setLoadingFirst(true);                                       // 🔹
+                const pageRaw = await fetchPage(0);
             const page = Array.isArray(pageRaw) ? pageRaw : [];          // 🔹
             idSetRef.current = new Set(page.map(m => m.id));
             setMsgs(page);
@@ -62,7 +62,7 @@ export default function Chat() {
             setLoadingFirst(false);                                      // 🔹
         })();
     }, [groupId]);
-
+    
     /* scroll-up lazy loader ---------------------------------------*/
     useEffect(() => {
         const box = listRef.current; if (!box || !hasMore) return;
@@ -81,10 +81,10 @@ export default function Chat() {
         box.addEventListener("scroll", onScroll);
         return () => box.removeEventListener("scroll", onScroll);
     }, [offset, hasMore, groupId]);
-
+    
     /* live WS messages -------------------------------------------*/
     useEffect(() => {
-        const ws = (window as any)._globalWS as WebSocket; if (!ws || !groupId) return;
+        if (!socket) return;
         const h = (ev: MessageEvent) => {
             let d: any; try { d = JSON.parse(ev.data); } catch { return; }
             if (d.groupId !== groupId || d.type !== "chatMessage") return;
@@ -93,10 +93,11 @@ export default function Chat() {
             setMsgs(p => [...p, d.message]);
             setOff(o => o + 1);
         };
-        ws.addEventListener("message", h);
+        socket.addEventListener("message", h);
         send({ type: "subscribeChat", groupId });
-        return () => ws.removeEventListener("message", h);
+        return () => socket.removeEventListener("message", h);
     }, [groupId, send]);
+
 
     /* scroll restore / auto-bottom -------------------------------*/
     useLayoutEffect(() => {
@@ -123,11 +124,11 @@ export default function Chat() {
     if (!groupId) return null;
     let lastDay = "";
 
-    if (loadingFirst) { 
+    if (loadingFirst) {
         return <Loading />;
     }
 
-    if (!msgs || msgs.length === 0) {                     
+    if (!msgs || msgs.length === 0) {
         return (
             <div className={styles.emptyBox}>
                 <Image src="/img/empty.svg" alt="Empty chat" width={180} height={180} />

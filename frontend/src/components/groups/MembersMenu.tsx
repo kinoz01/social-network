@@ -11,15 +11,15 @@ import Loading from "@/components/Loading";
 
 export default function MembersMenu() {
     const { id: groupId } = useParams() as { id: string };
-    const { groupMembers, subscribeGroup, online } = useWS();
+    const { groupMembers, getGroupMembers, online } = useWS();
     const { version } = useGroupSync();
 
     const members = groupMembers.get(groupId);
 
     /* refresh snapshot when groupId or version changes */
     useEffect(() => {
-        if (groupId) subscribeGroup(groupId);
-    }, [groupId, version, subscribeGroup]);
+        if (groupId) getGroupMembers(groupId);
+    }, [groupId, version, getGroupMembers]);
 
     /* ---------- sort: online first, then alphabetically ---------- */
     const ordered = useMemo(() => {

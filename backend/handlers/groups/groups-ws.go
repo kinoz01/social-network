@@ -66,10 +66,9 @@ type inbound struct {
 	Type    string `json:"type"` // subscribeGroup | subscribeChat | chatMessage
 	GroupID string `json:"groupId,omitempty"`
 	Content string `json:"content,omitempty"`
-	Before  string `json:"before,omitempty"` // RFC3339 for olderChat
 }
 
-/*────────── Entry point ─────────*/
+/*────────── Entry point (upgrade) ─────────*/
 // route:  GET  /api/ws
 func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	u, err := auth.GetUser(r)
@@ -126,7 +125,7 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 	}
 
 	switch msg.Type {
-	case "subscribeGroup":
+	case "getGroupMembers":
 		c.mu.Lock()
 		c.subs[msg.GroupID] = true
 		c.mu.Unlock()
@@ -147,15 +146,6 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		}
 		m := storeAndBuildMessage(msg.GroupID, u, msg.Content)
 		broadcastChat(msg.GroupID, m)
-	case "olderChat":
-		if msg.Before == "" {
-			return
-		}
-		t, err := time.Parse(time.RFC3339, msg.Before)
-		if err != nil {
-			return
-		}
-		sendOlderChat(c, msg.GroupID, t)
 	}
 }
 
@@ -254,30 +244,4 @@ func broadcastChat(gid string, m chatMsg) {
 		_ = cl.conn.WriteJSON(payload)
 		cl.mu.Unlock()
 	}
-}
-
-// ---------- helpers ----------
-
-func sendOlderChat(c *client, gid string, before time.Time) {
-	rows, _ := tp.DB.Query(`
-      SELECT gc.id, gc.content, gc.created_at,
-             u.id, u.first_name, u.last_name, u.profile_pic
-      FROM group_chats gc
-      JOIN users u ON u.id = gc.sender_id
-      WHERE gc.group_id = ? AND gc.created_at < ?
-      ORDER BY gc.created_at DESC LIMIT 20`, gid, before)
-	defer rows.Close()
-
-	var block []chatMsg
-	for rows.Next() {
-		var m chatMsg
-		rows.Scan(&m.ID, &m.Content, &m.CreatedAt,
-			&m.SenderID, &m.FirstName, &m.LastName, &m.ProfilePic)
-		block = append([]chatMsg{m}, block...)
-	}
-	c.mu.Lock()
-	_ = c.conn.WriteJSON(map[string]any{
-		"type": "olderChat", "groupId": gid, "messages": block,
-	})
-	c.mu.Unlock()
 }

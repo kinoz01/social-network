@@ -19,10 +19,11 @@ export interface Member {
 }
 
 interface WSContextShape {
+    socket: WebSocket | null;                  // current socket
     online: Set<string>;                       // userIDs online anywhere
     groupMembers: Map<string, Member[]>;       // groupID → member list
-    subscribeGroup: (id: string) => void;      // ask server for member list
-    send: (msg: object) => void;               // raw helper
+    getGroupMembers: (id: string) => void;      // ask server for member list
+    send: (msg: object) => void;               // helper
 }
 
 const WSContext = createContext<WSContextShape | null>(null);
@@ -30,9 +31,9 @@ export const useWS = () => useContext(WSContext)!; // consumption hook
 
 /* ───────── provider ───────── */
 export function WSProvider({ children }: { children: ReactNode }) {
-    const socketRef = useRef<WebSocket | null>(null);
+    const socketRef = useRef<WebSocket | null>(null); // store ws connexion
 
-    const [online, setOnline] = useState<Set<string>>(new Set());
+    const [online, setOnline] = useState<Set<string>>(new Set()); // strore online users
     const [groupMembers, setGroupMembers] = useState<
         Map<string, Member[]>
     >(new Map());
@@ -43,7 +44,6 @@ export function WSProvider({ children }: { children: ReactNode }) {
         socketRef.current = ws;
 
         ws.onopen = () => console.log("[WS] open");
-        (window as any)._globalWS = ws;
 
         ws.onmessage = (ev) => {
             const msg = JSON.parse(ev.data);
@@ -78,7 +78,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
         if (ws.readyState === WebSocket.OPEN) {
             ws.send(payload);
         } else {
-            /* queue once, send when open */
+            /* queue once, send when open (forsafety) */
             const onOpen = () => {
                 ws.send(payload);
                 ws.removeEventListener("open", onOpen);
@@ -87,12 +87,12 @@ export function WSProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const subscribeGroup = (groupId: string) =>
-        send({ type: "subscribeGroup", groupId });
+    const getGroupMembers = (groupId: string) =>
+        send({ type: "getGroupMembers", groupId });
 
     /* 3. provide values */
     return (
-        <WSContext.Provider value={{ online, groupMembers, subscribeGroup, send }}>
+        <WSContext.Provider value={{ socket: socketRef.current, online, groupMembers, getGroupMembers, send }}>
             {children}
         </WSContext.Provider>
     );

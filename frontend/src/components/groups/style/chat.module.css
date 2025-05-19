@@ -25,8 +25,8 @@
 }
 
 .avatar {
-    width: 32px;
-    height: 32px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -40,7 +40,7 @@
 }
 
 .name {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: .2rem;
     color: rgb(63, 63, 63);
@@ -49,7 +49,7 @@
 
 .content {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     white-space: pre-wrap;
     word-break: break-word;
     color: rgb(63, 63, 63);
@@ -93,14 +93,14 @@
 .dayDivider {
     text-align: center;
     margin: 1rem 0 .5rem;
-    font-size: .8rem;
+    font-size: .9rem;
     font-weight: 600;
     color: #666;
 }
 
 .time {
     font-weight: 400;
-    font-size: .75rem;
+    font-size: 0.9rem;
     color: #707070;
     margin-left: .4rem;
 }
