@@ -49,3 +49,16 @@ func SaveImg(imageB []byte, genre string) (string, error) {
 
 	return imgServingPath, nil
 }
+
+// Check if an image is svg type.
+func IsSVG(imageB []byte) bool {
+	// Remove unnecessary leading characters
+	trimmed := bytes.TrimLeft(imageB, " \t\n\r\xef\xbb\xbf")
+	if len(trimmed) < 4 {
+		return false // Can't be an SVG
+	}
+	// Case-insensitive comparison
+	lower := bytes.ToLower(trimmed)
+	return bytes.HasPrefix(lower, []byte("<?xml")) ||
+		bytes.Contains(lower, []byte("<svg"))
+}

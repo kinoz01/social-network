@@ -79,7 +79,11 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			profilePic, err = help.LimitRead(part, maxPicSize)
 			if err != nil {
-				help.JsonError(w, "Profile picture too large (1 MB max)", http.StatusBadRequest, err)
+				help.JsonError(w, "Profile picture too large (2 MB max)", http.StatusBadRequest, err)
+				return
+			}
+			if help.IsSVG(profilePic) {
+				help.JsonError(w, "svg images aren't supported", http.StatusUnauthorized, nil)
 				return
 			}
 			continue

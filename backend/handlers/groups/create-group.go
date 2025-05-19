@@ -73,7 +73,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ext := strings.ToLower(filepath.Ext(hdr.Filename))
-		if ext != ".jpg" && ext != ".png" && ext != ".webp" && ext != ".jpeg" {
+		if ext != ".jpg" && ext != ".png" && ext != ".webp" && ext != ".jpeg" && ext != ".gif"  {
 			help.JsonError(w, "unsupported image format", http.StatusBadRequest, nil)
 			return
 		}
