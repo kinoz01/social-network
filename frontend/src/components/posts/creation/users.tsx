@@ -1,26 +1,46 @@
+import { fetchUsers } from "@/apiService/users/apiUsers";
 import styles from "../posts.module.css"
 import { BackIcon } from "@/components/icons";
-import React, { useState } from "react";
-
-const List_Users = [{ id: "1", value: "eman" }, { id: "2", value: "ihssan" }, { id: "3", value: "hasnae" }]
-
+import React, { useState, useEffect } from "react";
+import { User } from "../Feed";
 type UsersListParams = {
     onBack: () => void;
     onUserCHange: (users: string[]) => void;
 }
+interface FollowerInfo {
+    id: string;
+    username: string;
+}
 
 const ShowUsers = (props: UsersListParams) => {
-    const [selectedUser, setSelected] = useState<string[]>([])
+    // interface User {
+    //     id: string;
+    //     email: string;
+    //     username: string;
+    //     first_name: string;
+    //     last_name: string;
+    //     profile_pic: string;
+    // }
+    const [selectedUser, setSelected] = useState<FollowerInfo[]>([])
+    const [List_Users, setLIstUsers] = useState<User[]>([])
+
 
     const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
+        const valueID = e.target.value
         const isChecked = e.target.checked
-        const listUsers = isChecked ? ([...selectedUser, value]) :
-            (selectedUser.filter((elem) => elem != value))
+        const valueName = e.target.dataset.username || "undefined"
+        const listUsers = isChecked ? ([...selectedUser, { id: valueID, username: valueName }]) :
+            (selectedUser.filter((elem) => elem.id != valueID))
         setSelected(listUsers)
-        props.onUserCHange(listUsers)
+        props.onUserCHange(listUsers.map((u) => u.id))
     }
 
+    useEffect(() => {
+        fetchUsers()
+            .then(data => setLIstUsers(data.Users))
+    }, [])
+
+    // console.log("here, -------", List_Users && List_Users[0].id)
     return (
         <div className={styles.postAud}>
             <div className={styles.header}>
@@ -36,16 +56,25 @@ const ShowUsers = (props: UsersListParams) => {
                 <label>Who can view your post:</label>
                 {selectedUser.map((elem, i) => (
                     <div key={i} className={styles.chip}>
-                        <p className={styles.chipLabel}>{elem}</p>
+                        <p className={styles.chipLabel}>{elem.username}</p>
                     </div>
                 ))}
             </div>
             <div className={styles.content}>
-                {List_Users.map((elem) => (
+                {List_Users && List_Users.map((elem) => (
                     <div key={elem.id} className={styles.checkboxElem}>
-                        <input type="checkbox" name="vipUsers" id={elem.id} value={elem.value} onChange={handleSelect}
-                            checked={selectedUser.includes(elem.value)} />
-                        <label htmlFor={elem.id}>{elem.value}</label>
+                        <input type="checkbox" name="vipUsers" id={elem.id} value={elem.id} data-username={elem.username || elem.email} onChange={handleSelect}
+                            checked={selectedUser.some((u) => u.id === elem.id)} />
+                        <img
+                            className={styles.userIcon}
+                            src={`/storage/avatars/${elem.profile_pic}`}
+                            alt={elem.username}
+                            width={30}
+                            height={30}
+                        />
+
+                        <label htmlFor={elem.id}>{elem.username}</label>
+                        <span>{elem.email}</span>
                     </div>
                 ))}
             </div>

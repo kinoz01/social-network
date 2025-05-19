@@ -32,7 +32,7 @@ func ValidInput(inputs string) error {
 }
 
 func ValidFile(handler *multipart.FileHeader) error {
-	fmt.Printf("here fileeeee------------->%v \n and handler %v\n", handler.Size, handler.Header.Get("Content-Type"))
+	// fmt.Printf("here fileeeee------------->%v \n and handler %v\n", handler.Size, handler.Header.Get("Content-Type"))
 	maxSize := int64(10 << 20)
 	if handler.Size > maxSize {
 		return fmt.Errorf("file size exceeds 10MB limit")

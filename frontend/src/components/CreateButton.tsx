@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { CreateIcon } from "./icons";
-import AddPost from "./posts/AddPost";
 import AddGroup from "./events/AddGroup";
 
 function CreateButton() {
@@ -44,8 +43,8 @@ function CreateButton() {
           </div>
         ) : null}
       </div >
-      {create && newPost ? <AddPost isOpen={newPost} onClose={close} /> : null
-      }
+      {/* {create && newPost ? <AddPost isOpen={newPost} onClose={close} /> : null
+      } */}
       {create && newGroup ? <AddGroup isOpen={newGroup} onClose={close} /> : null}
     </>
   );

@@ -130,7 +130,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Save optional profile pic
-	profilePicPath := "avatar.webp"
+	profilePicPath := "profile.png"
 	if len(profilePic) > 0 {
 		if help.IsSVG(profilePic) {
 			help.JsonError(w, "svg images aren't supported", http.StatusUnauthorized, nil)

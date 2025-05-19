@@ -18,12 +18,30 @@ type User struct {
 	AboutMe     string `json:"about_me"`
 	AccountType string `json:"account_type"`
 }
+type Users struct {
+	Users []User
+}
 
 type Post struct {
-	ID         string `json:"id"`
-	UserID     string
+	ID         string         `json:"id"`
+	UserID     string         `json:"userID"`
 	Content    string         `json:"content"`
 	Imag_post  sql.NullString `json:"imag_post"`
 	Visibility string         `json:"visibility"`
 	VipUsers   []string       `json:"vipUsers"`
+}
+
+// type
+
+type PostData struct {
+	PostID     string         `json:"id"`
+	UserID     string         `json:"userID"`
+	Content    string         `json:"content"`
+	Imag_post  sql.NullString `json:"imag_post"`
+	Visibility string         `json:"visibility"`
+	VipUsers   []string       `json:"vipUsers"`
+	FirstName  string         `json:"firstName"`
+	LastName   string         `json:"lastName"`
+	ProfilePic string         `json:"profile_pic"`
+	CreatedAt  string         `json:"createdAt"`
 }
