@@ -5,6 +5,7 @@
     overflow-y: scroll;
     background-color:  #f9fafb;
     min-width: 350px;
+    scrollbar-width: thin;
 }
 
 /**************************************** Groups GRID CARDS *********************************************/

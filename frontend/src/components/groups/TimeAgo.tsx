@@ -1,14 +1,17 @@
 "use client";
+import { log } from "console";
 import { useState, useEffect } from "react";
 
 export function formatTimeAgo(dateStr: string) {
     const date = new Date(dateStr);
+console.log(dateStr, date);
 
-    // Shift date back by 2 hours
-    date.setHours(date.getHours() - 2);
+    // Shift date back by 1 hours
+     date.setUTCHours(date.getUTCHours()-1);
 
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    console.log('seconds', seconds);
 
     if (seconds < 1) return 'just now';
     if (seconds < 60) return 'seconds ago';
