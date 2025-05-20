@@ -10,7 +10,7 @@ import (
 )
 
 func GetComments(w http.ResponseWriter, r *http.Request) {
-	post_id := "e4853d68-fd1e-465e-8413-783fa9bf3dd8"
+	post_id := "54eb5aaa-086d-4146-85e0-251f14fe2029"
 	var comments []tp.Comment
 	if r.Method != http.MethodGet {
 		JsonError.JsonError(w, "Method not allowed", 405, nil)
