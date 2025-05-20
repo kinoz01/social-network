@@ -28,7 +28,7 @@ func InviteFollowersHandler(w http.ResponseWriter, r *http.Request) {
 
 	var body struct {
 		GroupID    string          `json:"group_id"`
-		InviteeIDs json.RawMessage `json:"invitee_ids"` // array or "ALL"
+		InviteeIDs json.RawMessage `json:"invitee_ids"` 
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.GroupID == "" {
 		help.JsonError(w, "bad json", http.StatusBadRequest, nil)

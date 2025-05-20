@@ -11,7 +11,6 @@ import Link from "next/link";
 import Image from "next/image";
 import Loading from "@/components/Loading";
 import styles from "./style/comments.module.css";
-import { createPortal } from "react-dom";
 import { useUser } from "@/context/UserContext";
 import  TimeAgo  from "./TimeAgo";
 
@@ -276,5 +275,5 @@ export default function PostComments({
         </div >
     );
 
-    return createPortal(modal, document.body);
+    return modal
 }
