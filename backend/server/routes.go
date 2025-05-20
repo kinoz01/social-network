@@ -5,9 +5,9 @@ import (
 	"time"
 
 	auth "social-network/handlers/authentication"
+	comment "social-network/handlers/comments"
 	"social-network/handlers/posts"
 	"social-network/handlers/users"
-	comment "social-network/handlers/comments"
 
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
@@ -32,7 +32,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
 
-	//posts
+	// posts
 	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
 	mux.Handle("/api/allPosts/", rl.RateLimitMW(http.HandlerFunc(posts.AllPosts)))
 	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))

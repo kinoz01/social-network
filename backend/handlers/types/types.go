@@ -3,6 +3,8 @@ package types
 import (
 	"database/sql"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 var DB *sql.DB
@@ -46,16 +48,16 @@ type PostData struct {
 	ProfilePic string         `json:"profile_pic"`
 	CreatedAt  string         `json:"createdAt"`
 }
+
 type Comment struct {
-	ID          string `json:"id,omitempty"`
-	Firstname   string `json:"firstname"`
-	Lastname    string `json:"lastname"`
-	Profile_pic string `json:"profile_pic"`
-	// Username   string    `json:"username,omitempty"`
-	Postid  string    `json:"postid"`
-	Content string    `json:"content"`
-	Userid  string    `json:"userid"`
-	Creatat time.Time `json:"creatat,omitempty"`
+	ID          uuid.UUID `json:"id,omitempty"`
+	Firstname   string    `json:"first_name"`
+	Lastname    string    `json:"lastname"`
+	Profile_pic string    `json:"profile_pic"`
+	Postid      string    `json:"postid,omitempty"`
+	Content     string    `json:"content"`
+	Userid      string    `json:"userid,omitempty"`
+	Creatat     time.Time `json:"creatat,omitempty"`
 }
 
 type Errorcomment struct {
