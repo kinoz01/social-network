@@ -36,6 +36,7 @@ function List({
               getCurrentUser()
           },[])
   const filterdUsers = users?.filter(user => user.id != currentUser?.id)
+  console.log(filterdUsers, currentUser?.id);
   
   return (
     <div className={`${styles.List} ${styles[type]} `}>

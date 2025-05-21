@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	auth "social-network/handlers/authentication"
+	"social-network/handlers/helpers"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
@@ -20,8 +22,21 @@ func FetchUsers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 	}
-	query := "SELECT u.id, u.first_name, u.last_name, u.profile_pic FROM users u"
-	rows, err := tp.DB.Query(query)
+	user, err := auth.GetUser(r)
+	if err != nil {
+		helpers.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
+		return
+	}
+	fmt.Println(user.ID)
+	query := `SELECT DISTINCT u.id, u.first_name, u.last_name, u.profile_pic 
+FROM users u
+LEFT JOIN follow_requests fr1 ON fr1.followed_id = u.id AND fr1.follower_id = ? AND fr1.status = 'accepted'
+LEFT JOIN follow_requests fr2 ON fr2.follower_id = u.id AND fr2.followed_id = ? AND fr2.status = 'accepted'
+WHERE 
+    u.account_type = 'public' 
+    OR fr1.follower_id IS NOT NULL 
+    OR fr2.followed_id IS NOT NULL;`
+	rows, err := tp.DB.Query(query, user.ID, user.ID)
 	if err != nil {
 		log.Fatal("error in fetching data!!")
 		return
@@ -40,5 +55,5 @@ func FetchUsers(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("can not convert to json")
 		return
 	}
-	fmt.Println(usersData[0])
+	fmt.Println(usersData)
 }

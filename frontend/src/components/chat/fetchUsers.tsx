@@ -11,6 +11,7 @@ export  default function FetchUsers() {
         try{
                 const resp = await fetch(`http://localhost:8080/api/fetchUsers`, {
                     method: "POST",
+                    credentials: "include"
                 })
                 console.log(resp);
                 const responseUsers = await resp.json()

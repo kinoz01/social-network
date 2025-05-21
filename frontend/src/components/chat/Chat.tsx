@@ -5,6 +5,8 @@ import { getUser, User } from "@/lib/user";
 import { fetchMessages, Messages } from "@/lib/message";
 import { useEffect, useRef, useState } from "react";
 
+const EMOJIS = ["😀", "😂", "😍", "👍", "🙏", "😎", "😢"];
+
 function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<WebSocket | null>, msg:Messages| null}) {
     console.log(user);
     const [message, setMessage] = useState<string>("")
@@ -13,6 +15,8 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
     const [moreMessages, setMoreMessages] = useState<boolean>(true)
     const messageContainer = useRef<HTMLDivElement>(null)
     const msgNumRef = useRef<number>(0)
+    const [showEmojis, setShowEmojis] = useState(false)
+
 
     useEffect(() => {
         const getCurrentUser = async() => {
@@ -23,24 +27,39 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
     },[])
 
     useEffect(() => {
-        console.log("msg",msg);
-        
-        if(msg && msg.receiver_id && msg.content) {
-            setMessages(prev => [...prev, msg])
-            // displayNotification(msg.first_name + msg.last_name)
-            setTimeout(() => {
-                const container = messageContainer.current
-            if(container) container.scrollTop = container.scrollHeight
-            }, 100)
-            if(msg.receiver_id === currentUser?.id) {
-                console.log("exactly");
-                
-                displayNotification(`${msg.first_name} ${msg.last_name}`)
-            }
-            
+        if (!msg || !msg.receiver_id || !msg.content) return;
+    
+        const isCurrentUserSender = msg.sender_id === currentUser?.id;
+        const isCurrentUserReceiver = msg.receiver_id === currentUser?.id;
+        const isChatWithSenderOpen = user?.id === msg.sender_id;
+        const isChatWithReceiverOpen = user?.id === msg.receiver_id;
+    
+        // 1. Show message in sender's chat if the sender is the current user and chatting with the receiver
+        if (isCurrentUserSender && isChatWithReceiverOpen) {
+            setMessages(prev => [...prev, msg]);
+            scrollToBottom();
         }
-        
-    }, [msg, currentUser])
+    
+        // 2. Show message in receiver's chat if receiver is current user and is chatting with sender
+        else if (isCurrentUserReceiver && isChatWithSenderOpen) {
+            setMessages(prev => [...prev, msg]);
+            scrollToBottom();
+        }
+    
+        // 3. In all cases where receiver is current user, show notification
+        if (isCurrentUserReceiver) {
+            displayNotification(`${msg.first_name} ${msg.last_name}`);
+        }
+    
+    }, [msg, currentUser?.id, user?.id]);
+    
+    const scrollToBottom = () => {
+        setTimeout(() => {
+            const container = messageContainer.current;
+            if (container) container.scrollTop = container.scrollHeight;
+        }, 100);
+    };
+    
 
     useEffect(() => {
         if(!user?.id || !currentUser?.id) return
@@ -143,7 +162,34 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
                 })}
             </div>
             <form className={styles.chatForm} onSubmit={handleSubmit}>
-                <input type="text" placeholder="Send a message..." value={message} onChange={(e) => setMessage(e.target.value)}/>
+            <input type="text" placeholder="Send a message..." value={message} onChange={(e) => setMessage(e.target.value)}/>
+            <div className={styles.emojiContainer}>
+                    <button 
+                        type="button" 
+                        className={styles.emojiToggleBtn} 
+                        onClick={() => setShowEmojis(prev => !prev)}
+                    >
+                        😊
+                    </button>
+
+                    {showEmojis && (
+                        <div className={styles.emojiDropdown}>
+                            {EMOJIS.map((emoji, index) => (
+                                <span 
+                                    key={index} 
+                                    className={styles.emoji} 
+                                    onClick={() => {
+                                        setMessage(prev => prev + emoji)
+                                        setShowEmojis(false) // Hide emoji picker after selecting
+                                    }}
+                                >
+                                    {emoji}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                
                 <button type="submit" className={styles.sendBtn}>
                     <SendIcon />
                 </button>
@@ -183,7 +229,7 @@ const displayNotification = (username: string) => {
     const timerNotification = document.createElement('div')
     containerNotification.className = styles.messageNotification
     timerNotification.className = styles.timer
-    messageNotification.innerHTML = `${username} has sent you a new message`
+    messageNotification.innerHTML = `<strong>${username}</strong> has sent you a new message`
     containerNotification.append(messageNotification, timerNotification)
     chat?.appendChild(containerNotification)
     console.log("suuuure");

@@ -42,7 +42,7 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 	rows, err := tp.DB.Query(query, user.Sender_id, user.Receiver_id, user.Receiver_id, user.Sender_id, 4, user.MsgNbr)
 	fmt.Println("errr,,,", err)
 	if err != nil {
-		fmt.Println("fffff")
+		// fmt.Println("fffff")
 		help.JsonError(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest, nil)
 		return
 	}
