@@ -39,7 +39,7 @@ func FetchMessages(w http.ResponseWriter, r *http.Request) {
 	msgs := []Messages{}
 	fmt.Println("msgNum", user.MsgNbr)
 	query := "SELECT p.id, p.sender_id, p.receiver_id, p.content, p.is_read, p.created_at, u.first_name, u.last_name FROM private_chats p inner join users u on u.id = p.sender_id where (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)  ORDER BY p.created_at DESC LIMIT ? OFFSET ?"
-	rows, err := tp.DB.Query(query, user.Sender_id, user.Receiver_id, user.Receiver_id, user.Sender_id, 4, user.MsgNbr)
+	rows, err := tp.DB.Query(query, user.Sender_id, user.Receiver_id, user.Receiver_id, user.Sender_id, 10, user.MsgNbr)
 	fmt.Println("errr,,,", err)
 	if err != nil {
 		// fmt.Println("fffff")

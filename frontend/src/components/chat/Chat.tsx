@@ -28,26 +28,17 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
 
     useEffect(() => {
         if (!msg || !msg.receiver_id || !msg.content) return;
-    
-        const isCurrentUserSender = msg.sender_id === currentUser?.id;
-        const isCurrentUserReceiver = msg.receiver_id === currentUser?.id;
-        const isChatWithSenderOpen = user?.id === msg.sender_id;
-        const isChatWithReceiverOpen = user?.id === msg.receiver_id;
-    
-        // 1. Show message in sender's chat if the sender is the current user and chatting with the receiver
-        if (isCurrentUserSender && isChatWithReceiverOpen) {
+        if (msg.sender_id === currentUser?.id &&  user?.id === msg.receiver_id) {
             setMessages(prev => [...prev, msg]);
             scrollToBottom();
         }
     
-        // 2. Show message in receiver's chat if receiver is current user and is chatting with sender
-        else if (isCurrentUserReceiver && isChatWithSenderOpen) {
+        else if (msg.receiver_id === currentUser?.id &&  user?.id === msg.sender_id) {
             setMessages(prev => [...prev, msg]);
             scrollToBottom();
         }
     
-        // 3. In all cases where receiver is current user, show notification
-        if (isCurrentUserReceiver) {
+        if (msg.receiver_id === currentUser?.id) {
             displayNotification(`${msg.first_name} ${msg.last_name}`);
         }
     
@@ -74,7 +65,7 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
                     container.scrollTop = container.scrollHeight;
                 }
             }, 100); 
-            if (msgs.length > 0) msgNumRef.current = 4
+            if (msgs.length > 0) msgNumRef.current = msgs.length
 
         }
         getMessages()
@@ -104,11 +95,10 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
         } else {
             msgs.sort().reverse()
             setMessages(prev => [...msgs, ...prev]);
-            if(msgs.length > 0) msgNumRef.current =  currentMsgNum + 4
+            if(msgs.length > 0) msgNumRef.current =  currentMsgNum + msgs.length
             setTimeout(() => {
                 if (container) {
-                    container.scrollTop = container.scrollHeight - oldScroll - 20; // 3. Scroll delta
-                    
+                    container.scrollTop = container.scrollHeight - oldScroll - 20;
                 }
             }, 100);
         }
@@ -144,7 +134,7 @@ function Chat({user, socket, msg}:{user?: User, socket:React.MutableRefObject<We
     }, [handleScroll])
     return (
         <div className={styles.chat}>
-
+            <div className={styles.name}><strong>{user?.first_name} {user?.last_name}</strong></div>
             <div className={styles.messages} ref={messageContainer}>
                 {messages.map(msg => {
                     const isReceiver = msg.receiver_id === user?.id
