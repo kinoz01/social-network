@@ -117,3 +117,121 @@
 .cmtBtn:hover {
     transform: scale(1.1);
 }
+
+
+/* ——— container ——— */
+.postBox {
+    border-radius: 12px;
+    padding: 0.75rem;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 30px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+/* ——— first row ——— */
+.inputRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.avatar {
+    border-radius: 50%;
+}
+
+/* Auto-grow text input */
+.input {
+    flex: 1;
+    min-height: 2.2rem;
+    max-height: 9rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--color1) !important;
+    border-radius: 20px;
+    resize: none;
+    overflow-y: hidden;
+    transition: border-color 0.2s;
+    font-size: 0.9rem;
+    font-family: 'Inter';
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    /* IE 10+ */
+    scrollbar-width: none;
+}
+
+.input::-webkit-scrollbar {
+    display: none;
+}
+
+.input:focus {
+    border: 2px solid #000 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Circular Icon-Only Post Button */
+.postButtonIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.postButtonIcon:hover {
+    background: #222;
+}
+
+/* ——— second row ——— */
+.actionRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .5rem;
+}
+
+/* Error Message */
+.error {
+    color: #d00;
+    font-size: .85rem;
+    margin-right: auto;
+}
+
+/* Image Picker Button */
+.imageButton {
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color6);
+    margin-right: 5px;
+}
+
+.imageButton:focus {
+    outline: none;
+    border-radius: 6px;
+}
+
+/* Display Selected File Name */
+.fileName {
+    font-size: .8rem;
+    color: grey;
+}
+
+/* ——— small screens ——— */
+@media (max-width: 480px) {
+    .input {
+        max-height: 16rem;
+    }
+}

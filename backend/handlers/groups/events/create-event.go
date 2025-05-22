@@ -59,7 +59,6 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	eid := uuid.Must(uuid.NewV4()).String()
 
 	tx, _ := tp.DB.Begin()
@@ -102,7 +101,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:     time.Now(),
 	}
 	w.Header().Set("Content-Type", "application/json")
-json.NewEncoder(w).Encode(resp) 
+	json.NewEncoder(w).Encode(resp)
 }
 
 func btoi(b bool) int {
@@ -144,7 +143,7 @@ func ListEventsHandler(w http.ResponseWriter, r *http.Request) {
 		out = append(out, ev)
 	}
 	w.Header().Set("Content-Type", "application/json")
-json.NewEncoder(w).Encode(out) 
+	json.NewEncoder(w).Encode(out)
 }
 
 /* ────────── route wiring (patch) ────────── */

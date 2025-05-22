@@ -23,7 +23,6 @@ export default async function HomeLayout({
             <UserProvider>
                 <SideBar />
                 {children}
-                {/* <CreateButton /> */}
             </UserProvider>
         </WSProvider>
     );

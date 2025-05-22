@@ -75,8 +75,7 @@ export default function CreateGroupModal({ onClose }: Props) {
                 `?status=accepted&query=${encodeURIComponent(q)}`,
                 { credentials: "include" }
             );
-
-            /* --- 404 means "no match" - clear the list ------------------- */
+            /* -------------- 404 means "no match" - clear the list ------------------- */
             if (res.status === 404) {
                 setResults([]);
                 if (hasFollowers === null) setHasFollowers(false);   // first check

@@ -1,20 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import {
+    useState,
+    useEffect,
+    useRef,
+    FormEvent,
+    KeyboardEvent,
+} from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import GroupPost from "./GroupPost";
-import styles from "./style/groupFeed.module.css";
 import Loading from "@/components/Loading";
-import { useGroupFeed } from "@/context/GroupFeedContext";
-// import { Post } from "./GroupPost";
+import styles from "./style/groupFeed.module.css";
+import { Post } from "./GroupPost";
 
-type Post = Parameters<typeof GroupPost>[0]["p"];
 const PAGE_SIZE = 20;
 
-export default function Feed() {
+/* ──────────────────────────────  FEED  ────────────────────────────── */
+export default function GroupFeed() {
     const { id: groupId } = useParams() as { id: string };
-    const { feedVersion } = useGroupFeed();
     const boxRef = useRef<HTMLDivElement>(null);
 
     const [posts, setPosts] = useState<Post[]>([]);
@@ -23,27 +28,24 @@ export default function Feed() {
     const [loadingFirst, setLoadingFirst] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    // Fetch page helper
-    const fetchPage = async (off: number) => {
+    /* ---------- helpers ---------- */
+    const fetchPage = async (off: number): Promise<Post[]> => {
         const qs = `group_id=${groupId}&limit=${PAGE_SIZE}&offset=${off}`;
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/groups/posts?${qs}`, {
-            credentials: "include",
-            cache: "no-store",
-        });
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/posts?${qs}`,
+            { credentials: "include", cache: "no-store" }
+        );
         if (!res.ok) throw new Error("Failed to load posts");
-        return (await res.json()) as Post[];
+        return res.json();
     };
 
-    // Handle initial load and feed refresh
     const loadInitialFeed = async () => {
         setLoadingFirst(true);
         try {
             const page = await fetchPage(0);
-            if (!page || !page.length) return         
             setPosts(page);
             setOffset(page.length);
             setHasMore(page.length === PAGE_SIZE);
-            
         } catch (e) {
             console.error(e);
         } finally {
@@ -51,18 +53,17 @@ export default function Feed() {
         }
     };
 
-    // Lazy loading handler
     const loadMorePosts = async () => {
         if (loadingMore || !hasMore) return;
         setLoadingMore(true);
         try {
             const next = await fetchPage(offset);
-            if (!next || !next.length) {
+            if (!next.length) {
                 setHasMore(false);
                 return;
             }
-            setPosts(prev => [...prev, ...next]);
-            setOffset(o => o + next.length);
+            setPosts((prev) => [...prev, ...next]);
+            setOffset((o) => o + next.length);
             setHasMore(next.length === PAGE_SIZE);
         } catch (e) {
             console.error(e);
@@ -71,12 +72,11 @@ export default function Feed() {
         }
     };
 
-    // Load initial or on feedVersion change
+    /* ---------- effects ---------- */
     useEffect(() => {
         loadInitialFeed();
-    }, [groupId, feedVersion]);
+    }, [groupId]);
 
-    // Bind lazy scroll
     useEffect(() => {
         const el = boxRef.current;
         if (!el) return;
@@ -88,26 +88,174 @@ export default function Feed() {
 
         el.addEventListener("scroll", onScroll);
         return () => el.removeEventListener("scroll", onScroll);
-    }, [loadMorePosts]); // Only rebind if loadMorePosts ref changes
+    }, [loadMorePosts]);
 
-    // UI States
+    /* ---------- helpers ---------- */
+    const prependPost = (p: Post) => setPosts((prev) => [p, ...prev]);
+
+    /* ---------- UI ---------- */
     if (loadingFirst) return <Loading />;
-    if (!posts || !posts.length) {
-        return (
-            <div className={styles.status}>
-                <p>No posts yet.</p>
-                <Image src="/img/empty.svg" alt="Empty state" width={200} height={200} />
-            </div>
-        );
-    }
 
     return (
-        <div ref={boxRef} className={styles.feed}>
-            {posts.map(p => <GroupPost key={p.post_id} p={p} />)}
-            {loadingMore && <Loading />}
-            {!hasMore && offset > PAGE_SIZE && <p className={styles.status}>End of feed</p>}
-        </div>
+        <>
+            <PostInput groupId={groupId} onAdd={prependPost} />
+
+            {posts.length === 0 ? (
+                <div className={styles.status}>
+                    <p>No posts yet.</p>
+                    <Image src="/img/empty.svg" alt="" width={200} height={200} />
+                </div>
+            ) : (
+                <div ref={boxRef} className={styles.feed}>
+                    {posts.map((p) => (
+                        <GroupPost key={p.post_id} p={p} />
+                    ))}
+                    {loadingMore && <Loading />}
+                    {!hasMore && offset > PAGE_SIZE && (
+                        <p className={styles.status}>End of feed</p>
+                    )}
+                </div>
+            )}
+        </>
     );
+}
+
+/* ─────────────────────  POST INPUT (local)  ───────────────────── */
+
+function PostInput({
+    groupId,
+    onAdd,
+}: {
+    groupId: string;
+    onAdd: (p: Post) => void;
+}) {
+    const { user } = useUser();
+    const [text, setText] = useState("");
+    const [image, setImg] = useState<File | null>(null);
+    const [loading, setLoad] = useState(false);
+    const [errMsg, setErr] = useState("");
+    const fileRef = useRef<HTMLInputElement>(null);
+
+    if (!user) return null;
+
+    /* ---------- handlers ---------- */
+    const onPick = (e: React.ChangeEvent<HTMLInputElement>) =>
+        setImg(e.target.files?.[0] ?? null);
+
+    const submit = async () => {
+        if (!text.trim()) return;
+
+        const fd = new FormData();
+        fd.append("group_id", groupId);
+        fd.append("body", text.trim());
+        if (image) fd.append("image", image);
+
+        setLoad(true);
+        try {
+            const r = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/create-post`,
+                { method: "POST", body: fd, credentials: "include" }
+            );
+            if (!r.ok) throw new Error((await r.json()).msg || "Could not post");
+
+            const added: Post = await r.json();
+            onAdd(added);          // <── prepend to feed
+            setText("");
+            setImg(null);
+            setErr("");
+
+            // reset height
+            const ta = document.querySelector(
+                `.${styles.input}`
+            ) as HTMLTextAreaElement | null;
+            if (ta) ta.style.height = "auto";
+        } catch (e: any) {
+            setErr(e.message || "Could not post");
+        } finally {
+            setLoad(false);
+        }
+    };
+
+    const onSubmit = (e?: FormEvent) => {
+        e?.preventDefault();
+        submit();
+    };
+
+    const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            submit();
+        }
+    };
+
+    const onInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+        const ta = e.currentTarget;
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
+    };
+
+    const avatar = user.profile_pic
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${user.profile_pic}`
+        : "/img/default-avatar.png";
+
+    /* ---------- UI ---------- */
+    return (
+        <form onSubmit={onSubmit} className={styles.postBox}>
+            <div className={styles.inputRow}>
+                <Image src={avatar} alt="" width={40} height={40} className={styles.avatar} />
+                <textarea
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    onKeyDown={onKeyDown}
+                    onInput={onInput}
+                    placeholder="Share your thoughts…"
+                    className={styles.input}
+                    rows={2}
+                    maxLength={1500}
+                />
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={styles.postButtonIcon}
+                >
+                    <Image src="/img/arrow-up.svg" alt="" width={18} height={18} />
+                </button>
+            </div>
+
+            <div className={styles.actionRow}>
+                {errMsg && <span className={styles.error}>{errMsg}</span>}
+
+                <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={onPick}
+                />
+                {image && (
+                    <span className={styles.fileName}>
+                        {truncateFileName(image.name, 50)}
+                    </span>
+                )}
+                <button
+                    type="button"
+                    className={styles.imageButton}
+                    onClick={() => fileRef.current?.click()}
+                >
+                    <Image src="/img/upload.svg" alt="" width={25} height={25} />
+                </button>
+            </div>
+        </form>
+    );
+}
+
+function truncateFileName(name: string, max: number = 30): string {
+    if (name.length <= max) return name;
+    const dotIndex = name.lastIndexOf(".");
+    if (dotIndex <= 0) return name.slice(0, max - 3) + "...";
+    const ext = name.slice(dotIndex);
+    const base = name.slice(0, max - ext.length - 3);
+    return base + "..." + ext;
 }
 
 // Throttle helper

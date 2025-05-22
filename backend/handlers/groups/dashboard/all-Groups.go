@@ -56,7 +56,7 @@ func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
          	AND gi.invitee_id = ?
          	AND gi.status = 'pending'
 	)
-	`, user.ID, /*  for CASE (join‑request)        */
+	`, user.ID,  /*  for CASE (join‑request)        */
 		user.ID, /*  for LEFT JOIN (member check)   */
 		user.ID, /*  for owner <> ?                 */
 		user.ID) /*  for NOT EXISTS (invitation)    */
