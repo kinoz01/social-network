@@ -19,15 +19,6 @@ func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* ---------- query params ---------- */
-	status := r.URL.Query().Get("status")
-	switch status {
-	case "pending", "rejected", "accepted":
-		// keep as‑is
-	default:
-		status = "accepted"
-	}
-
 	q := strings.TrimSpace(r.URL.Query().Get("query")) // search text
 
 	/* ---------- build SQL Query ---------- */
@@ -35,9 +26,9 @@ func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
     SELECT u.id, u.first_name, u.last_name, u.profile_pic
       FROM follow_requests f
       JOIN users u ON u.id = f.follower_id
-     WHERE f.followed_id = ? AND f.status = ?`
+     WHERE f.followed_id = ? AND f.status = 'accepted'`
 
-	args := []any{user.ID, status}
+	args := []any{user.ID}
 
 	if q != "" {
 		/* match columns that START with the query */
