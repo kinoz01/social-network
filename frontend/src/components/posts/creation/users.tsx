@@ -3,9 +3,11 @@ import styles from "../posts.module.css"
 import { BackIcon } from "@/components/icons";
 import React, { useState, useEffect } from "react";
 import { User } from "../Feed";
+import { fetchOldPosts } from "@/apiService/posts/prevPost";
 type UsersListParams = {
     onBack: () => void;
     onUserCHange: (users: string[]) => void;
+    userID: string
 }
 interface FollowerInfo {
     id: string;
@@ -13,14 +15,6 @@ interface FollowerInfo {
 }
 
 const ShowUsers = (props: UsersListParams) => {
-    // interface User {
-    //     id: string;
-    //     email: string;
-    //     username: string;
-    //     first_name: string;
-    //     last_name: string;
-    //     profile_pic: string;
-    // }
     const [selectedUser, setSelected] = useState<FollowerInfo[]>([])
     const [List_Users, setLIstUsers] = useState<User[]>([])
 
@@ -39,6 +33,8 @@ const ShowUsers = (props: UsersListParams) => {
         fetchUsers()
             .then(data => setLIstUsers(data.Users))
     }, [])
+
+    // console.log("liste of users", selectedUser);
 
     // console.log("here, -------", List_Users && List_Users[0].id)
     return (

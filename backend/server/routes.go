@@ -30,11 +30,14 @@ func Routes() http.Handler {
 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
+	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))
 
 	//posts
 	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
 	mux.Handle("/api/allPosts/", rl.RateLimitMW(http.HandlerFunc(posts.AllPosts)))
-	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))
+
+	//reactions
+	mux.Handle("/api/react", rl.RateLimitMW(http.HandlerFunc(posts.HandleLike)))
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

@@ -7,7 +7,7 @@ type handleSbmtParams = {
     e: React.FormEvent<HTMLFormElement>;
     onClose: () => void;
     onSubmit: (post: Omit<Post, "id">) => void;
-    user: User
+    userData: User
 
 }
 
@@ -28,13 +28,12 @@ const HandleCreation = async (props: handleSbmtParams) => {
         }
         console.log("dtat", formData.get("imag_post"), "content", formData.get("content"))
         const post: Post = await res.json()
-        console.log("------->", post)
         const newPost: Post = {
             ...post,
-            userID: props.user?.id,
-            firstName: props.user?.first_name,
-            lastName: props.user?.last_name,
-            profile_pic: props.user?.profile_pic,
+            userID: props.userData?.id,
+            firstName: props.userData?.first_name,
+            lastName: props.userData?.last_name,
+            profile_pic: props.userData?.profile_pic,
             createdAt: new Date().toISOString(),
         }
 

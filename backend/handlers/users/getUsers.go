@@ -3,6 +3,7 @@ package users
 import (
 	"encoding/json"
 	"net/http"
+
 	usersDB "social-network/database/repositories/db_users"
 	"social-network/handlers/helpers"
 )
@@ -12,6 +13,7 @@ func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 		helpers.JsonError(w, "methos not allowed", http.StatusMethodNotAllowed, nil)
 		return
 	}
+
 	users, err := usersDB.GetAllUsers()
 	if err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusInternalServerError, nil)

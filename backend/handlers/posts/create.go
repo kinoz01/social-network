@@ -41,9 +41,9 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 
 	content := r.FormValue("content")
 	visibility := r.FormValue("privacy")
-	vipUsers := r.Form["vipUsers"]
+	vipUsers := append(r.Form["vipUsers"], user.ID)
 	var fileName sql.NullString
-	fmt.Println("here------------->", content, visibility, vipUsers)
+	// fmt.Println("here------------->", content, visibility, vipUsers)
 
 	file, handler, err := r.FormFile("file")
 	if err != nil {
@@ -86,7 +86,7 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 		Visibility: Postsrv.ValidVisibility(visibility),
 	}
 	if newPost.Visibility == "private" {
-		fmt.Println("handle now private posts")
+		// fmt.Println("handle now private posts")
 		for _, vipUser := range vipUsers {
 			if err := postDB.PostPrivacyDB(newPost.ID, vipUser); err != nil {
 				help.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
@@ -94,7 +94,7 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	fmt.Println("--------posts", newPost)
+	// fmt.Println("--------posts", newPost)
 	if err := postDB.CreatePostDB(newPost); err != nil {
 		help.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
 		return

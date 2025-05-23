@@ -1,3 +1,6 @@
+networks:
+  i_zahid:
+    driver: bridge
 services:
   backend:
     build:
@@ -7,7 +10,9 @@ services:
       - "8080:8080"
     volumes:
       - ./backend/database/socNet.db:/app/database/socNet.db
-      - ./backend/database/schema.sql:/app/database/schema.sql 
+      - ./backend/database/schema.sql:/app/database/schema.sql
+    networks:
+      - i_zahid
 
   frontend:
     build:
@@ -17,3 +22,5 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - i_zahid

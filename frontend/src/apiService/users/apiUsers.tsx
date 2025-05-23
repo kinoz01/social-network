@@ -9,7 +9,7 @@ const fetchUsers = async () => {
             throw new Error((await res.json()).msg || "fetch failed")
         }
         const listUsers = await res.json()
-        console.log("fetch users=>", listUsers.Users)
+        // console.log("fetch users=>", listUsers.Users)
 
         return listUsers
     } catch (error) {

@@ -13,44 +13,16 @@ type PostParams = {
   isOpen?: boolean;
   onClose: () => void;
   onSubmit: (post: Omit<Post, "id">) => void;
+  userData: User | null
 }
 
-async function getUser(): Promise<User | null> {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/userInfo`, {
-      credentials: "include",
-      cache: "no-store",
-    })
-
-    if (!res.ok) {
-      console.error("failed to fetch user", res.status)
-      return null
-    }
-
-    const data: User = await res.json()
-    return data
-  } catch (error) {
-    console.error("Error fetching user", error)
-    return null
-  }
-}
-
-export const NewPOst = ({ onClose, onSubmit }: PostParams) => {
+export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
   const [showAudiance, setShow] = useState(false)
   const [showUsers, setUsers] = useState(false)
   const [privacy, setPrivacy] = useState("public")
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [user, setUser] = useState<User | null>(null)
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userData = await getUser()
-      setUser(userData)
-    }
-    fetchUser()
-  }, [])
-  console.log("------->", user)
-  if (!user) {
+  if (!userData) {
     // throw new Error("user not exist")
     return
   }
@@ -80,7 +52,7 @@ export const NewPOst = ({ onClose, onSubmit }: PostParams) => {
     <>
       {(
         <div className={styles.formContainer}>
-          <form className={styles.form} onSubmit={(e) => HandleCreation({ e, onClose, onSubmit, user })}>
+          <form className={styles.form} onSubmit={(e) => HandleCreation({ e, onClose, onSubmit, userData })}>
             {/* {!showAudiance ? */}
             <input type="hidden" name="privacy" value={privacy} />
 
@@ -93,7 +65,7 @@ export const NewPOst = ({ onClose, onSubmit }: PostParams) => {
             </div>
 
             <div style={{ display: showUsers ? "block" : "none", overflow: "auto" }}>
-              <ShowUsers onBack={handleBack} onUserCHange={setSelectedUsers} />
+              <ShowUsers onBack={handleBack} onUserCHange={setSelectedUsers} userID={userData.id} />
             </div>
 
           </form>

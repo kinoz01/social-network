@@ -43,5 +43,14 @@ type PostData struct {
 	FirstName  string         `json:"firstName"`
 	LastName   string         `json:"lastName"`
 	ProfilePic string         `json:"profile_pic"`
+	HasReact   sql.NullString `json:"hasReact"`
+	TotalLIKes int            `json:"totalLikes"`
 	CreatedAt  string         `json:"createdAt"`
+}
+type React struct {
+	ID        string
+	UserID    string `json:"userID"`
+	PostID    string `json:"postID,omitempty"`
+	CommentID string `json:"commentID,omitempty"`
+	ISLike    string `json:"IsLike"`
 }

@@ -7,11 +7,54 @@ import Comment from "../comments/Comment";
 import { useState, useEffect } from "react";
 import { Post } from "./Feed";
 import { CloseFriendIcon, CommentIcon, LikeIcon, PublicIcon, PrivateIcon } from "../icons";
+import { User } from "./Feed";
+import { getUser } from "@/lib/user";
+
 export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
+  // console.log("post.hasReact.String", post.hasReact);
+  const [user, setUser] = useState<User | null>(null)
   const [showComments, setComments] = useState(false)
-  const [liked, setReaction] = useState(false)
-  const [totalLikes, setTotalLikes] = useState(0)
+  const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
   const [totalCOmments, setTotalCOmments] = useState(0)
+  const [liked, setReaction] = useState(post.hasReact?.String === "1")
+
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getUser()
+      setUser(userData)
+    }
+    fetchUser()
+  }, [])
+
+  const handleLike = async () => {
+    if (liked) {
+      setReaction(!liked)
+      totalLikes > 0 && setTotalLikes(totalLikes - 1)
+    } else {
+      setReaction(!liked)
+      setTotalLikes(totalLikes + 1)
+    }
+    // console.log("------->user inside FEED", user)
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/react`, {
+      method: "POST",
+      // credentials: "include",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userID: user?.id,
+        postID: post.id,
+        IsLike: !liked ? "1" : "0"
+      })
+
+    })
+    if (!res.ok) {
+      throw new Error("failed to react")
+    }
+
+  }
+  // console.log("here reaction--------", post.hasReact.String);
 
   return (
     <>
@@ -55,14 +98,9 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
           <div className={styles.postFooter}>
             <button
               className={styles.reactBtn}
+
               onClick={
-                liked ? () => {
-                  setReaction(!liked)
-                  totalLikes > 0 && setTotalLikes(totalLikes - 1)
-                } : () => {
-                  setReaction(!liked)
-                  setTotalLikes(totalLikes + 1)
-                }
+                handleLike
               }
             >
               <LikeIcon fill={liked ? "red" : "none"} />
@@ -92,5 +130,5 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
 
     </>
 
-  );
+  )
 }
