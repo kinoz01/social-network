@@ -54,7 +54,6 @@ function Feed({ type }: { type: "home" | "group" }) {
   const [isLoading, setLoading] = useState(false)
   const [hasMOre, sethasMore] = useState(true)
   const observer = useRef<IntersectionObserver | null>(null)
-  // const [uniqueIDs, setUniqueIDs] = useState<Set<string>>(new Set())
   const delay = 1000
   const [user, setUser] = useState<User | null>(null)
   const requestedPages = useRef<Set<number>>(new Set())
@@ -89,12 +88,6 @@ function Feed({ type }: { type: "home" | "group" }) {
       }
 
       await new Promise((resolve) => setTimeout(resolve, 800))
-
-      // setUniqueIDs((prev) => {
-      //   const newSet = new Set(prev)
-      //   uniquePosts.forEach((post) => newSet.add(post.id))
-      //   return newSet
-      // })
 
       setPostedContent((prev) => [...prev, ...uniquePosts])
     } catch (err) {
