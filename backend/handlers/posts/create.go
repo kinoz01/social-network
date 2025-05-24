@@ -1,12 +1,9 @@
 package posts
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 
 	postDB "social-network/database/repositories/db_posts"
 	auth "social-network/handlers/authentication"
@@ -42,49 +39,22 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 	content := r.FormValue("content")
 	visibility := r.FormValue("privacy")
 	vipUsers := append(r.Form["vipUsers"], user.ID)
-	var fileName sql.NullString
-	// fmt.Println("here------------->", content, visibility, vipUsers)
 
-	file, handler, err := r.FormFile("file")
-	if err != nil {
-		// help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
-		fmt.Println("read file--", err)
-	}
-	// fmt.Println("hereNNNNNNNNNNNN------------->", content, visibility, handler)
-	if handler != nil {
-		filePath, err := os.Create("../frontend/public/storage/posts/" + handler.Filename)
-		if err != nil {
-			help.JsonError(w, "Failed to ceate a file", http.StatusInternalServerError, nil)
-			return
-		}
-		defer filePath.Close()
-		_, err = io.Copy(filePath, file)
-		if err != nil {
-			help.JsonError(w, "Failed to save file", http.StatusInternalServerError, nil)
-			return
-		}
-		if err := Postsrv.ValidFile(handler); err != nil {
-			help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
-			return
-		}
-		fileName = sql.NullString{
-			String: handler.Filename,
-			Valid:  true,
-		}
-	}
-	if err := Postsrv.ValidInput(content); err != nil {
-		help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
-		return
-	}
-	// fmt.Println("last esrror", err)
 	postID := uuid.Must(uuid.NewV4())
 	newPost := typeP.Post{
 		ID:         postID.String(),
 		UserID:     user.ID,
-		Content:    content,
-		Imag_post:  fileName,
 		Visibility: Postsrv.ValidVisibility(visibility),
 	}
+
+	filename, err := help.HamdleFIleUpload(r)
+	if err := Postsrv.ValidInput(content); err != nil {
+		help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		return
+	}
+	newPost.Imag_post = filename
+	newPost.Content = content
+
 	if newPost.Visibility == "private" {
 		// fmt.Println("handle now private posts")
 		for _, vipUser := range vipUsers {

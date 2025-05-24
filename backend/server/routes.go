@@ -8,6 +8,7 @@ import (
 	"social-network/handlers/posts"
 	"social-network/handlers/users"
 
+	"social-network/handlers/comments"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 )
@@ -35,6 +36,8 @@ func Routes() http.Handler {
 	//posts
 	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
 	mux.Handle("/api/allPosts/", rl.RateLimitMW(http.HandlerFunc(posts.AllPosts)))
+	mux.Handle("/api/addcomment", rl.RateLimitMW(http.HandlerFunc(comments.AddComment)))
+	mux.Handle("/api/getcomments", rl.RateLimitMW(http.HandlerFunc(comments.GetComments)))
 
 	//reactions
 	mux.Handle("/api/react", rl.RateLimitMW(http.HandlerFunc(posts.HandleLike)))

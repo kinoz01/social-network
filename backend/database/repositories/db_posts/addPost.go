@@ -1,6 +1,7 @@
 package repoPosts
 
 import (
+	"database/sql"
 	"fmt"
 
 	pType "social-network/handlers/types"
@@ -8,6 +9,18 @@ import (
 
 func CreatePostDB(newPost pType.Post) error {
 	// fmt.Println("before dqtqBQSE", newPost)
+	var imgPost sql.NullString
+	if newPost.Imag_post != "" {
+		imgPost = sql.NullString{
+			String: newPost.Imag_post,
+			Valid:  true,
+		}
+	} else {
+		imgPost = sql.NullString{
+			String: "",
+			Valid:  false,
+		}
+	}
 	query := `INSERT INTO posts (post_id, user_id, body, img_post, visibility)
 	          VALUES (?, ?, ?, ?, ?)`
 	stat, err := pType.DB.Prepare(query)
@@ -15,7 +28,7 @@ func CreatePostDB(newPost pType.Post) error {
 		return fmt.Errorf("failed to preparing statement %w", err)
 	}
 	defer stat.Close()
-	_, err = stat.Exec(newPost.ID, newPost.UserID, newPost.Content, newPost.Imag_post, newPost.Visibility)
+	_, err = stat.Exec(newPost.ID, newPost.UserID, newPost.Content, imgPost, newPost.Visibility)
 	if err != nil {
 		return fmt.Errorf("failed to insert new post in database %w", err)
 	}
@@ -78,11 +91,12 @@ func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 	var posts []pType.PostData
 	for rows.Next() {
 		var post pType.PostData
+		var imgPost sql.NullString
 		err := rows.Scan(
 			&post.PostID,
 			&post.UserID,
 			&post.Content,
-			&post.Imag_post,
+			&imgPost,
 			&post.Visibility,
 			&post.FirstName,
 			&post.LastName,
@@ -93,6 +107,11 @@ func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 		)
 		if err != nil {
 			return []pType.PostData{}, err
+		}
+		if imgPost.Valid {
+			post.Imag_post = imgPost.String
+		} else {
+			post.Imag_post = "" // Set to empty string if NULL
 		}
 		posts = append(posts, post)
 	}

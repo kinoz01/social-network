@@ -23,12 +23,12 @@ type Users struct {
 }
 
 type Post struct {
-	ID         string         `json:"id"`
-	UserID     string         `json:"userID"`
-	Content    string         `json:"content"`
-	Imag_post  sql.NullString `json:"imag_post"`
-	Visibility string         `json:"visibility"`
-	VipUsers   []string       `json:"vipUsers"`
+	ID         string   `json:"id"`
+	UserID     string   `json:"userID"`
+	Content    string   `json:"content"`
+	Imag_post  string   `json:"imag_post,omitempty"`
+	Visibility string   `json:"visibility"`
+	VipUsers   []string `json:"vipUsers"`
 }
 
 // type
@@ -37,7 +37,7 @@ type PostData struct {
 	PostID     string         `json:"id"`
 	UserID     string         `json:"userID"`
 	Content    string         `json:"content"`
-	Imag_post  sql.NullString `json:"imag_post"`
+	Imag_post  string         `json:"imag_post"`
 	Visibility string         `json:"visibility"`
 	VipUsers   []string       `json:"vipUsers"`
 	FirstName  string         `json:"firstName"`
@@ -53,4 +53,13 @@ type React struct {
 	PostID    string `json:"postID,omitempty"`
 	CommentID string `json:"commentID,omitempty"`
 	ISLike    string `json:"IsLike"`
+}
+
+type Comment struct {
+	ID          string `json:"commentId"`
+	Content     string `json:"content"`
+	UserID      string `json:"userID"`
+	Img_comment string `json:"img_comment,omitempty"`
+	PostID      string `json:"postID"`
+	CreatedAt   string `json:"createdAt"`
 }

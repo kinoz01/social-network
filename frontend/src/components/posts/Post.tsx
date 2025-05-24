@@ -3,12 +3,13 @@
 import Image from "next/image";
 import styles from "./posts.module.css";
 import AddComment from "../comments/AddComments";
-import Comment from "../comments/Comment";
 import { useState, useEffect } from "react";
 import { Post } from "./Feed";
 import { CloseFriendIcon, CommentIcon, LikeIcon, PublicIcon, PrivateIcon } from "../icons";
 import { User } from "./Feed";
 import { getUser } from "@/lib/user";
+import Comment from "../comments/Comment";
+import { CommentInfo } from "../comments/Comment";
 
 export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
   // console.log("post.hasReact.String", post.hasReact);
@@ -17,6 +18,7 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
   const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
   const [totalCOmments, setTotalCOmments] = useState(0)
   const [liked, setReaction] = useState(post.hasReact?.String === "1")
+  const [postedComments, setNewComments] = useState<CommentInfo[]>([]);
 
 
   useEffect(() => {
@@ -54,7 +56,14 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
     }
 
   }
+
+  const addNewComment = (newComment: CommentInfo) => {
+    setNewComments(prev => [newComment, ...prev])
+    setTotalCOmments(prev => prev + 1)
+  }
+
   // console.log("here reaction--------", post.hasReact.String);
+  // console.log("pooooost", post);
 
   return (
     <>
@@ -83,10 +92,10 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
           <div className={styles.postContent}>
             {post.content}
           </div>
-          {post.imag_post.String !== "" &&
+          {post.imag_post &&
             <img
               className={styles.postImage}
-              src={`/storage/posts/${post.imag_post.String}`}
+              src={`/storage/posts/${post.imag_post}`}
               alt={post.firstName}
               width={450}
               height={450}
@@ -121,8 +130,12 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
         {
           showComments ? (
             <div className={styles.comments}>
-              <AddComment />
-              <Comment />
+              <AddComment postID={post.id} userID={user?.id} onNewComment={addNewComment} />
+              {postedComments && postedComments.map((comm) => (
+                <div key={comm.commentId}>
+                  <Comment userData={user} commentData={comm} />
+                </div>
+              ))}
             </div>
           ) : null
         }

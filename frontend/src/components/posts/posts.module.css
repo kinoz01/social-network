@@ -283,17 +283,6 @@
   margin-top: 4px;
 }
 
-.commentForm {
-  border-radius: 15px;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: auto;
-  gap: 8;
-}
-
 .postOptions {
   width: 100%;
   display: flex;
@@ -303,8 +292,7 @@
 }
 
 .postTitleInput,
-.postContentInput,
-.commentInput {
+.postContentInput {
   /* background-color: var(--color2); */
   padding: 1rem;
   height: auto;
@@ -463,9 +451,9 @@
   gap: 8px;
   font-size: 0.9rem;
   color: #faebd7;
-  margin: 0.5rem;
   cursor: pointer;
   white-space: nowrap;
+  margin: 0.5rem;
 }
 
 .checkboxElem label {
@@ -477,9 +465,10 @@
 /* comments */
 .comment {
   display: flex;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: baseline;
-  gap: 8;
+  /* gap: 8px; */
+  padding: 16px;
 }
 
 .commentContent {
@@ -487,9 +476,9 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: end;
-  gap: 4;
-  border-radius: 0 15px 15px 15px;
-  background-color: var(--color1);
+  gap: 4px;
+  border-radius: 0 15px 15px;
+  background-color: #16161659;
 }
 
 .comments {
@@ -528,4 +517,92 @@
   .postImage {
     height: 10rem;
   }
+}
+
+.commentInputContainer {
+  margin: 10px 0;
+}
+
+.commentForm {
+  position: relative;
+  width: 100%;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  background-color: #f0f2f5;
+  border-radius: 20px;
+  padding: 8px 12px;
+  min-height: 40px;
+}
+
+.leftIcons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 10px;
+}
+
+.icon {
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.icon:hover {
+  opacity: 1;
+}
+
+.uploadImgBtn {
+  display: none;
+  /* Hide the file input, use label for styling */
+}
+
+.uploadIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.commentInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 14px;
+  line-height: 20px;
+  min-height: 20px;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  overflow-y: hidden;
+}
+
+.commentInput::placeholder {
+  color: #65676b;
+}
+
+.addCommentBtn {
+  background: none;
+  border: none;
+  padding: 0 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.sendIcon {
+  font-size: 1.7rem;
+  color: #0084ff;
+}
+
+/* .comment,
+.commentHeader,
+.commentInfo,
+.commentUser,
+.commentContent, */
+.commentCreationDate {
+  font-size: .8rem;
+  color: #1c1c1c;
 }
