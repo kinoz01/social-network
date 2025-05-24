@@ -44,7 +44,7 @@ export default function AddComment(props: commentParams) {
         throw new Error((await res.json()).msg || "creation of comment failed")
       }
       const data = await res.json()
-      // console.log("in 00", data);
+      // console.log("in 00------", data);
 
       setComment('')
       if (fileInputRef.current) {

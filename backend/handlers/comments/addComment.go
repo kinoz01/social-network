@@ -2,6 +2,7 @@ package comments
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	db_comment "social-network/database/repositories/db_posts"
 	"social-network/handlers/helpers"
@@ -23,8 +24,8 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 	comment.Content = r.FormValue("content")
-	comment.PostID = r.FormValue("userID")
-	comment.UserID = r.FormValue("postID")
+	comment.PostID = r.FormValue("postID")
+	comment.UserID = r.FormValue("userID")
 	// fmt.Println("content", comment.Content)
 
 	filename, err := helpers.HamdleFIleUpload(r)
@@ -48,5 +49,5 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(comment); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
-	// fmt.Println("testcomment", comment)
+	fmt.Println("testcomment", comment)
 }

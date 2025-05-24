@@ -63,7 +63,7 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
   }
 
   // console.log("here reaction--------", post.hasReact.String);
-  // console.log("pooooost", post);
+  console.log("pooooost", post);
 
   return (
     <>
