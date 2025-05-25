@@ -26,7 +26,7 @@ const HandleCreation = async (props: handleSbmtParams) => {
         if (!res.ok) {
             throw new Error((await res.json()).msg || "creation failed")
         }
-        // console.log("dtat", formData.get("imag_post"), "content", formData.get("content"))
+
         const post: Post = await res.json()
         const newPost: Post = {
             ...post,
@@ -34,7 +34,6 @@ const HandleCreation = async (props: handleSbmtParams) => {
             firstName: props.userData?.first_name,
             lastName: props.userData?.last_name,
             profile_pic: props.userData?.profile_pic,
-            createdAt: new Date().toISOString(),
         }
 
         // console.log('post created successfully', formData)

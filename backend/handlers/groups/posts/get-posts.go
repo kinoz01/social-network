@@ -36,7 +36,6 @@ func GroupPosts(w http.ResponseWriter, r *http.Request) {
         p.post_id,
         p.body,
         p.img_post,               -- nullable
-        p.visibility,             -- ← NEW
         p.created_at,
         u.id          AS user_id,
         u.first_name,
@@ -74,7 +73,6 @@ func GroupPosts(w http.ResponseWriter, r *http.Request) {
 			&p.PostID,
 			&p.Content,
 			&img,
-			&p.Visibility,
 			&p.CreatedAt,
 			&p.UserID,
 			&p.FirstName,

@@ -47,7 +47,7 @@ export const PostComponent: React.FC<{ post: Post, type?: "group" }> = ({ post, 
 
   const imgName = typeof post.imag_post === "string"
     ? post.imag_post                 // plain string column
-    : post.imag_post?.String ?? "";
+    : post.imag_post?.String ?? "";    
 
   return (
     <>
@@ -65,7 +65,7 @@ export const PostComponent: React.FC<{ post: Post, type?: "group" }> = ({ post, 
             <div className={styles.postUser}>{post.firstName} {post.lastName}</div>
             <div className={styles.postCreationDate}>
             <div className={styles.timeAgo}><TimeAgo dateStr={post.createdAt} /></div>
-              {post.visibility === "private" ? <PrivateIcon /> : post.visibility === "close" ? <CloseFriendIcon /> : <PublicIcon />}
+              {post.visibility === "private" ? <CloseFriendIcon /> : post.visibility === "almost-private" ? <PrivateIcon /> : <PublicIcon />}
             </div>
           </div>
         </div >

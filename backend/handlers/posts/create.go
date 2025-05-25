@@ -2,7 +2,6 @@ package posts
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -62,10 +61,9 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 
 		if p, err := help.SaveImg(buff, "posts/"); err == nil {
 			newPost.Imag_post = p
-			fmt.Printf("Image saved to: %s\n", p)
 		}
 	}
-	
+
 	if err := Postsrv.ValidInput(content); err != nil {
 		help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	tp "social-network/handlers/types"
+	help "social-network/handlers/helpers"
 )
 
 // GET /api/groups/chat?group_id=...&limit=20&offset=40
@@ -15,18 +16,12 @@ func ChatPage(w http.ResponseWriter, r *http.Request) {
 	offS := r.URL.Query().Get("offset")
 
 	if gid == "" {
-		http.Error(w, "group_id required", 400)
+		help.JsonError(w, "group_id required", 400, nil)
 		return
 	}
 
 	limit, _ := strconv.Atoi(limS)
-	if limit <= 0 {
-		limit = 20
-	}
 	offset, _ := strconv.Atoi(offS)
-	if offset < 0 {
-		offset = 0
-	}
 
 	rows, err := tp.DB.Query(`
 		SELECT gc.id, gc.content, gc.created_at,
@@ -37,7 +32,7 @@ func ChatPage(w http.ResponseWriter, r *http.Request) {
 		ORDER BY gc.created_at DESC, gc.ROWID DESC
 		LIMIT ? OFFSET ?`, gid, limit, offset)
 	if err != nil {
-		http.Error(w, "db err", 500)
+		help.JsonError(w, "db err", 500, err)
 		return
 	}
 	defer rows.Close()

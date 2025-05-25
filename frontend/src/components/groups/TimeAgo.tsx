@@ -16,7 +16,7 @@ export default function TimeAgo({ dateStr }: { dateStr: string }) {
     return <time dateTime={dateStr}>• {label}</time>;
 }
 
-// Input date in local time (but ends with Z)
+// Input date in local time (but ends with Z(UTC))
 export function formatTimeAgo(dateStr: string) {
     const dStr = dateStr.endsWith('Z') ? dateStr.slice(0, -1) : dateStr;
     const date = new Date(dStr); // if UTC converts to local time, if local time keeps it
