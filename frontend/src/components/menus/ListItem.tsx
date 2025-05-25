@@ -8,14 +8,14 @@ function ListItem({
   name,
 }: {
   type:
-    | "friendRequests"
-    | "followers"
-    | "followings"
-    | "suggestions"
-    | "chat"
-    | "group"
-    | "groups"
-    | "event";
+  | "friendRequests"
+  | "followers"
+  | "followings"
+  | "suggestions"
+  | "chat"
+  | "group"
+  | "groups"
+  | "event";
   name: String;
 }) {
   return (

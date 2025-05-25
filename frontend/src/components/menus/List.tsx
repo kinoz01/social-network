@@ -8,14 +8,14 @@ function List({
   title,
 }: {
   type:
-    | "friendRequests"
-    | "followers"
-    | "followings"
-    | "suggestions"
-    | "chat"
-    | "group"
-    | "groups"
-    | "event";
+  | "friendRequests"
+  | "followers"
+  | "followings"
+  | "suggestions"
+  | "chat"
+  | "group"
+  | "groups"
+  | "event";
   title: String;
 }) {
   return (
@@ -54,21 +54,21 @@ function List({
             <ListItem type={type} name={"Wayne Burton"} />
             <ListItem type={type} name={"Wayne Burton"} />
           </>
-        
+
         ) : type === "groups" ? (
           <>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
-            <ListItem type="groups" name={"zone01"}/>
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
+            <ListItem type="groups" name={"zone01"} />
           </>
         ) : (
           // Fetch just a few users

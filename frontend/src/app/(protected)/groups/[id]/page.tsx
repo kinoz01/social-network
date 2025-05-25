@@ -1,13 +1,10 @@
-import RightMenu from "@/components/menus/RightMenu";
-import Feed from "@/components/posts/Feed";
+import Feed from "@/components/groups/GroupFeed";
+import styles from "@/components/groups/style/groupFeed.module.css";
 
-export default async function GroupPage() {
+export default function GroupPage() {
     return (
-        <>
-            <Feed type="group"/>
-            <RightMenu />
-        </>
+        <div className={styles.feedContainer}>
+            <Feed />
+        </div>
     );
 }
-
-

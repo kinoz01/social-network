@@ -3,9 +3,11 @@ CREATE TABLE comments (
     user_id TEXT NOT NULL,
     post_id TEXT NOT NULL,
     content TEXT NOT NULL CHECK(length(trim(content)) > 0 AND length(content) <= 2000),
-    img_comment TEXT CHECK(img_comment IS NULL OR 
+    img_comment CHECK(img_comment IS NULL OR 
         (img_comment LIKE '%.jpg' OR 
-         img_comment LIKE '%.png' OR 
+         img_comment LIKE '%.png' OR
+         img_comment LIKE '%.jpeg' OR
+         img_comment LIKE '%.gif' OR
          img_comment LIKE '%.webp')
     ),
     created_at TIMESTAMP DEFAULT (DATETIME ('now', 'localtime')),

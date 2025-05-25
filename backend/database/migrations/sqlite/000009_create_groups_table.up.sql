@@ -1,6 +1,6 @@
 CREATE TABLE groups (
     id TEXT PRIMARY KEY,
-    groups_name TEXT,
+    group_name TEXT,
     group_owner TEXT NOT NULL,
     description TEXT,
     group_pic TEXT,

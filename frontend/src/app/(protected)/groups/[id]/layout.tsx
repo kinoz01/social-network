@@ -1,36 +1,36 @@
-import Feed from "@/components/posts/Feed";
-import RightMenu from "@/components/menus/RightMenu";
-import LeftMenu from "@/components/menus/LeftMenu";
+import GroupMenu from "@/components/groups/GroupMenu";
+import MembersMenu from "@/components/groups/MembersMenu";
+import InviteMenu from "@/components/groups/InviteMenu";
+import RequestsMenu from "@/components/groups/RequestsMenu";
+import { checkMembership } from "@/lib/auth";
+import style from "@/components/groups/style/groupLayout.module.css";
+import { GroupSyncProvider } from "@/context/GroupSyncContext";
 
 export default async function GroupLayout({
+    params: paramsPromise,
     children,
-}: Readonly<{
+}: {
+    params: Promise<{ id: string }>;
     children: React.ReactNode;
-}>) {
+}) {
+    const { id } = await paramsPromise;
+    await checkMembership(id);
+
     return (
-        <div className="mainContent group">
-            <LeftMenu type="groups" />
-            {children}
-        </div >
+            <GroupSyncProvider>
+                <div className={style.groupLayout}>
+                    <div className={style.menuLayout}>
+                        <GroupMenu />
+                        <RequestsMenu />
+                    </div>
+                    <div className={style.contentLayout}>
+                        {children}
+                    </div>
+                    <div className={style.menuLayout}>
+                        <MembersMenu />
+                        <InviteMenu />
+                    </div>
+                </div>
+            </GroupSyncProvider>
     );
 }
-
-
-// export default function RootLayout({
-//     children,
-// }: Readonly<{
-//     children: React.ReactNode;
-// }>) {
-//     return (
-//         <html lang="en">
-//             <body className={`${geistSans.variable} ${geistMono.variable}`}>
-//                 <main className={styles.main}>
-//                     <SideBar />
-//                     {/* <div className="mainContent"> */}
-//                     {children}
-//                     {/* </div> */}
-//                 </main>
-//             </body>
-//         </html>
-//     );
-// }

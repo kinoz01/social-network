@@ -18,3 +18,60 @@ type User struct {
 	AboutMe     string `json:"about_me"`
 	AccountType string `json:"account_type"`
 }
+type Users struct {
+	Users []User
+}
+
+type Post struct {
+	ID         string   `json:"id"`
+	UserID     string   `json:"userID"`
+	Content    string   `json:"content"`
+	Imag_post  string   `json:"imag_post,omitempty"`
+	Visibility string   `json:"visibility"`
+	VipUsers   []string `json:"vipUsers"`
+}
+
+// type
+type PostData struct {
+	PostID     string         `json:"id"`
+	UserID     string         `json:"userID"`
+	Content    string         `json:"content"`
+	Imag_post  string         `json:"imag_post"`
+	Visibility string         `json:"visibility"`
+	VipUsers   []string       `json:"vipUsers"`
+	FirstName  string         `json:"firstName"`
+	LastName   string         `json:"lastName"`
+	ProfilePic string         `json:"profile_pic"`
+	HasReact   sql.NullString `json:"hasReact"`
+	TotalLIKes int            `json:"totalLikes"`
+	CreatedAt  string         `json:"createdAt"`
+	GroupID    string         `json:"groupID,omitempty"`
+}
+
+type React struct {
+	ID        string
+	UserID    string `json:"userID"`
+	PostID    string `json:"postID,omitempty"`
+	CommentID string `json:"commentID,omitempty"`
+	ISLike    string `json:"IsLike"`
+}
+
+type Comment struct {
+	ID          string `json:"commentId"`
+	Content     string `json:"content"`
+	UserID      string `json:"userID"`
+	Img_comment string `json:"img_comment,omitempty"`
+	PostID      string `json:"postID"`
+	CreatedAt   string `json:"createdAt"`
+}
+
+type Group struct {
+	ID          string `json:"id"`
+	GroupName   string `json:"group_name"`
+	GroupOwner  string `json:"group_owner"`
+	GroupPic    string `json:"group_pic"`
+	Description string `json:"description"`
+	CreatedAt   string `json:"created_at"`
+	Request     string `json:"request"` // when rendering all groups (if pending)
+	Members     int    `json:"members"`
+}

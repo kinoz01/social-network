@@ -11,11 +11,10 @@ import {
   UserIcon,
 } from "./icons";
 import Link from "next/link";
-import AddPost from "./posts/AddPost";
 import { useLogout } from "@/lib/logout";
-
 export default function SideBar() {
   const [hover, setHover] = useState(false);
+
   const { handleLogout } = useLogout();
 
   return (
@@ -40,7 +39,7 @@ export default function SideBar() {
           <UserIcon />
           {hover ? <span>Profile</span> : null}
         </Link>
-        <Link href="/groups/1" className="navSection">
+        <Link href="/groups" className="navSection">
           <GroupsIcon />
           {hover ? <span>Groups</span> : null}
         </Link>

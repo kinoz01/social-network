@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { CreateIcon } from "./icons";
-import AddPost from "./posts/AddPost";
 import AddGroup from "./events/AddGroup";
 
 function CreateButton() {
   const [create, setCreate] = useState(false);
   const [newPost, setNewPost] = useState(false);
   const [newGroup, setNewGroup] = useState(false);
+
+  console.log("create: ", create);
+  console.log("newPost: ", newPost);
 
   const close = () => {
     newPost ?
@@ -26,7 +28,7 @@ function CreateButton() {
             setCreate(!create);
           }}
         >
-        <CreateIcon />
+          <CreateIcon />
         </button>
         {create ? (
           <div className="createButtons">
@@ -41,8 +43,8 @@ function CreateButton() {
           </div>
         ) : null}
       </div >
-      {create && newPost ? <AddPost isOpen={newPost} onClose={close} /> : null
-      }
+      {/* {create && newPost ? <AddPost isOpen={newPost} onClose={close} /> : null
+      } */}
       {create && newGroup ? <AddGroup isOpen={newGroup} onClose={close} /> : null}
     </>
   );

@@ -49,9 +49,8 @@ function ProfileHeader() {
         </div>
       </div>
       <button
-        className={`${styles.followBtn} ${
-          followingAction ? styles.follow : styles.unfollow
-        }`}
+        className={`${styles.followBtn} ${followingAction ? styles.follow : styles.unfollow
+          }`}
         onClick={handelClick}
       >
         Follow

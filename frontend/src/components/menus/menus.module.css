@@ -118,6 +118,22 @@
   align-items: center;
 }
 
+/* posts */
+/* input[type="checkbox"] {
+  color: beige;
+  cursor: pointer;
+} */
+
+
+
+/* 
+label {
+  font-size: 0.8rem;
+  color: #343434;
+  margin-left: 0.5rem;
+  cursor: pointer;
+} */
+
 /* GROUP LIST */
 .leftMenu.chat {
   height: 100%;
