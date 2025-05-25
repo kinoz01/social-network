@@ -10,15 +10,31 @@ import { User } from "./Feed";
 import { getUser } from "@/lib/user";
 import Comment from "../comments/Comment";
 import { CommentInfo } from "../comments/Comment";
+import { COmmentsGetter } from "@/apiService/posts/prevPost";
+
 
 export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
+  console.log("IN POST COMPONENTBEFORE", post);
+
   // console.log("post.hasReact.String", post.hasReact);
   const [user, setUser] = useState<User | null>(null)
   const [showComments, setComments] = useState(false)
   const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
-  const [totalCOmments, setTotalCOmments] = useState(0)
+  const [totalCOmments, setTotalCOmments] = useState(post.totalComments || 0)
   const [liked, setReaction] = useState(post.hasReact?.String === "1")
   const [postedComments, setNewComments] = useState<CommentInfo[]>([]);
+
+
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      const fetchedComments = await COmmentsGetter({ postID: post.id });
+      if (fetchedComments) {
+        setNewComments(fetchedComments)
+      }
+    }
+    fetchComments()
+  }, [post.id])
 
 
   useEffect(() => {
@@ -28,6 +44,10 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
     }
     fetchUser()
   }, [])
+
+
+
+
 
   const handleLike = async () => {
     if (liked) {
@@ -63,7 +83,7 @@ export const PostComponent: React.FC<{ post: Post }> = ({ post }) => {
   }
 
   // console.log("here reaction--------", post.hasReact.String);
-  console.log("pooooost", post);
+  // console.log("pooooost", post);
 
   return (
     <>

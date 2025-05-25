@@ -2,7 +2,6 @@ package posts
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,5 +41,5 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 
-	fmt.Println("posts ⭐⭐", posts)
+	// fmt.Println("posts ⭐⭐", posts)
 }

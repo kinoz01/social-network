@@ -6,8 +6,11 @@ export interface CommentInfo {
   commentId: string;
   content: string;
   userID: string;
-  postID: string;
   img_comment: string;
+  postID: string;
+  first_name: string;
+  last_name: string;
+  avatar: string;
   createdAt: string;
 }
 

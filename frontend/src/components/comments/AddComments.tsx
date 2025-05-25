@@ -1,6 +1,6 @@
 import Image from "next/image";
 import styles from "../posts/posts.module.css";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { popup } from "../posts/utils";
 import { CommentInfo } from "./Comment";
 
@@ -15,7 +15,6 @@ export default function AddComment(props: commentParams) {
   const [comment, setComment] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
   const handleComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     var commentINputs = e.currentTarget
@@ -27,7 +26,6 @@ export default function AddComment(props: commentParams) {
       popup('Empty comment or exceeds 500 characters', false)
       return
     }
-
     formDAta.append('userID', props.userID || '')
     formDAta.append('postID', props.postID)
     try {

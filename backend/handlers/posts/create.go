@@ -47,13 +47,14 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 		Visibility: Postsrv.ValidVisibility(visibility),
 	}
 
-	filename, err := help.HamdleFIleUpload(r)
 	if err := Postsrv.ValidInput(content); err != nil {
 		help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
 	}
-	newPost.Imag_post = filename
 	newPost.Content = content
+
+	filename, err := help.HamdleFIleUpload(r)
+	newPost.Imag_post = filename
 
 	if newPost.Visibility == "private" {
 		// fmt.Println("handle now private posts")
@@ -64,11 +65,12 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	// fmt.Println("--------posts", newPost)
+	fmt.Println("--------posts", newPost)
 	if err := postDB.CreatePostDB(newPost); err != nil {
 		help.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 

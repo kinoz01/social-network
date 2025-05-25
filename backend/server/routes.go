@@ -37,7 +37,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
 	mux.Handle("/api/allPosts/", rl.RateLimitMW(http.HandlerFunc(posts.AllPosts)))
 	mux.Handle("/api/addcomment", rl.RateLimitMW(http.HandlerFunc(comments.AddComment)))
-	mux.Handle("/api/getcomments", rl.RateLimitMW(http.HandlerFunc(comments.GetComments)))
+	mux.Handle("/api/comments", rl.RateLimitMW(http.HandlerFunc(comments.GetComments)))
 
 	//reactions
 	mux.Handle("/api/react", rl.RateLimitMW(http.HandlerFunc(posts.HandleLike)))

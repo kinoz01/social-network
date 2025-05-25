@@ -12,7 +12,7 @@ import { HandleCreation } from "@/apiService/posts/savePost";
 type PostParams = {
   isOpen?: boolean;
   onClose: () => void;
-  onSubmit: (post: Omit<Post, "id">) => void;
+  onSubmit: (post: Post) => void;
   userData: User | null
 }
 

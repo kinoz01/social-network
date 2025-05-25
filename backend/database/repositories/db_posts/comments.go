@@ -33,3 +33,56 @@ func CreateCommentDB(newComment types.Comment) error {
 	}
 	return nil
 }
+
+func CommentByPost(postID string) ([]types.Comment, error) {
+	var comments []types.Comment
+	query := `
+	SELECT
+		c.comment_id,
+		c.user_id,
+		c.post_id,
+		c.content,
+		c.img_comment,
+		c.created_at,
+		u.first_name,
+		u.last_name,
+		u.profile_pic
+		FROM comments c
+		INNER JOIN users u ON u.id = c.user_id
+		WHERE c.post_id = ?
+		ORDER BY c.created_at DESC
+	`
+	rows, err := types.DB.Query(query, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var comment types.Comment
+		var imgComment sql.NullString
+		err := rows.Scan(
+			&comment.ID,
+			&comment.UserID,
+			&comment.PostID,
+			&comment.Content,
+			&imgComment,
+			&comment.CreatedAt,
+			&comment.FirstName,
+			&comment.LastName,
+			&comment.Avatar,
+		)
+		if err != nil {
+			return nil, err
+		}
+		if imgComment.Valid {
+			comment.Img_comment = imgComment.String
+		} else {
+			comment.Img_comment = ""
+		}
+		comments = append(comments, comment)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return comments, nil
+}

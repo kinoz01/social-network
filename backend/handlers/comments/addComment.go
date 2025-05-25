@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
+
 	db_comment "social-network/database/repositories/db_posts"
 	"social-network/handlers/helpers"
 	"social-network/handlers/types"
-	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -18,11 +19,7 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var comment types.Comment
-	// err := json.NewDecoder(r.Body).Decode(&comment)
-	// if err != nil {
-	// 	helpers.JsonError(w, "failed to parse json", http.StatusBadRequest, nil)
-	// 	return
-	// }
+
 	comment.Content = r.FormValue("content")
 	comment.PostID = r.FormValue("postID")
 	comment.UserID = r.FormValue("userID")
@@ -49,5 +46,5 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(comment); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
-	fmt.Println("testcomment", comment)
+	fmt.Println("⭐NEW COMMENT", comment)
 }

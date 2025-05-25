@@ -34,18 +34,19 @@ type Post struct {
 // type
 
 type PostData struct {
-	PostID     string         `json:"id"`
-	UserID     string         `json:"userID"`
-	Content    string         `json:"content"`
-	Imag_post  string         `json:"imag_post"`
-	Visibility string         `json:"visibility"`
-	VipUsers   []string       `json:"vipUsers"`
-	FirstName  string         `json:"firstName"`
-	LastName   string         `json:"lastName"`
-	ProfilePic string         `json:"profile_pic"`
-	HasReact   sql.NullString `json:"hasReact"`
-	TotalLIKes int            `json:"totalLikes"`
-	CreatedAt  string         `json:"createdAt"`
+	PostID        string         `json:"id"`
+	UserID        string         `json:"userID"`
+	Content       string         `json:"content"`
+	Imag_post     string         `json:"imag_post,omitempty"`
+	Visibility    string         `json:"visibility"`
+	VipUsers      []string       `json:"vipUsers"`
+	FirstName     string         `json:"firstName"`
+	LastName      string         `json:"lastName"`
+	ProfilePic    string         `json:"profile_pic"`
+	HasReact      sql.NullString `json:"hasReact"`
+	TotalLIKes    int            `json:"totalLikes"`
+	TotalComments int            `json:"totalComments"`
+	CreatedAt     string         `json:"createdAt"`
 }
 type React struct {
 	ID        string
@@ -61,5 +62,8 @@ type Comment struct {
 	UserID      string `json:"userID"`
 	Img_comment string `json:"img_comment,omitempty"`
 	PostID      string `json:"postID"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	Avatar      string `json:"avatar"`
 	CreatedAt   string `json:"createdAt"`
 }

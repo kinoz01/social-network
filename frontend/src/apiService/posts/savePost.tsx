@@ -6,7 +6,7 @@ import { popup } from "@/components/posts/utils";
 type handleSbmtParams = {
     e: React.FormEvent<HTMLFormElement>;
     onClose: () => void;
-    onSubmit: (post: Omit<Post, "id">) => void;
+    onSubmit: (post: Post) => void;
     userData: User
 
 }
@@ -34,10 +34,10 @@ const HandleCreation = async (props: handleSbmtParams) => {
             firstName: props.userData?.first_name,
             lastName: props.userData?.last_name,
             profile_pic: props.userData?.profile_pic,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),//---
         }
 
-        // console.log('post created successfully', formData)
+        console.log('post created successfully', formData)
         props.onSubmit(newPost)
         form.reset()
         document.querySelector(".popup")?.remove()

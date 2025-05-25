@@ -21,6 +21,7 @@ export interface Post {
   profile_pic: string;
   hasReact?: string;
   totalLikes: number;
+  totalComments: number;
 }
 
 export interface User {
@@ -116,8 +117,9 @@ function Feed({ type }: { type: "home" | "group" }) {
     if (node) observer.current.observe(node)
   }, [isLoading, hasMOre])
 
-  const handleNewPOst = (post: Omit<Post, "id">) => {
-    const newPOst = { ...post, id: Date.now().toString() }
+  const handleNewPOst = (post: Post) => {
+    console.log("=================================", post);
+    const newPOst = { ...post }
     setPostedContent(posted => [newPOst, ...posted])
     // setUniqueIDs(prev => new Set(prev).add(newPOst.id))
   }

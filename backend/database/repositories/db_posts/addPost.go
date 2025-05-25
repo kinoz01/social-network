@@ -65,8 +65,11 @@ func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 		         p.created_at,
 			 (SELECT COUNT(*) 
               FROM like_reaction lr 
-              WHERE lr.post_id = p.post_id AND lr.react_type = '1') AS like_count
-	         FROM
+              WHERE lr.post_id = p.post_id AND lr.react_type = '1') AS like_count,
+			 (SELECT COUNT(*) 
+              FROM comments c 
+               WHERE c.post_id = p.post_id) AS comment_count
+	          FROM
 		         posts p
 		         INNER JOIN users u ON u.id = p.user_id
 		         LEFT JOIN like_reaction l ON l.post_id = p.post_id AND l.user_id = ?
@@ -104,6 +107,7 @@ func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 			&post.HasReact,
 			&post.CreatedAt,
 			&post.TotalLIKes,
+			&post.TotalComments,
 		)
 		if err != nil {
 			return []pType.PostData{}, err
