@@ -17,7 +17,7 @@ import (
 )
 
 // Handle the creation of a new group.
-func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
+func CreateGroup(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 		return
@@ -52,7 +52,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(ids) > 0 {
-		if err := grpInvite.InviteFollowers(groupID, ids); err != nil {
+		if err := grpInvite.Invite(groupID, ids); err != nil {
 			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
 			return
 		}

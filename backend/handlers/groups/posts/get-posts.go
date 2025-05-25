@@ -12,7 +12,7 @@ import (
 
 // Retrieves posts from a specific group based on the provided group ID.
 // while supporting pagination through limit and offset parameters.
-func GroupPostsHandler(w http.ResponseWriter, r *http.Request) {
+func GroupPosts(w http.ResponseWriter, r *http.Request) {
 	groupID := r.URL.Query().Get("group_id")
 	if groupID == "" {
 		help.JsonError(w, "missing group_id", http.StatusBadRequest, nil)

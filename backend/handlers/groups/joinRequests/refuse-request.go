@@ -9,7 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-func RefuseJoinRequestHandler(w http.ResponseWriter, r *http.Request) {
+func RefuseJoinRequest(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", 401, err)

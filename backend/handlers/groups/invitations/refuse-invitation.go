@@ -10,7 +10,7 @@ import (
 )
 
 // Handles the refusal of a group invitation.
-func RefuseInvitationHandler(w http.ResponseWriter, r *http.Request) {
+func RefuseInvitation(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

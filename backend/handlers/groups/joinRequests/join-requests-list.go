@@ -20,7 +20,7 @@ type joinReq struct {
 /* -------------------------------------------------------------------- */
 /* GET /api/groups/requests?group_id=…  → only owner can call           */
 /* -------------------------------------------------------------------- */
-func ListJoinRequestsHandler(w http.ResponseWriter, r *http.Request) {
+func ListJoinRequests(w http.ResponseWriter, r *http.Request) {
 	u, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", 401, err)

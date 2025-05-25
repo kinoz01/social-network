@@ -220,7 +220,7 @@ export default function GroupCard({
 
                 <div className={styles.groupCardContent}>
                     {loading ? <Loading /> : (
-                        groups.length === 0 ? (
+                        !groups|| groups.length === 0 ? (
                             <div className={styles.emptyState}>
                                 <Image src="/img/empty.svg" alt="empty" width={150} height={150} />
                                 {title === "Your Groups"

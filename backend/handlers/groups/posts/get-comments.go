@@ -11,7 +11,7 @@ import (
 )
 
 // GET /api/groups/comments?post_id=...&limit=&offset=
-func GetCommentsHandler(w http.ResponseWriter, r *http.Request) {
+func GetComments(w http.ResponseWriter, r *http.Request) {
 	postID := r.URL.Query().Get("post_id")
 	if postID == "" {
 		http.Error(w, "post_id required", http.StatusBadRequest)

@@ -43,6 +43,7 @@ export default function GroupFeed() {
         setLoadingFirst(true);
         try {
             const page = await fetchPage(0);
+            if (!page) return;
             setPosts(page);
             setOffset(page.length);
             setHasMore(page.length === PAGE_SIZE);
@@ -100,7 +101,7 @@ export default function GroupFeed() {
         <>
             <PostInput groupId={groupId} onAdd={prependPost} />
 
-            {posts.length === 0 ? (
+            {!posts || posts.length === 0 ? (
                 <div className={styles.status}>
                     <p>No posts yet.</p>
                     <Image src="/img/empty.svg" alt="" width={200} height={200} />

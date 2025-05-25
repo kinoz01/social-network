@@ -19,7 +19,7 @@ const maxCommentImg = 3 << 20 // 3 MB
 
 // POST /api/groups/comment
 // Multipart-form: post_id, content (text), image (optional file)
-func CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
+func CreateComment(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

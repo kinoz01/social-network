@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 
 // Input date in local time (but ends with Z)
-export function formatTimeAgo(dateStr: string) {    
+export function formatTimeAgo(dateStr: string) {
+    if (!dateStr) return 'just now';  
     const dStr = dateStr.endsWith('Z') ? dateStr.slice(0, -1) : dateStr;
     const date = new Date(dStr); // if UTC converts to local time, if local time keeps it
 

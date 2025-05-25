@@ -11,7 +11,7 @@ import (
 )
 
 // GET /api/followers get followers of the current user by a search query.
-func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
+func GetFollowers(w http.ResponseWriter, r *http.Request) {
 	/* ---------- current user ---------- */
 	user, err := auth.GetUser(r)
 	if err != nil {

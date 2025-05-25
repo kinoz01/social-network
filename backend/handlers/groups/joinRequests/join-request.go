@@ -12,7 +12,7 @@ import (
 
 // This is used when a user wants to join a group
 // Inserts a row into group_requests (if it isn't there already)
-func JoinRequestHandler(w http.ResponseWriter, r *http.Request) {
+func JoinRequest(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

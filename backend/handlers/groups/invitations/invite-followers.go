@@ -12,7 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func InviteFollowersHandler(w http.ResponseWriter, r *http.Request) {
+func InviteFollowers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
 		return
@@ -49,7 +49,7 @@ func InviteFollowersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(ids) > 0 {
-		if err := InviteFollowers(body.GroupID, ids); err != nil {
+		if err := Invite(body.GroupID, ids); err != nil {
 			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
 			return
 		}
@@ -59,7 +59,7 @@ func InviteFollowersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Invites follwer to join a group if they are not already a member
-func InviteFollowers(groupID string, ids []string) error {
+func Invite(groupID string, ids []string) error {
 	if len(ids) > 7000 {
 		return fmt.Errorf("too many invitees (max 7000)")
 	}

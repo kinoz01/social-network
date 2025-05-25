@@ -29,7 +29,7 @@ type Post struct {
 	ProfilePic *string   `json:"profile_pic"`
 }
 
-func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
 		return

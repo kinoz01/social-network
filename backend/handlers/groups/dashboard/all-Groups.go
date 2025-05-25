@@ -12,7 +12,7 @@ import (
 
 // Select all groups that the user is not a member of and has not been invited to.
 // This includes groups that the user has already sent a join request to.
-func AvailableGroupsHandler(w http.ResponseWriter, r *http.Request) {
+func AvailableGroups(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
