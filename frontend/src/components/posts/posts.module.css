@@ -344,6 +344,10 @@
   color: #080809;
 }
 
+.postUser:hover {
+  color: rgb(66, 66, 66);
+}
+
 .submitBtn:hover,
 .submitBtn:focus {
   background-color: var(--color4);
@@ -622,3 +626,4 @@
   font-family: 'Zain';
   font-size: 1rem;
 }
+

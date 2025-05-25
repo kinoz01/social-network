@@ -34,6 +34,7 @@ const HandleCreation = async (props: handleSbmtParams) => {
             firstName: props.userData?.first_name,
             lastName: props.userData?.last_name,
             profile_pic: props.userData?.profile_pic,
+            createdAt: new Date().toLocaleString() + "z",
         }
 
         // console.log('post created successfully', formData)
