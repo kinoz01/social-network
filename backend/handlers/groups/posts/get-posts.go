@@ -22,9 +22,6 @@ func GroupPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	if limit == 0 {
-		limit = 20
-	}
 
 	// ------------------------------------------------------------------ user
 	user, err := auth.GetUser(r) // require auth so we can compute hasReact

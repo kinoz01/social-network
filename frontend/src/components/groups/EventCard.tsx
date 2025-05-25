@@ -54,7 +54,6 @@ export default function EventCard({
         <div className={styles.card}>
             <h4 className={styles.title}>{ev.title}</h4>
             <p className={styles.desc}>{ev.description}</p>
-            <p className={styles.date}>{date}</p>
 
             <div className={styles.counts}>
                 <span>{ev.going_count} going</span>
@@ -76,6 +75,7 @@ export default function EventCard({
                 >
                     Not going
                 </button>
+                <p className={styles.date}>{date}</p>
             </div>
         </div>
     );
