@@ -43,17 +43,7 @@ func JoinRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Clear rejected invitations before creating join request
-	_, err = tp.DB.Exec(`
-		DELETE FROM group_invitations
- 		WHERE group_id = ? AND invitee_id = ? AND status = 'rejected'
-`	, body.GroupID, user.ID)
-	if err != nil {
-		help.JsonError(w, "Failed to clear old rejected invitations", http.StatusInternalServerError, err)
-		return
-	}
-
-	// Proceed with join request
+	// Insert join request
 	_, err = tp.DB.Exec(`
 		INSERT OR IGNORE INTO group_requests (id, group_id, requester_id)
 		VALUES (?, ?, ?)`,

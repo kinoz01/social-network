@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const isFly = process.env.FLY_APP_NAME !== undefined; // Detect if running on Fly.io
 
 const nextConfig: NextConfig = {
+  reactStrictMode: false,
   /* config options here */
   env: {
     NEXT_PUBLIC_API_URL: isFly

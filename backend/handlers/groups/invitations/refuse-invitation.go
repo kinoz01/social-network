@@ -16,6 +16,7 @@ func RefuseInvitation(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
+
 	var body struct {
 		InvitationID string `json:"invitation_id"`
 	}
@@ -24,13 +25,17 @@ func RefuseInvitation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = tp.DB.Exec(`
-		UPDATE group_invitations
-		   SET status = 'rejected'
-		 WHERE id = ? AND invitee_id = ?`,
+	res, err := tp.DB.Exec(`
+		DELETE FROM group_invitations
+		      WHERE id = ? AND invitee_id = ?`,
 		body.InvitationID, user.ID)
 	if err != nil {
 		help.JsonError(w, "DB error", http.StatusInternalServerError, err)
+		return
+	}
+	// For feedback
+	if n, _ := res.RowsAffected(); n == 0 {
+		help.JsonError(w, "Forbidden", http.StatusForbidden, nil)
 		return
 	}
 

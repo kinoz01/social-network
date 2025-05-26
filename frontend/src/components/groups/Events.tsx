@@ -37,6 +37,8 @@ export default function Events() {
             setLoading(true);
             try {
                 const first = await fetchPage(0);
+                if (!first || first.length === 0) return
+
                 setEvents(first);
                 setOffset(first.length);
                 setMore(first.length === PAGE_SIZE);

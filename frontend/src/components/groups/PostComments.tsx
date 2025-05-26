@@ -35,7 +35,7 @@ const fetchComments = async (
 ): Promise<CommentT[]> => {
     const qs = `post_id=${postId}&limit=${PAGE}&offset=${offset}`;
     const r = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/groups/comments?${qs}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/groups/get-comments?${qs}`,
         { credentials: "include", cache: "no-store" }
     );
     if (!r.ok) throw new Error("fetch comments");

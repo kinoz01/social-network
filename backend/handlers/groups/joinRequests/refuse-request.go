@@ -24,12 +24,11 @@ func RefuseJoinRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* ensure the request belongs to a group the caller owns */
 	res, err := tp.DB.Exec(`
-		UPDATE group_requests
-		   SET status = 'rejected'
-		 WHERE id = ?
-		   AND group_id IN (SELECT id FROM groups WHERE group_owner = ?)`,
+		DELETE FROM group_requests
+		      WHERE id = ?
+		        AND group_id IN (
+		           SELECT id FROM groups WHERE group_owner = ?)`,
 		body.RequestID, user.ID)
 	if err != nil {
 		help.JsonError(w, "DB error", 500, err)

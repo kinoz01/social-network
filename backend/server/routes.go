@@ -62,8 +62,8 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/groups/get-events", grpevent.GetEvents)
 	mux.HandleFunc("/api/groups/event-response", grpevent.EventResponse)
 	// comments / groups comments
-	mux.HandleFunc("/api/get-comments", grpsPost.GetComments)
-	mux.HandleFunc("/api/create-comment", grpsPost.CreateComment)
+	mux.HandleFunc("/api/groups/get-comments", grpsPost.GetComments)
+	mux.HandleFunc("/api/groups/create-comment", grpsPost.CreateComment)
 
 	// Followers search:
 	mux.HandleFunc("/api/followers", flw.GetFollowers)

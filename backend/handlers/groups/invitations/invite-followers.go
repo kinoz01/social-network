@@ -58,18 +58,17 @@ func InviteFollowers(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// Invites follwer to join a group if they are not already a member
+// Invite follower to join a group if they are not already a member
 func Invite(groupID string, ids []string) error {
 	if len(ids) > 7000 {
 		return fmt.Errorf("too many invitees (max 7000)")
 	}
-	// Start transaction
+
 	tx, err := tp.DB.Begin()
 	if err != nil {
 		return err
 	}
 
-	// Prepare insert statement
 	stmt, err := tx.Prepare(`
 		INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
 		SELECT ?, ?, ?
@@ -83,15 +82,12 @@ func Invite(groupID string, ids []string) error {
 	}
 	defer stmt.Close()
 
-	// Loop through follower IDs
 	for _, uid := range ids {
 		_, err := stmt.Exec(uuid.Must(uuid.NewV4()).String(), groupID, uid, groupID, uid)
 		if err != nil {
-			tx.Rollback()
-			return err
+			continue
 		}
 	}
 
-	// Commit transaction
 	return tx.Commit()
 }
