@@ -7,6 +7,9 @@ services:
       - "8080:8080"
     volumes:
       - ./backend/database:/app/database
+      - ./backend/storage:/app/storage
+    environment:
+      - DOCKER=true
 
   frontend:
     build:
@@ -16,3 +19,5 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      - DOCKER=true
