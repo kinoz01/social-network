@@ -63,7 +63,7 @@ var upgrader = websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return
 /*────────── Incoming message ─────────*/
 // client → server
 type inbound struct {
-	Type    string `json:"type"` // subscribeGroup | subscribeChat | chatMessage
+	Type    string `json:"type"` // subscribeGroup | subscribeChat | groupChatMessage
 	GroupID string `json:"groupId,omitempty"`
 	Content string `json:"content,omitempty"`
 }
@@ -140,7 +140,7 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		chatHubs.mu.Unlock()
 		sendChatHistory(c, msg.GroupID)
 
-	case "chatMessage":
+	case "groupChatMessage":
 		if msg.Content == "" || len(msg.Content) > 500 {
 			return
 		}
@@ -236,7 +236,7 @@ func storeAndBuildMessage(gid string, u *tp.User, content string) chatMsg {
 }
 
 func broadcastChat(gid string, m chatMsg) {
-	payload := map[string]any{"type": "chatMessage", "groupId": gid, "message": m}
+	payload := map[string]any{"type": "groupChatMessage", "groupId": gid, "message": m}
 	chatHubs.mu.RLock()
 	defer chatHubs.mu.RUnlock()
 	for cl := range chatHubs.m[gid] {

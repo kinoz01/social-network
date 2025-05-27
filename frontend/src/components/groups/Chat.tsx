@@ -87,7 +87,7 @@ export default function Chat() {
         if (!socket) return;
         const h = (ev: MessageEvent) => {
             let d: any; try { d = JSON.parse(ev.data); } catch { return; }
-            if (d.groupId !== groupId || d.type !== "chatMessage") return;
+            if (d.groupId !== groupId || d.type !== "groupChatMessage") return;
             if (idSetRef.current.has(d.message.id)) return;
             idSetRef.current.add(d.message.id);
             setMsgs(p => [...p, d.message]);
@@ -122,7 +122,7 @@ export default function Chat() {
 
     const sendMsg = () => {
         if (!text.trim()) return;
-        send({ type: "chatMessage", groupId, content: text.trim() }); setText("");
+        send({ type: "groupChatMessage", groupId, content: text.trim() }); setText("");
     };
 
     if (!groupId) return null;
