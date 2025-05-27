@@ -15,7 +15,7 @@ interface Group {
     request?: string;        // for Available Groups
     members?: number;
     invitation_id?: string;  // Invitations
-    invitation_status?: "pending" | "rejected";
+    invitation_status?: "pending";
 }
 
 export default function GroupCard({
@@ -182,22 +182,18 @@ export default function GroupCard({
                         }}>Join</button>
                     )
                 ) : isInvitation ? (
-                    g.invitation_status === "rejected" ? (
-                        <span className={styles.refusedText}>Rejected</span>
-                    ) : (
-                        <div className={styles.invitationActions}>
-                            <button className={styles.inviteBtn} onClick={(e) => {
-                                e.stopPropagation(); handleAccept(g.invitation_id!);
-                            }}>
-                                <Image src="/img/accept.svg" alt="accept" width={22} height={22} />
-                            </button>
-                            <button className={styles.inviteBtn} onClick={(e) => {
-                                e.stopPropagation(); handleRefuse(g.invitation_id!);
-                            }}>
-                                <Image src="/img/refuse.svg" alt="refuse" width={22} height={22} />
-                            </button>
-                        </div>
-                    )
+                    <div className={styles.invitationActions}>
+                        <button className={styles.inviteBtn} onClick={(e) => {
+                            e.stopPropagation(); handleAccept(g.invitation_id!);
+                        }}>
+                            <Image src="/img/accept.svg" alt="accept" width={22} height={22} />
+                        </button>
+                        <button className={styles.inviteBtn} onClick={(e) => {
+                            e.stopPropagation(); handleRefuse(g.invitation_id!);
+                        }}>
+                            <Image src="/img/refuse.svg" alt="refuse" width={22} height={22} />
+                        </button>
+                    </div>
                 ) : null}
             </div>
         );
@@ -220,7 +216,7 @@ export default function GroupCard({
 
                 <div className={styles.groupCardContent}>
                     {loading ? <Loading /> : (
-                        !groups|| groups.length === 0 ? (
+                        !groups || groups.length === 0 ? (
                             <div className={styles.emptyState}>
                                 <Image src="/img/empty.svg" alt="empty" width={150} height={150} />
                                 {title === "Your Groups"

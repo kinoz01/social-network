@@ -121,8 +121,7 @@ export default function GroupFeed() {
     );
 }
 
-/* ─────────────────────  POST INPUT (local)  ───────────────────── */
-
+/* ─────────────────────  POST INPUT ───────────────────── */
 function PostInput({
     groupId,
     onAdd,
@@ -160,15 +159,13 @@ function PostInput({
             if (!r.ok) throw new Error((await r.json()).msg || "Could not post");
 
             const added: Post = await r.json();
-            onAdd(added);          // <── prepend to feed
+            onAdd(added); // prepend to feed
             setText("");
             setImg(null);
             setErr("");
 
             // reset height
-            const ta = document.querySelector(
-                `.${styles.input}`
-            ) as HTMLTextAreaElement | null;
+            const ta = document.querySelector(`.${styles.input}`) as HTMLTextAreaElement | null;
             if (ta) ta.style.height = "auto";
         } catch (e: any) {
             setErr(e.message || "Could not post");

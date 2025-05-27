@@ -13,7 +13,7 @@ export interface Event {
     going_count: number;
     not_going_count: number;
     created_at: string;
-    going: boolean | null;          // null ⇒ viewer hasn’t voted
+    going: boolean | null;          // null --> viewer hasn't voted
 }
 
 export default function EventCard({

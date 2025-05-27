@@ -71,7 +71,7 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 	/* ---- no follower matched the query ---- */
 	if len(list) == 0 {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound) // 404
+		w.WriteHeader(http.StatusFound) 
 		json.NewEncoder(w).Encode(map[string]string{
 			"msg": "User not found",
 		})
