@@ -3,6 +3,7 @@ package follows
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	auth "social-network/handlers/authentication"
@@ -20,6 +21,8 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("query")) // search text
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
 
 	/* ---------- build SQL Query ---------- */
 	base := `
@@ -42,7 +45,8 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 		args = append(args, pattern, pattern, pattern, pattern)
 	}
 
-	base += ` ORDER BY u.first_name, u.last_name`
+	base += ` ORDER BY u.first_name, u.last_name LIMIT ? OFFSET ?`
+	args = append(args, limit, offset)
 
 	rows, err := tp.DB.Query(base, args...)
 	if err != nil {
@@ -71,7 +75,7 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 	/* ---- no follower matched the query ---- */
 	if len(list) == 0 {
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusFound) 
+		w.WriteHeader(http.StatusFound)
 		json.NewEncoder(w).Encode(map[string]string{
 			"msg": "User not found",
 		})

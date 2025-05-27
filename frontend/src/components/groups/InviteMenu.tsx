@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, FormEvent, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import styles from "./style/inviteMenu.module.css";
 import Loading from "@/components/Loading";
 
+/* ───────── helpers ───────── */
+const SLICE = 50;
+
+/* ───────── types ───────── */
 interface Follower {
     id: string;
     first_name: string;
@@ -13,6 +17,7 @@ interface Follower {
     profile_pic: string | null;
 }
 
+/* ───────── component ───────── */
 export default function InviteMenu({
     modal = false,
     onClose,
@@ -22,96 +27,108 @@ export default function InviteMenu({
 }) {
     const { id: groupId } = useParams() as { id: string };
 
-    /* ───── state ───── */
+    /* search state */
     const [query, setQuery] = useState("");
-    const [searching, setSearch] = useState(false);
-    const [results, setResults] = useState<Follower[]>([]);
+    const [results, setRes] = useState<Follower[]>([]);
+    const [offset, setOff] = useState(0);
+    const [hasMore, setMore] = useState(true);
+    const [searching, setSearching] = useState(false);
+    const [loadingMore, setLoadMore] = useState(false);
+
+    /* selection & cache */
     const [cache, setCache] = useState<Map<string, Follower>>(new Map());
     const [selected, setSel] = useState<Set<string>>(new Set());
+
+    /* misc ui */
     const [submitting, setSubmitting] = useState(false);
-
-    /* follower existence flag (null = not checked yet) */
-    const [hasFollowers, setHasFollowers] = useState<boolean | null>(null);
-
-    /* feedback flash */
-    const [msg, setMsg] = useState("");
+    const [msg, setMsg] = useState("");          // flash message
     const [cls, setCls] = useState<"" | "ok" | "err">("");
 
+    const listRef = useRef<HTMLUListElement>(null);
+
     const flash = (t: string, ok: boolean) => {
-        setMsg(t);
-        setCls(ok ? "ok" : "err");
-        setTimeout(() => {
-            setMsg("");
-            setCls("");
-        }, 8000);
+        setMsg(t); setCls(ok ? "ok" : "err");
+        setTimeout(() => { setMsg(""); setCls(""); }, 8000);
     };
 
-    /* ---------- one-row existence check on mount ---------- */
-    useEffect(() => {
-        (async () => {
-            try {
-                const r = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/followers?status=accepted&limit=1`,
-                    { credentials: "include" }
-                );
-                if (r.status === 404) {
-                    setHasFollowers(false);
-                    return;
-                }
-                if (!r.ok) throw new Error();
-                const list: Follower[] = await r.json();
-                setHasFollowers(list.length > 0);
-            } catch {
-                setHasFollowers(false); // treat error as none
-            }
-        })();
-    }, []);
+    /* ───────── fetch helpers ───────── */
+    const fetchSlice = async (q: string, off: number) => {
+        const qs =
+            `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
+        const r = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/followers?${qs}`,
+            { credentials: "include" }
+        );
+        if (r.status === 404) return [];
+        if (!r.ok) throw new Error();
+        return (await r.json()) as Follower[];
+    };
 
-    /* ---------- live search ---------- */
-    const runSearch = async (q: string) => {
-        if (!q.trim()) {
-            setResults([]);
-            return;
-        }
-        setSearch(true);
-        try {
-            const r = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/followers?query=${encodeURIComponent(
-                    q
-                )}`,
-                { credentials: "include" }
-            );
-            if (r.status === 404) {
-                setResults([]);
+    /* first slice on every keystroke */
+    const runSearch = useCallback(
+        async (q: string) => {
+            setQuery(q);
+            if (!q.trim()) {
+                setRes([]); setOff(0); setMore(true);
                 return;
             }
-            if (!r.ok) throw new Error();
+            setSearching(true);
+            try {
+                const slice = await fetchSlice(q, 0);
+                setRes(slice);
+                setOff(slice.length);
+                setMore(slice.length === SLICE);
 
-            const list: Follower[] = await r.json();
-            setResults(list);
+                /* cache for pills */
+                setCache(prev => {
+                    const m = new Map(prev);
+                    slice.forEach(u => m.set(u.id, u));
+                    return m;
+                });
+            } finally { setSearching(false); }
+        },
+        []
+    );
 
-            /* add to cache for pills display */
-            setCache((prev) => {
+    /* next slices via scroll */
+    const loadMore = useCallback(async () => {
+        if (loadingMore || !hasMore || !query.trim()) return;
+        setLoadMore(true);
+        try {
+            const slice = await fetchSlice(query, offset);
+            setRes(prev => [...prev, ...slice]);
+            setOff(o => o + slice.length);
+            setMore(slice.length === SLICE);
+
+            setCache(prev => {
                 const m = new Map(prev);
-                list.forEach((u) => m.set(u.id, u));
+                slice.forEach(u => m.set(u.id, u));
                 return m;
             });
-        } catch {
-            setResults([]);
-        } finally {
-            setSearch(false);
-        }
-    };
+        } finally { setLoadMore(false); }
+    }, [loadingMore, hasMore, query, offset]);
 
-    /* ---------- toggle single follower ---------- */
+    /* scroll listener */
+    useEffect(() => {
+        const el = listRef.current;
+        if (!el) return;
+        const onScroll = throttle(() => {
+            const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 250;
+            if (nearBottom) loadMore();
+        }, 300);
+        el.addEventListener("scroll", onScroll);
+        return () => el.removeEventListener("scroll", onScroll);
+    }, [loadMore]);
+
+    /* ───────── selection helpers ───────── */
     const toggle = (id: string) =>
-        setSel((prev) => {
+        setSel(prev => {
             const n = new Set(prev);
             n.has(id) ? n.delete(id) : n.add(id);
             return n;
         });
 
-    /* ---------- send invitation ---------- */
+    /* ───────── invite POST ───────── */
     const onSubmit = async (e?: FormEvent) => {
         e?.preventDefault();
         if (selected.size === 0) return;
@@ -131,48 +148,34 @@ export default function InviteMenu({
                 }
             );
             if (!r.ok) throw new Error();
-            setSel(new Set()); // clear selection
+            setSel(new Set());
             flash("Sending succeeded", true);
-        } catch {
-            flash("Sending failed", false);
-        } finally {
-            setSubmitting(false);
-        }
+        } catch { flash("Sending failed", false); }
+        finally { setSubmitting(false); }
     };
 
-    /* ---------- selected-pills UI ---------- */
+    /* ───────── pills UI ───────── */
     const pills =
         selected.size === 0 ? (
-            <p className={styles.placeholder}>
-                {hasFollowers === false ? "You have no followers." : "No one selected"}
-            </p>
+            <p className={styles.placeholder}>No one selected</p>
         ) : (
-            Array.from(selected).map((id) => {
-                const f = cache.get(id);
-                if (!f) return null; // should not happen—selected always from results
+            Array.from(selected).map(id => {
+                const f = cache.get(id); if (!f) return null;
                 return (
                     <div key={id} className={styles.selItem}>
                         <Image
-                            src={
-                                f.profile_pic
-                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
-                                    : "/img/default-avatar.png"
-                            }
-                            alt=""
-                            width={24}
-                            height={24}
-                            className={styles.avt}
-                        />
+                            src={f.profile_pic
+                                ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
+                                : "/img/default-avatar.png"}
+                            alt="" width={24} height={24} className={styles.avt} />
                         <span className={styles.selName}>{f.first_name}</span>
-                        <button className={styles.remove} onClick={() => toggle(id)}>
-                            ×
-                        </button>
+                        <button className={styles.remove} onClick={() => toggle(id)}>×</button>
                     </div>
                 );
             })
         );
 
-    /* ---------- main body ---------- */
+    /* ───────── main body ───────── */
     const body = (
         <>
             <h4 className={styles.heading}>INVITE FOLLOWERS</h4>
@@ -183,45 +186,37 @@ export default function InviteMenu({
                 className={styles.search}
                 placeholder="Search followers…"
                 value={query}
-                onChange={(e) => {
-                    setQuery(e.target.value);
-                    runSearch(e.target.value);
-                }}
+                onChange={e => runSearch(e.target.value)}
             />
 
-            {searching && <p className={styles.status}>Searching…</p>}
+            {searching && <Loading />}
             {!searching && query && results.length === 0 && (
                 <p className={styles.status}>No match</p>
             )}
 
-            <ul className={styles.results}>
-                {results.map((f) => {
+            <ul ref={listRef} className={styles.results}>
+                {results.map(f => {
                     const picked = selected.has(f.id);
                     return (
-                        <li
-                            key={f.id}
+                        <li key={f.id}
                             className={`${styles.item} ${picked ? styles.checked : ""}`}
-                            onClick={() => toggle(f.id)}
-                        >
+                            onClick={() => toggle(f.id)}>
                             <Image
-                                src={
-                                    f.profile_pic
-                                        ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
-                                        : "/img/default-avatar.png"
-                                }
-                                alt=""
-                                width={28}
-                                height={28}
-                                className={styles.avt}
-                            />
-                            <span className={styles.name}>
-                                {f.first_name} {f.last_name}
-                            </span>
+                                src={f.profile_pic
+                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
+                                    : "/img/default-avatar.png"}
+                                alt="" width={28} height={28} className={styles.avt} />
+                            <span className={styles.name}>{f.first_name} {f.last_name}</span>
                             <span className={styles.tick}>{picked ? "✓" : "+"}</span>
                         </li>
                     );
                 })}
             </ul>
+
+            {loadingMore && <Loading />}
+            {!hasMore && !loadingMore && offset > SLICE && (
+                <p className={styles.loadingText}>— no more results —</p>
+            )}
 
             <div className={`${styles.status} ${cls && styles[cls]}`}>{msg}&nbsp;</div>
 
@@ -237,25 +232,19 @@ export default function InviteMenu({
         </>
     );
 
-    /* ---------- overlays / containers ---------- */
+    /* ───────── modal / sidebar containers ───────── */
     if (submitting) {
         const loadingContent = (
             <div className={styles.menu}>
                 <Loading />
             </div>
         );
-
         if (!modal) return loadingContent;
-
         return (
             <div className={styles.backdrop} onClick={onClose}>
-                <div
-                    className={`${styles.menu} ${styles.modal}`}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <button className={styles.close} onClick={onClose}>
-                        ×
-                    </button>
+                <div className={`${styles.menu} ${styles.modal}`}
+                    onClick={e => e.stopPropagation()}>
+                    <button className={styles.close} onClick={onClose}>×</button>
                     {loadingContent}
                 </div>
             </div>
@@ -266,15 +255,24 @@ export default function InviteMenu({
 
     return (
         <div className={styles.backdrop} onClick={onClose}>
-            <div
-                className={`${styles.menu} ${styles.modal}`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button className={styles.close} onClick={onClose}>
-                    ×
-                </button>
+            <div className={`${styles.menu} ${styles.modal}`}
+                onClick={e => e.stopPropagation()}>
+                <button className={styles.close} onClick={onClose}>×</button>
                 {body}
             </div>
         </div>
     );
 }
+
+/* simple throttle */
+const throttle = (fn: (...a: any[]) => void, wait = 300) => {
+    let waiting = false, saved: any[] | null = null;
+    const timer = () => {
+        if (!saved) { waiting = false; return; }
+        fn(...saved); saved = null; setTimeout(timer, wait);
+    };
+    return (...args: any[]) => {
+        if (waiting) { saved = args; return; }
+        fn(...args); waiting = true; setTimeout(timer, wait);
+    };
+};

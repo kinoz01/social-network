@@ -78,6 +78,7 @@
     border-radius: 6px;
     font-size: .9rem;
 }
+
 .search:focus {
     outline: none;
     border-color: #000;
@@ -221,4 +222,10 @@
     cursor: pointer;
     line-height: 1;
     color: #000;
+}
+
+.loadingText {
+    font-size: 1rem;
+    text-align: center;
+    color: #6b7280;
 }
