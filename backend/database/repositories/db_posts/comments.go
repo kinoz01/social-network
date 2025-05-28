@@ -34,7 +34,7 @@ func CreateCommentDB(newComment types.Comment) error {
 	return nil
 }
 
-func CommentByPost(postID string) ([]types.Comment, error) {
+func CommentByPost(postID string, page int) ([]types.Comment, error) {
 	var comments []types.Comment
 	query := `
 	SELECT
@@ -51,8 +51,9 @@ func CommentByPost(postID string) ([]types.Comment, error) {
 		INNER JOIN users u ON u.id = c.user_id
 		WHERE c.post_id = ?
 		ORDER BY c.created_at DESC
+		LIMIT 2 OFFSET ?
 	`
-	rows, err := types.DB.Query(query, postID)
+	rows, err := types.DB.Query(query, postID, page)
 	if err != nil {
 		return nil, err
 	}

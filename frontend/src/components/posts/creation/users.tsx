@@ -2,8 +2,9 @@ import { fetchUsers } from "@/apiService/users/apiUsers";
 import styles from "../posts.module.css"
 import { BackIcon } from "@/components/icons";
 import React, { useState, useEffect } from "react";
-import { User } from "../Feed";
-import { fetchOldPosts } from "@/apiService/posts/prevPost";
+import { User } from "@/components/types";
+import Image from "next/image";
+
 type UsersListParams = {
     onBack: () => void;
     onUserCHange: (users: string[]) => void;
@@ -61,10 +62,11 @@ const ShowUsers = (props: UsersListParams) => {
                     <div key={elem.id} className={styles.checkboxElem}>
                         <input type="checkbox" name="vipUsers" id={elem.id} value={elem.id} data-username={elem.username || elem.email} onChange={handleSelect}
                             checked={selectedUser.some((u) => u.id === elem.id)} />
-                        <img
+                        <Image
                             className={styles.userIcon}
-                            src={`/storage/avatars/${elem.profile_pic}`}
-                            alt={elem.username}
+                            // src={`/storage/avatars/${elem.profile_pic}`}
+                            src={`${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${elem.profile_pic}`}
+                            alt={elem.first_name}
                             width={30}
                             height={30}
                         />

@@ -16,19 +16,14 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 		helpers.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
 		return
 	}
-	// fmt.Println("incoming request==>", time.Now())
-	// fmt.Println("headers==>", r.Header)
-	user, err := auth.GetUser(r)
-	// fmt.Println("USER ==> ", user.ID, err)
 
-	// fmt.Println("---path", r.URL.Path)
+	user, err := auth.GetUser(r)
 	currentPage, err := strconv.Atoi((strings.Split(r.URL.Path, "/")[3]))
 	if err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
 	}
 	posts, err := repoPosts.GetAllPOst(currentPage, user.ID)
-	// fmt.Println("posts", posts)
 	if err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
 		return

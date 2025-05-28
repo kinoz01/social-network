@@ -21,10 +21,6 @@ func ValidVisibility(visibility string) string {
 
 func ValidInput(inputs string) error {
 	trimSpace := strings.TrimSpace(inputs)
-	if len(trimSpace) == 0 {
-		return fmt.Errorf("post content cannot be empty")
-	}
-
 	if len(trimSpace) > 5000 {
 		return fmt.Errorf("post content exceeds 5000 characters limit")
 	}
@@ -33,10 +29,6 @@ func ValidInput(inputs string) error {
 
 func ValidFile(handler *multipart.FileHeader) error {
 	// fmt.Printf("here fileeeee------------->%v \n and handler %v\n", handler.Size, handler.Header.Get("Content-Type"))
-	maxSize := int64(10 << 20)
-	if handler.Size > maxSize {
-		return fmt.Errorf("file size exceeds 10MB limit")
-	}
 	contentType := handler.Header.Get("Content-Type")
 	allowedType := map[string]bool{
 		"image/jpeg": true,

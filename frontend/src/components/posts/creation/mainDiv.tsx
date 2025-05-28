@@ -7,6 +7,7 @@ type MainParams = {
     onClose: () => void;
     privacy: string;
     showCHoice: () => void;
+    userName: string;
 }
 
 const MainDiv = (props: MainParams) => {
@@ -20,7 +21,7 @@ const MainDiv = (props: MainParams) => {
             <textarea
                 name="content"
                 className={styles.postContentInput}
-                placeholder="What's on your mind, ??"
+                placeholder={`What's on your mind, ${props.userName}??`}
             />
             <div className={styles.privacy} onClick={props.showCHoice}>
                 {props.privacy.toUpperCase()} ▼
@@ -32,7 +33,12 @@ const MainDiv = (props: MainParams) => {
                         <Image src="/img/postImg.svg" alt="Upload Icon" width={28} height={28} />
                     </span>
                 </label>
-                <input id="postImage" type="file" name="file" className={styles.uploadImgBtn} />
+                <input id="postImage" type="file" name="file" className={styles.uploadImgBtn}
+                    onChange={(e) => {
+                        if (e.target.files?.length) {
+                            setFileName(e.target.files[0].name)
+                        }
+                    }} />
             </div>
             <button type="submit" className={styles.submitBtn}>
                 Create

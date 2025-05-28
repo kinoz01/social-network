@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	postDB "social-network/database/repositories/db_posts"
+	auth "social-network/handlers/authentication"
 	"social-network/handlers/helpers"
 	help "social-network/handlers/helpers"
 	"social-network/handlers/types"
@@ -17,9 +18,13 @@ func HandleLike(w http.ResponseWriter, r *http.Request) {
 		helpers.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
 		return
 	}
+	_, err := auth.GetUser(r)
+	if err != nil {
+		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		return
+	}
 	var Like types.React
-
-	err := json.NewDecoder(r.Body).Decode(&Like)
+	err = json.NewDecoder(r.Body).Decode(&Like)
 	if err != nil {
 		helpers.JsonError(w, "bad request", http.StatusBadRequest, nil)
 		return
@@ -28,7 +33,6 @@ func HandleLike(w http.ResponseWriter, r *http.Request) {
 	reactID := uuid.Must(uuid.NewV4())
 	Like.ID = reactID.String()
 
-	// fmt.Println("reactionDetaisl", Like)
 	if err := postDB.IsReacted(Like); err != nil {
 		if err := postDB.SavePOstLIke(Like); err != nil {
 			help.JsonError(w, err.Error(), http.StatusInternalServerError, nil)

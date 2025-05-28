@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	postDB "social-network/database/repositories/db_posts"
 	auth "social-network/handlers/authentication"
-	help "social-network/handlers/helpers"
+	"social-network/handlers/helpers"
 	typeP "social-network/handlers/types"
 	Postsrv "social-network/service/service_posts"
 
@@ -15,24 +16,21 @@ import (
 )
 
 func CreatPosts(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println("createPOst now")
 	if r.Method != http.MethodPost {
-		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
+		helpers.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 		return
 	}
 
 	user, err := auth.GetUser(r)
 	if err != nil {
 		fmt.Println("not exist user", err)
-		help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
 	}
-	// fmt.Println("user-------------", user)
 
-	// posts := type.Post
 	err = r.ParseMultipartForm(10 << 20)
 	if err != nil {
-		help.JsonError(w, "Error in parsing form data", http.StatusBadRequest, nil)
+		helpers.JsonError(w, "Error in parsing form data", http.StatusBadRequest, nil)
 		return
 	}
 
@@ -48,26 +46,30 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := Postsrv.ValidInput(content); err != nil {
-		help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
 	}
 	newPost.Content = content
 
-	filename, err := help.HamdleFIleUpload(r)
+	filename, err := helpers.HamdleFIleUpload(r, "posts/")
+	if err != nil {
+		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		return
+	}
 	newPost.Imag_post = filename
 
 	if newPost.Visibility == "private" {
-		// fmt.Println("handle now private posts")
 		for _, vipUser := range vipUsers {
 			if err := postDB.PostPrivacyDB(newPost.ID, vipUser); err != nil {
-				help.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
+				helpers.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
 				return
 			}
 		}
 	}
-	fmt.Println("--------posts", newPost)
+	newPost.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
+
 	if err := postDB.CreatePostDB(newPost); err != nil {
-		help.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
+		helpers.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
 		return
 	}
 

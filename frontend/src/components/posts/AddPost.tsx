@@ -6,8 +6,8 @@ import { MainDiv } from "./creation/mainDiv";
 import { ShowUsers } from "./creation/users";
 import { PostAudience } from "./creation/audience";
 import { useEffect, useState } from "react";
-import { Post, User } from "./Feed";
 import { HandleCreation } from "@/apiService/posts/savePost";
+import { User, Post } from "../types";
 
 type PostParams = {
   isOpen?: boolean;
@@ -57,7 +57,7 @@ export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
             <input type="hidden" name="privacy" value={privacy} />
 
             <div style={{ display: showAudiance || showUsers ? "none" : "block", width: "100%", boxSizing: "border-box", padding: "20px", overflow: "auto" }}>
-              <MainDiv onClose={onClose} privacy={privacy} showCHoice={showCHoice} />
+              <MainDiv onClose={onClose} privacy={privacy} showCHoice={showCHoice} userName={userData.first_name} />
             </div>
 
             <div style={{ display: showAudiance && !showUsers ? "block" : "none", overflow: "auto" }}>

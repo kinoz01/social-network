@@ -29,24 +29,26 @@ type Post struct {
 	Imag_post  string   `json:"imag_post,omitempty"`
 	Visibility string   `json:"visibility"`
 	VipUsers   []string `json:"vipUsers"`
+	CreatedAt  string   `json:"createdAt"`
 }
 
 // type
 
 type PostData struct {
-	PostID        string         `json:"id"`
-	UserID        string         `json:"userID"`
-	Content       string         `json:"content"`
-	Imag_post     string         `json:"imag_post,omitempty"`
-	Visibility    string         `json:"visibility"`
-	VipUsers      []string       `json:"vipUsers"`
-	FirstName     string         `json:"firstName"`
-	LastName      string         `json:"lastName"`
-	ProfilePic    string         `json:"profile_pic"`
-	HasReact      sql.NullString `json:"hasReact"`
-	TotalLIKes    int            `json:"totalLikes"`
-	TotalComments int            `json:"totalComments"`
-	CreatedAt     string         `json:"createdAt"`
+	PostID     string   `json:"id"`
+	UserID     string   `json:"userID"`
+	Content    string   `json:"content"`
+	Imag_post  string   `json:"imag_post,omitempty"`
+	Visibility string   `json:"visibility"`
+	VipUsers   []string `json:"vipUsers"`
+	FirstName  string   `json:"firstName"`
+	LastName   string   `json:"lastName"`
+	ProfilePic string   `json:"profile_pic"`
+	// HasReact      sql.NullString `json:"hasReact"`
+	HasReact      string `json:"hasReact"`
+	TotalLIKes    int    `json:"totalLikes"`
+	TotalComments int    `json:"totalComments"`
+	CreatedAt     string `json:"createdAt"`
 }
 type React struct {
 	ID        string

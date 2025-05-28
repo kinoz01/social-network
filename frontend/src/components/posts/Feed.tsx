@@ -5,36 +5,10 @@ import React from "react";
 import { useRef, useCallback } from "react";
 import { PostComponent } from "./Post";
 import { NewPOst } from "./AddPost";
-// import { error } from "console";
 import { fetchOldPosts } from "@/apiService/posts/prevPost";
 import { getUser } from "@/lib/user";
-
-export interface Post {
-  id: string;
-  userID: string;
-  content: string;
-  visibility: string;
-  imag_post: string;
-  firstName: string;
-  lastName: string;
-  createdAt: string;
-  profile_pic: string;
-  hasReact?: string;
-  totalLikes: number;
-  totalComments: number;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  username?: string;
-  profile_pic: string;
-  first_name: string;
-  last_name: string;
-  birthday: string;
-  about_me?: string;
-  account_type: string;
-}
+import Image from "next/image";
+import { User, Post } from "../types";
 
 const throttle = (func: (...args: any[]) => void, delay: number) => {
   let funcSchedule: NodeJS.Timeout | null = null
@@ -118,10 +92,9 @@ function Feed({ type }: { type: "home" | "group" }) {
   }, [isLoading, hasMOre])
 
   const handleNewPOst = (post: Post) => {
-    console.log("=================================", post);
+    // console.log("=================================", post);
     const newPOst = { ...post }
     setPostedContent(posted => [newPOst, ...posted])
-    // setUniqueIDs(prev => new Set(prev).add(newPOst.id))
   }
 
   const toggleFOrm = () => {
@@ -132,7 +105,16 @@ function Feed({ type }: { type: "home" | "group" }) {
     <>
       <div className={`${styles.feed} ${styles[type]}`}>
         <div className={styles.toggleFOrm} onClick={toggleFOrm}>
-          {<div className={styles.insideFOrm}>{user && user.username?.toUpperCase()}, What's on your mind ??</div>}
+          {<div className={styles.insideFOrm}>
+            <Image
+              src={user?.profile_pic ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${user.profile_pic}` : "/img/default-avatar.png"}
+              alt=""
+              width={40}
+              height={40}
+              className={styles.userIcon}
+            />
+            What's on your mind, {user && user.first_name?.toUpperCase()} ??
+          </div>}
         </div>
         {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
 

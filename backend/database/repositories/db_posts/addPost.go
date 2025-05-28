@@ -95,6 +95,7 @@ func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 	for rows.Next() {
 		var post pType.PostData
 		var imgPost sql.NullString
+		var react sql.NullString
 		err := rows.Scan(
 			&post.PostID,
 			&post.UserID,
@@ -104,7 +105,7 @@ func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 			&post.FirstName,
 			&post.LastName,
 			&post.ProfilePic,
-			&post.HasReact,
+			&react,
 			&post.CreatedAt,
 			&post.TotalLIKes,
 			&post.TotalComments,
@@ -115,7 +116,12 @@ func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 		if imgPost.Valid {
 			post.Imag_post = imgPost.String
 		} else {
-			post.Imag_post = "" // Set to empty string if NULL
+			post.Imag_post = ""
+		}
+		if react.Valid {
+			post.HasReact = react.String
+		} else {
+			post.HasReact = ""
 		}
 		posts = append(posts, post)
 	}

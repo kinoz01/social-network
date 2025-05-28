@@ -1,6 +1,5 @@
 import React from "react";
-import { Post } from "@/components/posts/Feed";
-import { User } from "@/lib/user";
+import { Post, User } from "@/components/types";
 import { popup } from "@/components/posts/utils";
 
 type handleSbmtParams = {
@@ -15,6 +14,14 @@ const HandleCreation = async (props: handleSbmtParams) => {
     props.e.preventDefault();
     var form = props.e.currentTarget
     const formData = new FormData(form)
+
+    const content = formData.get('content')
+    const file = formData.get('file') as File | null;
+    if (!content && !file?.name) {
+        popup("post content cannot be empty", false)
+        return
+    }
+
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/createPost`,
             {
@@ -26,7 +33,7 @@ const HandleCreation = async (props: handleSbmtParams) => {
         if (!res.ok) {
             throw new Error((await res.json()).msg || "creation failed")
         }
-        // console.log("dtat", formData.get("imag_post"), "content", formData.get("content"))
+
         const post: Post = await res.json()
         const newPost: Post = {
             ...post,
@@ -34,10 +41,8 @@ const HandleCreation = async (props: handleSbmtParams) => {
             firstName: props.userData?.first_name,
             lastName: props.userData?.last_name,
             profile_pic: props.userData?.profile_pic,
-            createdAt: new Date().toISOString(),//---
+            // createdAt: post.,//---
         }
-
-        console.log('post created successfully', formData)
         props.onSubmit(newPost)
         form.reset()
         document.querySelector(".popup")?.remove()
@@ -45,7 +50,6 @@ const HandleCreation = async (props: handleSbmtParams) => {
         document.querySelector("form")?.remove()
         props.onClose()
     } catch (error: any) {
-        // setErrorMsg()
         console.error('creation error:', error)
         document.querySelector(".popup")?.remove()
         popup(error, false)

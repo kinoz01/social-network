@@ -51,7 +51,7 @@ func SaveImg(imageB []byte, genre string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	imgSavingPath := "../frontend/public/storage/" + genre + imguuid.String() + ".jpg"
+	imgSavingPath := "./storage/" + genre + imguuid.String() + ".jpg"
 
 	err = os.WriteFile(imgSavingPath, imageB, 0o644)
 	if err != nil {

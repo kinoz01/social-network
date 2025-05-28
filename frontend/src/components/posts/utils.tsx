@@ -7,8 +7,8 @@ const popup = (mssg: string, close: boolean) => {
     `
     document.body.appendChild(popup);
     document.querySelector(".close-popup")?.addEventListener("click", () => popup.remove())
-    close && setTimeout(() => popup.classList.add("fade-out"), 5000)
-    close && setTimeout(() => popup.remove(), 6500)
+    setTimeout(() => popup.classList.add("fade-out"), 5000)
+    setTimeout(() => popup.remove(), 6500)
 }
 
 export { popup }
