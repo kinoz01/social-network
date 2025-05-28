@@ -1,3 +1,5 @@
+'use client'
+
 import styles from "./posts.module.css";
 import "../../app/globals.css";
 import { useState, useEffect } from "react";
