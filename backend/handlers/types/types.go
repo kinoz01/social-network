@@ -37,16 +37,20 @@ type Post struct {
 // type
 
 type PostData struct {
-	PostID     string         `json:"id"`
-	UserID     string         `json:"userID"`
-	Content    string         `json:"content"`
-	Imag_post  sql.NullString `json:"imag_post"`
-	Visibility string         `json:"visibility"`
-	VipUsers   []string       `json:"vipUsers"`
-	FirstName  string         `json:"firstName"`
-	LastName   string         `json:"lastName"`
-	ProfilePic string         `json:"profile_pic"`
-	CreatedAt  string         `json:"createdAt"`
+	PostID       string         `json:"id"`
+	UserID       string         `json:"userID"`
+	Content      string         `json:"content"`
+	Imag_post    sql.NullString `json:"imag_post"`
+	Visibility   string         `json:"visibility"`
+	VipUsers     []string       `json:"vipUsers"`
+	FirstName    string         `json:"firstName"`
+	LastName     string         `json:"lastName"`
+	ProfilePic   string         `json:"profile_pic"`
+	CreatedAt    string         `json:"createdAt"`
+	Group_id     any            `json:"group_id,omitempty"`
+	Post_id      string         `json:"post_id"`
+	Cte_likes    int            `json:"cte_likes"`
+	Comments_nbr int            `json:"comments_nbr"`
 }
 
 type Comment struct {
@@ -63,3 +67,17 @@ type Comment struct {
 type Errorcomment struct {
 	Content string `json:"content"`
 }
+
+type UserData struct {
+	Email       string     `json:"email"`
+	Firstname   string     `json:"first_name"`
+	Lastname    string     `json:"last_name"`
+	Profile_pic string     `json:"profile_pic,omitempty"`
+	Username    string     `json:"username"`
+	Birthday    string     `json:"birthday"`
+	About_me    string     `json:"about_me,omitempty"`
+	AccountType string     `json:"account_type"`
+	Posts       []PostData `json:"posts"`
+	PostNbr     int        `json:"post_nbr"`
+}
+

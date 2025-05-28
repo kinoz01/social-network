@@ -1,3 +1,4 @@
+"use client"
 import styles from "./posts.module.css";
 import "../../app/globals.css";
 import { useState, useEffect } from "react";
@@ -7,6 +8,7 @@ import { PostComponent } from "./Post";
 import { NewPOst } from "./AddPost";
 // import { error } from "console";
 import { fetchOldPosts } from "@/apiService/posts/prevPost";
+import { Init } from "v8";
 
 
 export interface Post {
@@ -32,7 +34,18 @@ export interface User {
   about_me?: string;
   account_type: string;
 }
-
+export interface Profile {
+  email: string;
+  username: string;
+  profile_pic: string;
+  first_name: string;
+  last_name: string;
+  birthday: string;
+  about_me: string;
+  account_type: string;
+  posts: Post[];
+  post_nbr: number;
+}
 const throttle = (func: (...args: any[]) => void, delay: number) => {
   let funcSchedule: NodeJS.Timeout | null = null
   return (...args: any[]) => {
@@ -134,7 +147,7 @@ function Feed({ type }: { type: "home" | "group" }) {
 
   return (
     <>
-      <div className={`${styles.feed} ${styles[type]}`}>
+      <div  className={`${styles.feed} ${styles[type]}`}>
         <div className={styles.toggleFOrm} onClick={toggleFOrm}>
           {<div className={styles.insideFOrm}>What's on your mind ??</div>}
         </div>

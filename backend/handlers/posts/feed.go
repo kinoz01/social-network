@@ -42,5 +42,4 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(posts); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
-	fmt.Println("posts ⭐⭐", posts)
 }

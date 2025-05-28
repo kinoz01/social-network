@@ -6,6 +6,7 @@ import (
 
 	auth "social-network/handlers/authentication"
 	comment "social-network/handlers/comments"
+	profil "social-network/handlers/profil"
 	"social-network/handlers/posts"
 	"social-network/handlers/users"
 
@@ -38,6 +39,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))
 	mux.HandleFunc("/api/addcomment", comment.AddComment)
 	mux.HandleFunc("/api/comments", comment.GetComments)
+	mux.HandleFunc("/api/profil", profil.GetDateFollow)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }
