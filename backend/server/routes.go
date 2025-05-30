@@ -5,8 +5,15 @@ import (
 	"time"
 
 	auth "social-network/handlers/authentication"
+	flw "social-network/handlers/follows"
+	grps "social-network/handlers/groups"
+	grpsD "social-network/handlers/groups/dashboard"
+	grpsInvite "social-network/handlers/groups/invitations"
+	grpsRequest "social-network/handlers/groups/joinRequests"
+	grpsPost "social-network/handlers/groups/posts"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
+	grpevent "social-network/handlers/groups/events"
 )
 
 var Router http.Handler

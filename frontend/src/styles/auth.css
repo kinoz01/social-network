@@ -221,6 +221,7 @@
 .upload-text {
     font-weight: 500;
     color: var(--title-color) !important;
+    font-size: 1rem;
 }
 
 .drag-over {

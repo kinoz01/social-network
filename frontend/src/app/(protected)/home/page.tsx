@@ -33,7 +33,7 @@ const showWelcome = () => {
     popup.innerHTML = `
         <span class="close-popup">&times;</span>
         🎉🎉🎉<br>
-        <strong>Welcome to our Community!</strong><br>
+        <strong>Welcome to our Community!</strong><br><br>
         Feel free to share your thoughts.
     `;
     document.body.appendChild(popup);

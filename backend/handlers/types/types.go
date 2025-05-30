@@ -18,3 +18,14 @@ type User struct {
 	AboutMe     string `json:"about_me"`
 	AccountType string `json:"account_type"`
 }
+
+type Group struct {
+	ID          string `json:"id"`
+	GroupName   string `json:"group_name"`
+	GroupOwner  string `json:"group_owner"`
+	GroupPic    string `json:"group_pic"`
+	Description string `json:"description"`
+	CreatedAt   string `json:"created_at"`
+	Request     string `json:"request"` // when rendering all groups (if pending)
+	Members     int    `json:"members"`
+}

@@ -6,8 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./backend/database/socNet.db:/app/database/socNet.db
-      - ./backend/database/schema.sql:/app/database/schema.sql 
+      - ./backend/database:/app/database
 
   frontend:
     build:

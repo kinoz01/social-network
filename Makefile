@@ -1,3 +1,7 @@
+# Run everything
+run: check-npm check-nextjs kill-ports run-backend run-frontend
+	@echo "Live and running!"
+
 # Check if npm is installed
 check-npm:
 	@command -v npm >/dev/null 2>&1 || { \
@@ -37,11 +41,6 @@ go:
 run-frontend:
 	@echo "Starting Next.js frontend..."
 	cd frontend && npm run dev
-
-# Run everything
-run: check-npm check-nextjs kill-ports run-backend run-frontend
-	@echo "Live and running!"
-
 
 #------------------------- Docker -------------------------#
 buildDocker: kill-ports
