@@ -1,40 +1,97 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, useRef, FormEvent } from "react";
 import EventCard, { Event } from "./EventCard";
 import styles from "./style/events.module.css";
 import { useParams } from "next/navigation";
 import Loading from "@/components/Loading";
+import { API_URL } from "@/lib/api_url";
+
+
+const PAGE_SIZE = 20;
 
 export default function Events() {
     const { id: groupId } = useParams() as { id: string };
-    const [events, setEvents] = useState<Event[]>([]);
-    const [loading, setLoad] = useState(true);
 
-    /* ─ fetch list ─ */
+    /* ───────────── list / paging state ───────────── */
+    const boxRef = useRef<HTMLDivElement>(null);
+
+    const [events, setEvents] = useState<Event[]>([]);
+    const [offset, setOffset] = useState(0);
+    const [hasMore, setMore] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadMore] = useState(false);
+
+    /* helper to fetch one page */
+    const fetchPage = async (off: number) => {
+        const qs = `group_id=${groupId}&limit=${PAGE_SIZE}&offset=${off}`;
+        const res = await fetch(
+            `${API_URL}/api/groups/get-events?${qs}`,
+            { credentials: "include", cache: "no-store" }
+        );
+        if (!res.ok) throw new Error("Failed to load events");
+        return res.json() as Promise<Event[]>;
+    };
+
+    /* initial page / when group changes */
     useEffect(() => {
-        const fetchList = async () => {
-            const r = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/events?group_id=${groupId}`,
-                { credentials: "include", cache: "no-store" }
-            );
-            if (r.ok) {
-                setEvents(await r.json());
+        (async () => {
+            setLoading(true);
+            try {
+                const first = await fetchPage(0);
+                if (!first || first.length === 0) return
+
+                setEvents(first);
+                setOffset(first.length);
+                setMore(first.length === PAGE_SIZE);
+            } finally {
+                setLoading(false);
             }
-            setLoad(false);
-        };
-        fetchList();
+        })();
     }, [groupId]);
 
-    /* ─ form state ─ */
+    /* infinite scroll */
+    useEffect(() => {
+        const container = boxRef.current;
+        if (!container) return;
+
+        const onScroll = () => {
+            if (!hasMore || loadingMore) return;
+            if (container.scrollHeight - container.scrollTop - container.clientHeight > 120) return;
+
+            (async () => {
+                setLoadMore(true);
+                try {
+                    const next = await fetchPage(offset);
+                    setEvents(prev => [...prev, ...next]);
+                    setOffset(o => o + next.length);
+                    setMore(next.length === PAGE_SIZE);
+                } finally {
+                    setLoadMore(false);
+                }
+            })();
+        };
+
+        container.addEventListener("scroll", onScroll);
+        return () => container.removeEventListener("scroll", onScroll);
+    }, [hasMore, loadingMore, offset]);
+
+    /* ───────────── creator-form state ───────────── */
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
     const [start, setStart] = useState("");
     const [going, setGoing] = useState(true);
+    const [errMsg, setErr] = useState("");
 
+    /* create-event submit */
     const submit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!title.trim() || !start) return;
+        setErr("");
+
+        if (!title.trim() || !start) {
+            setErr("Title and date are required.");
+            return;
+        }
 
         const payload = {
             group_id: groupId,
@@ -44,8 +101,8 @@ export default function Events() {
             going,
         };
 
-        const r = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/create-event`,
+        const res = await fetch(
+            `${API_URL}/api/groups/create-event?group_id=${groupId}`,
             {
                 method: "POST",
                 credentials: "include",
@@ -53,42 +110,54 @@ export default function Events() {
                 body: JSON.stringify(payload),
             }
         );
-        if (!r.ok) return;
-        const ev: Event = await r.json();
-        setEvents((p) => [...p, ev]);
-        // reset
+
+        if (!res.ok) {
+            const { msg } = await res.json().catch(() => ({ msg: "Failed to create event." }));
+            setErr(msg);
+            return;
+        }
+
+        const ev: Event = await res.json();
+        /* prepend new event & update paging offset */
+        setEvents(prev => [ev, ...prev]);
+        setOffset(o => o + 1);
+
+        /* reset form */
         setTitle("");
         setDesc("");
         setStart("");
         setGoing(true);
     };
 
+    /* ─────────────────── render ─────────────────── */
     return (
-        <div className={styles.events}>
-            {/* ───────── creator prompt ───────── */}
+        <div className={styles.events} ref={boxRef}>
+            {/* ── creator form ── */}
             <form className={styles.creator} onSubmit={submit}>
                 <input
                     className={styles.inputTitle}
-                    placeholder="Event title..."
+                    placeholder="Event title…"
                     value={title}
-                    maxLength={100}
-                    onChange={(e) => setTitle(e.target.value)}
+                    maxLength={80}
+                    onChange={e => setTitle(e.target.value)}
                     required
                 />
+
                 <textarea
                     className={styles.inputDesc}
-                    placeholder="Short Description..."
+                    placeholder="Short description…"
                     value={desc}
-                    maxLength={500}
-                    onChange={(e) => setDesc(e.target.value)}
+                    maxLength={200}
+                    onChange={e => setDesc(e.target.value)}
                     required
                 />
+
                 <div className={styles.metaRow}>
                     <input
                         type="datetime-local"
                         className={styles.inputDate}
                         value={start}
-                        onChange={(e) => setStart(e.target.value)}
+                        onChange={e => setStart(e.target.value)}
                         required
                     />
 
@@ -109,17 +178,39 @@ export default function Events() {
                         </button>
                     </div>
 
-                    <button type="submit" className={styles.button}>
-                        Create
-                    </button>
+                    <button type="submit" className={styles.button}>Create</button>
                 </div>
+
+                {errMsg && <div className={styles.error}>{errMsg}</div>}
             </form>
 
-            {/* ───────── list ───────── */}
+            {/* ── list / states ── */}
             {loading ? (
                 <Loading />
+            ) : !events || events.length === 0 ? (
+                <div className={styles.empty}>
+                    <img src="/img/empty.svg" alt="empty" width={160} height={160} />
+                    <p>No events available</p>
+                </div>
             ) : (
-                events.map((ev) => <EventCard key={ev.id} ev={ev} />)
+                <div className={styles.feed}>
+                    {events.map(ev => (
+                        <EventCard
+                            key={ev.id}
+                            ev={ev}
+                            onUpdate={(goingCnt, notCnt, myChoice) =>
+                                setEvents(prev =>
+                                    prev.map(p => p.id === ev.id ? { ...p, going_count: goingCnt, not_going_count: notCnt, going: myChoice } : p)
+                                )
+                            }
+                        />
+                    ))}
+
+                    {loadingMore && <Loading />}
+                    {!hasMore && events.length > PAGE_SIZE && (
+                        <p className={styles.end}>No more events</p>
+                    )}
+                </div>
             )}
         </div>
     );

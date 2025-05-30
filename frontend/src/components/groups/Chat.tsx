@@ -3,9 +3,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import styles from "./style/chat.module.css";
 import { useWS } from "@/context/wsClient";
-import { throttle } from "./GroupFeed";
 import Loading from "../Loading";
 import Image from "next/image";
+import { API_URL } from "@/lib/api_url";
+import { throttle } from "../../lib/utils";
+
 
 interface ChatMsg {
     id: string; sender_id: string; first_name: string; last_name: string;
@@ -42,7 +44,7 @@ export default function Chat() {
     const fetchPage = async (o: number) => {
         const qs = `group_id=${groupId}&limit=${PAGE}&offset=${o}`;
         const r = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/chat?${qs}`,
+            `${API_URL}/api/groups/chat?${qs}`,
             { credentials: "include", cache: "no-store" });
         if (!r.ok) return [];
         return await r.json() as ChatMsg[];
@@ -52,14 +54,14 @@ export default function Chat() {
     useEffect(() => {
         (async () => {
             if (!groupId) return;
-            setLoadingFirst(true);                                       
+            setLoadingFirst(true);
             const pageRaw = await fetchPage(0);
-            const page = Array.isArray(pageRaw) ? pageRaw : [];          
+            const page = Array.isArray(pageRaw) ? pageRaw : [];
             idSetRef.current = new Set(page.map(m => m.id));
             setMsgs(page);
             setOff(page.length);
             setHM(page.length === PAGE);
-            setLoadingFirst(false);                                      
+            setLoadingFirst(false);
         })();
     }, [groupId]);
 
@@ -111,7 +113,7 @@ export default function Chat() {
     }, [msgs]);
 
     /* helpers */
-    const t = (iso: string) =>  {
+    const t = (iso: string) => {
         const dateStr = iso.endsWith('Z') ? iso.slice(0, -1) : iso;
         return new Date(dateStr).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
@@ -169,7 +171,7 @@ export default function Chat() {
                             {div}
                             <div className={styles.msg}>
                                 <img src={m.profile_pic
-                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${m.profile_pic}`
+                                    ? `${API_URL}/api/storage/avatars/${m.profile_pic}`
                                     : "/img/default-avatar.png"} className={styles.avatar} />
                                 <div className={styles.bubble}>
                                     <span className={styles.name}>{m.first_name} {m.last_name}

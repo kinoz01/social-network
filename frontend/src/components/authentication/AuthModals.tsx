@@ -4,6 +4,7 @@ import "@/styles/auth.css";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { API_URL } from "@/lib/api_url";
 
 interface AuthModalProps {
     authSuccess: () => void; // called after successful auth
@@ -13,8 +14,8 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
     // route-aware view
     const router = useRouter();
     const pathname = usePathname();
-    const [isLogin, setIsLogin] = useState(pathname === "/login");
-    useEffect(() => setIsLogin(pathname === "/login"), [pathname]);
+    const [isLogin, setIsLogin] = useState(pathname !== "/signup");
+    useEffect(() => setIsLogin(pathname !== "/signup"), [pathname]);
 
     // ui state
     const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +38,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         setFormData(p => ({ ...p, [e.target.name]: e.target.value }));
 
     const handleAccountType = (t: "private" | "public") =>
-        setFormData(p => ({ ...p, accountType: t })); // overwrite account type
+        setFormData(p => ({ ...p, accountType: t }));
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0];
@@ -63,7 +64,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         if (formData.profilePic) signupData.append("profile_pic", formData.profilePic);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
+            const res = await fetch(`${API_URL}/api/signup`, {
                 method: "POST",
                 body: signupData,
                 credentials: "include",
@@ -78,12 +79,11 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         }
     };
 
-    // React.FormEvent React's built-in type for form events (like onSubmit, onChange, etc.).
-    // <HTMLFormElement> sub-type that specifies this event comes from a <form> element
+
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+            const res = await fetch(`${API_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

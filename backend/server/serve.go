@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var Port = "8080"
+const Port = "8080"
 
 // Starts the HTTP server
 func Serve(handler http.Handler) {

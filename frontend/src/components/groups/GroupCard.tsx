@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import styles from "./style/groups.module.css";
 import Loading from "@/components/Loading";
 import CreateGroupModal from "../groups/CreateGroup";
+import { API_URL } from "@/lib/api_url";
 
 interface Group {
     id: string;
@@ -15,7 +16,7 @@ interface Group {
     request?: string;        // for Available Groups
     members?: number;
     invitation_id?: string;  // Invitations
-    invitation_status?: "pending" | "rejected";
+    invitation_status?: "pending";
 }
 
 export default function GroupCard({
@@ -39,10 +40,10 @@ export default function GroupCard({
         try {
             setLoading(true);
             let url = "";
-            if (title === "Your Groups") url = `${process.env.NEXT_PUBLIC_API_URL}/api/groups/owned`;
-            else if (title === "Joined Groups") url = `${process.env.NEXT_PUBLIC_API_URL}/api/groups/joined`;
-            else if (title === "Available Groups") url = `${process.env.NEXT_PUBLIC_API_URL}/api/groups/available`;
-            else if (title === "Invitations") url = `${process.env.NEXT_PUBLIC_API_URL}/api/groups/invitations`;
+            if (title === "Your Groups") url = `${API_URL}/api/groups/owned`;
+            else if (title === "Joined Groups") url = `${API_URL}/api/groups/joined`;
+            else if (title === "Available Groups") url = `${API_URL}/api/groups/available`;
+            else if (title === "Invitations") url = `${API_URL}/api/groups/invitations`;
 
             if (url) {
                 const res = await fetch(url, { credentials: "include" });
@@ -65,7 +66,7 @@ export default function GroupCard({
 
     const handleAccept = async (id: string) => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/groups/accept-invitation`, {
+            const res = await fetch(`${API_URL}/api/groups/accept-invitation`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -80,7 +81,7 @@ export default function GroupCard({
     const handleRefuse = async (id: string) => {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/refuse-invitation`,
+                `${API_URL}/api/groups/refuse-invitation`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -93,7 +94,6 @@ export default function GroupCard({
             /* --- instant UI update: drop the card locally --- */
             setGroups(prev => prev.filter(g => g.invitation_id !== id));
 
-            /* no need to fetch again; server already stored rejected */
         } catch (err) {
             console.error(err);
         }
@@ -102,7 +102,7 @@ export default function GroupCard({
     /* ---------- join request ---------- */
     const handleJoin = async (groupId: string) => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/groups/join-request`, {
+            const res = await fetch(`${API_URL}/api/groups/join-request`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -137,7 +137,7 @@ export default function GroupCard({
                 <div className={styles.groupIcon}>
                     <Image
                         src={g.group_pic
-                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_avatars/${g.group_pic}`
+                            ? `${API_URL}/api/storage/groups_avatars/${g.group_pic}`
                             : "/img/default-group.jpg"}
                         alt={g.group_name}
                         width={50} height={50} style={{ borderRadius: "50%", objectFit: "cover" }}
@@ -182,22 +182,18 @@ export default function GroupCard({
                         }}>Join</button>
                     )
                 ) : isInvitation ? (
-                    g.invitation_status === "rejected" ? (
-                        <span className={styles.refusedText}>Rejected</span>
-                    ) : (
-                        <div className={styles.invitationActions}>
-                            <button className={styles.inviteBtn} onClick={(e) => {
-                                e.stopPropagation(); handleAccept(g.invitation_id!);
-                            }}>
-                                <Image src="/img/accept.svg" alt="accept" width={22} height={22} />
-                            </button>
-                            <button className={styles.inviteBtn} onClick={(e) => {
-                                e.stopPropagation(); handleRefuse(g.invitation_id!);
-                            }}>
-                                <Image src="/img/refuse.svg" alt="refuse" width={22} height={22} />
-                            </button>
-                        </div>
-                    )
+                    <div className={styles.invitationActions}>
+                        <button className={styles.inviteBtn} onClick={(e) => {
+                            e.stopPropagation(); handleAccept(g.invitation_id!);
+                        }}>
+                            <Image src="/img/accept.svg" alt="accept" width={22} height={22} />
+                        </button>
+                        <button className={styles.inviteBtn} onClick={(e) => {
+                            e.stopPropagation(); handleRefuse(g.invitation_id!);
+                        }}>
+                            <Image src="/img/refuse.svg" alt="refuse" width={22} height={22} />
+                        </button>
+                    </div>
                 ) : null}
             </div>
         );

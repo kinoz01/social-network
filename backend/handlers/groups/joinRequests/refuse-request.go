@@ -9,7 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-func RefuseJoinRequestHandler(w http.ResponseWriter, r *http.Request) {
+func RefuseJoinRequest(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", 401, err)
@@ -26,8 +26,7 @@ func RefuseJoinRequestHandler(w http.ResponseWriter, r *http.Request) {
 
 	/* ensure the request belongs to a group the caller owns */
 	res, err := tp.DB.Exec(`
-		UPDATE group_requests
-		   SET status = 'rejected'
+		DELETE FROM group_requests
 		 WHERE id = ?
 		   AND group_id IN (SELECT id FROM groups WHERE group_owner = ?)`,
 		body.RequestID, user.ID)

@@ -2,60 +2,142 @@
 
 import Image from "next/image";
 import styles from "./posts.module.css";
-import AddComment from "../comments/AddComments";
+import { useState, useEffect } from "react";
+// import { Post } from "./Feed";
 import Comment from "../comments/Comment";
-import { useState } from "react";
+import TimeAgo from "../groups/TimeAgo";
+import { popup } from "../../lib/utils";
+import { useUser } from "@/context/UserContext";
+import Link from "next/link";
+import { API_URL } from "@/lib/api_url";
+import { Post } from "@/lib/types";
+import { CloseFriendIcon, CommentIcon, LikeIcon, PrivateIcon, PublicIcon } from "../icons";
 
-export default function Post() {
-  const [showComments, setComments] = useState(false);
+export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({ post, type }) => {
+
+  const [showComments, setShowComments] = useState(false)
+  const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
+  const [totalCOmments, setTotalCOmments] = useState(post.totalComments || 0)
+  const [liked, setReaction] = useState(post.hasReact === "1")
+
+  const { user } = useUser()
+
+  const handleLike = async () => {
+    const res = await fetch(`${API_URL}/api/react`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userID: user?.id,
+        postID: post.id,
+        IsLike: !liked ? "1" : ""
+      })
+
+    })
+    if (!res.ok) {
+      popup("action failed", false)
+      throw new Error((await res.json()).msg || "failed to react")
+    }
+    if (liked) {
+      setReaction(!liked)
+      totalLikes > 0 && setTotalLikes(totalLikes - 1)
+    } else {
+      setReaction(!liked)
+      setTotalLikes(totalLikes + 1)
+    }
+  }
+
+  const imgName =
+    typeof post.imag_post === "string"
+      ? post.imag_post
+      : post.imag_post ?? "";
 
   return (
-    <div className={styles.post}>
+    <div
+      key={post.id}
+      className={type === "group" ? styles.postGroup : undefined}
+    >
       {/* HEADER */}
       <div className={styles.postHeader}>
-        <Image
-          className={styles.userIcon}
-          src="https://images.unsplash.com/photo-1742626157100-a25483dda2ea?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDM0fGJvOGpRS1RhRTBZfHxlbnwwfHx8fHw%3D"
-          alt=""
-          width={40}
-          height={40}
-        />
-        <div className={styles.postInfo}>
-          <div className={styles.postUser}>John</div>
-          <div className={styles.postCreationDate}>01/01/2000</div>
-        </div>
-      </div>
-      {/* CONTENT */}
-      <div className={styles.postDesc}>
-        <Image
-          className={styles.postImage}
-          src="https://images.unsplash.com/photo-1740768081811-e3adf4af4efe?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDExOHxibzhqUUtUYUUwWXx8ZW58MHx8fHx8"
-          alt=""
-          width={450}
-          height={450}
-        />
-        <div className={styles.postContent}>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Accusantium
-          et laudantium fugiat, sequi quam hic atque optio temporibus at
-          incidunt animi in quos corporis dolores qui voluptatem facere
-          blanditiis molestias!
-        </div>
-        <button
-          className={styles.commentsBtn}
-          onClick={
-            !showComments ? () => setComments(true) : () => setComments(false)
-          }
+        <Link
+          href={`/profile/${post.userID}`}
+          className={styles.link}
         >
-          comments
-        </button>
-      </div>
-      {/* COMMENTS */}
-      {showComments ? (
-        <div className={styles.comments}>
-          <AddComment />
-          <Comment />
+          <img
+            className={styles.userIcon}
+            src={`${API_URL}/api/storage/avatars/${post.profile_pic}`}
+            alt={post.firstName}
+            width={40}
+            height={40}
+          />
+        </Link>
+        <div className={styles.postInfo}>
+          <Link
+            href={`/profile/${post.userID}`}
+          >
+            <span className={styles.postUser}>
+              {post.firstName} {post.lastName}
+            </span>
+          </Link>
+          <div className={styles.postCreationDate}>
+            <div className={styles.timeAgo}>
+              <TimeAgo dateStr={post.createdAt} />
+            </div>
+            {post.visibility === "private" ? <CloseFriendIcon /> : post.visibility === "almost-private" ? <PrivateIcon /> : <PublicIcon />}
+          </div>
         </div>
-      ) : null}
-    </div>
-  );
+      </div >
+      {/* CONTENT */}
+      < div className={styles.postDesc} >
+        <div className={styles.postContent}>
+          {post.content}
+        </div>
+        {imgName && (
+          <img
+            className={styles.postImage}
+            src={`${API_URL}/api/storage/${type === "group" ? "groups_posts" : "posts"}/${imgName}`}
+            alt={`${post.firstName} post`}
+            width={450}
+            height={450}
+          />
+        )}
+        <div className={styles.reactAmount}>
+          <span>{totalLikes} Likes</span>
+          <span>{totalCOmments} comments</span>
+        </div>
+        <div className={styles.postFooter}>
+          <button
+            className={styles.reactBtn}
+
+            onClick={
+              handleLike
+            }
+          >
+            <LikeIcon fill={liked ? "red" : "none"} />
+            Like
+          </button>
+          <button
+            className={styles.commentsBtn}
+            onClick={() => setShowComments(true)}
+          >
+            <CommentIcon />
+            Comment
+          </button>
+        </div>
+
+        {showComments && (
+          <Comment
+            userData={user}
+            postID={post.id}
+            postCreator={post.firstName}
+            onClose={() => setShowComments(false)}
+            onCOmmentAdded={() => setTotalCOmments(i => i + 1)}
+          />
+        )}
+      </div >
+    </div >
+
+  )
 }

@@ -16,7 +16,7 @@ type Followers struct {
 	TotalPages int       `json:"totalPages"`
 }
 
-func FollowersHandler(w http.ResponseWriter, r *http.Request) {
+func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 		return

@@ -12,13 +12,13 @@
 /* white card - centre */
 .card {
     width: min(680px, 92vw);
-    height: 92vh;
+    height: 70vh;
     background: #fff;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     position: relative;
-    padding: 1rem 1.25rem 0 1.25rem;
+    padding: 1rem 1.25rem 1rem;
 }
 
 /* top bar */
@@ -53,7 +53,7 @@
 /* single comment */
 .item {
     display: flex;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .avt {
@@ -82,7 +82,7 @@
     margin-top: 10px;
     margin-bottom: 5px;
     font-family: 'Zain', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     overflow-wrap: anywhere;
     white-space: pre-wrap;
 }
@@ -113,7 +113,7 @@
     color: #666;
 }
 
-.empty p{
+.empty p {
     margin-bottom: 15px;
 }
 
@@ -224,3 +224,95 @@
     font-family: 'Zain', sans-serif;
     margin-top: 4px;
 }
+
+/* //comment */
+
+.commentInputContainer {
+    margin: 10px 0;
+}
+
+.commentForm {
+    border-top: 1px solid rgb(142, 142, 142);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.formWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.formContent {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    gap: 10px;
+}
+
+.commentInput {
+    flex-grow: 1;
+    padding: 20px;
+    border: 1px solid #e5e5e5;
+    border-radius: 15px;
+    font-size: 1.2rem;
+    font-family: 'Zain';
+    resize: none;
+}
+
+.leftIcons {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-direction: column;
+}
+
+.icon,
+.addCommentBtn {
+    cursor: pointer;
+}
+
+.uploadImgBtn {
+    display: none;
+}
+
+.commentInput::placeholder {
+    color: #65676b;
+}
+
+.commentInput:hover,
+.commentInput:focus {
+    outline: none;
+    border: 1px solid #c0c0c0 !important;
+}
+
+.addCommentBtn {
+    background: none;
+    border: none;
+    padding: 0 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.sendIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background .15s, transform .15s;
+}
+
+.addCommentBtn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }

@@ -17,7 +17,7 @@ import (
 )
 
 // Handle the creation of a new group.
-func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
+func CreateGroup(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 		return
@@ -43,21 +43,16 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groupID := uuid.Must(uuid.NewV4()).String()
 	/* ---------- invitations ---------- */
-	switch j := r.FormValue("invitee_ids"); {
-	case j == "ALL":
-		if err := grpInvite.InviteAllFollowers(groupID, user.ID); err != nil {
-			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
-			return
-		}
-	case j != "":
-		var ids []string
-		if err := json.Unmarshal([]byte(j), &ids); err != nil {
-			help.JsonError(w, "Invalid invitee_ids", 400, err)
-			return
-		}
-		if err := grpInvite.InviteFollowers(groupID, ids); err != nil {
+	groupID := uuid.Must(uuid.NewV4()).String()
+	invitees := r.FormValue("invitee_ids")
+	var ids []string
+	if err := json.Unmarshal([]byte(invitees), &ids); err != nil {
+		help.JsonError(w, "Invalid invitee_ids", 400, err)
+		return
+	}
+	if len(ids) > 0 {
+		if err := grpInvite.Invite(groupID, ids); err != nil {
 			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
 			return
 		}
@@ -73,7 +68,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ext := strings.ToLower(filepath.Ext(hdr.Filename))
-		if ext != ".jpg" && ext != ".png" && ext != ".webp" && ext != ".jpeg" && ext != ".gif"  {
+		if ext != ".jpg" && ext != ".png" && ext != ".webp" && ext != ".jpeg" && ext != ".gif" {
 			help.JsonError(w, "unsupported image format", http.StatusBadRequest, nil)
 			return
 		}

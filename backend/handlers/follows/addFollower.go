@@ -11,20 +11,20 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func FollowingRequestHandler(w http.ResponseWriter, r *http.Request) {
+func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 		return
 	}
 
-	var follower tp.Follower
+	var followRequest tp.FollowRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&follower); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&followRequest); err != nil {
 		help.JsonError(w, "Unexpected error, try again later.", http.StatusInternalServerError, err)
 		return
 	}
 
-	selectFollower := `
+	selectFollowRequest := `
 SELECT
     EXISTS (
     	SELECT
@@ -37,10 +37,10 @@ SELECT
     	    AND status = "accepted"
 );`
 
-	var followerExist bool
-	fmt.Println("follow req: ", follower)
+	var exists bool
+	fmt.Println("follow req: ", followRequest)
 
-	if err := tp.DB.QueryRow(selectFollower, follower.FollowerID, follower.FollowedID).Scan(&followerExist); err != nil {
+	if err := tp.DB.QueryRow(selectFollowRequest, followRequest.FollowerID, followRequest.FollowedID).Scan(&exists); err != nil {
 		fmt.Println("exist err: ", err)
 
 		help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
@@ -50,13 +50,13 @@ SELECT
 
 	id := uuid.Must(uuid.NewV4())
 
-	if follower.Action == "follow" || follower.Action == "accepted" {
-		if followerExist {
+	if followRequest.Action == "follow" || followRequest.Action == "accepted" {
+		if exists {
 			help.JsonError(w, "You've already follwed this user", http.StatusBadRequest, nil)
 			return
 		}
 
-		if follower.Status == "accepted" {
+		if followRequest.Status == "accepted" {
 			fmt.Println("heeeeere: 0")
 			deleteFollowRequest := `
 							UPDATE
@@ -67,7 +67,7 @@ SELECT
 								follower_id = ? AND followed_id = ? AND status = "pending"
 							`
 
-			if _, err := tp.DB.Exec(deleteFollowRequest, follower.FollowerID, follower.FollowedID); err != nil {
+			if _, err := tp.DB.Exec(deleteFollowRequest, followRequest.FollowerID, followRequest.FollowedID); err != nil {
 				fmt.Println("err delete1: ", err)
 
 				help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
@@ -81,7 +81,7 @@ SELECT
 							VALUES
 								(?, ?, ?, ?)`
 
-			if _, err := tp.DB.Exec(insertFollower, id, follower.FollowerID, follower.FollowedID, follower.Status); err != nil {
+			if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, followRequest.Status); err != nil {
 				fmt.Println("err:1 ", err)
 
 				help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
@@ -89,7 +89,7 @@ SELECT
 			}
 		}
 
-	} else if follower.Action == "rejected" || follower.Action == "unfollow" {
+	} else if followRequest.Action == "rejected" || followRequest.Action == "unfollow" {
 		insertFollower := `
 							DELETE 
 							FROM
@@ -98,7 +98,7 @@ SELECT
 							follower_id = ? AND followed_id = ?
 							`
 
-		if _, err := tp.DB.Exec(insertFollower, follower.FollowerID, follower.FollowedID); err != nil {
+		if _, err := tp.DB.Exec(insertFollower, followRequest.FollowerID, followRequest.FollowedID); err != nil {
 			fmt.Println("err: ", err)
 
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)

@@ -10,16 +10,16 @@ import (
 )
 
 // GET /api/groups/info?id=<group-id>
-func GetGroupInfoHandler(w http.ResponseWriter, r *http.Request) {
+func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 
-	gid := r.URL.Query().Get("id")
+	gid := r.URL.Query().Get("group_id")
 	if gid == "" {
-		http.Error(w, "Missing id", http.StatusBadRequest)
+		help.JsonError(w, "Missing id", http.StatusBadRequest, nil)
 		return
 	}
 

@@ -16,7 +16,7 @@ type FollowingRequests struct {
 	TotalPages        int       `json:"totalPages"`
 }
 
-func FollowingRequestsHandler(w http.ResponseWriter, r *http.Request) {
+func GetFollowingRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
 		return

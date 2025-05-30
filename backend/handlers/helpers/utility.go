@@ -31,25 +31,6 @@ func LimitRead(part io.Reader, maxSize int) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// Save image and return uuid path to insert in DB.
-// Return only Image name
-func SaveImg(imageB []byte, genre string) (string, error) {
-	imguuid, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
-	imgSavingPath := "./storage/" + genre + imguuid.String() + ".jpg"
-
-	err = os.WriteFile(imgSavingPath, imageB, 0o644)
-	if err != nil {
-		return "", err
-	}
-
-	imgServingPath := imguuid.String() + ".jpg"
-
-	return imgServingPath, nil
-}
-
 // Check if an image is svg type.
 func IsSVG(imageB []byte) bool {
 	// Remove unnecessary leading characters
@@ -61,4 +42,25 @@ func IsSVG(imageB []byte) bool {
 	lower := bytes.ToLower(trimmed)
 	return bytes.HasPrefix(lower, []byte("<?xml")) ||
 		bytes.Contains(lower, []byte("<svg"))
+}
+
+// Save image and return uuid path to insert in DB.
+// Return only Image name
+func SaveImg(imageB []byte, genre string) (string, error) {
+	imguuid, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	imgSavingPath := "./storage/" + genre + imguuid.String() + ".jpg"
+
+	err = os.WriteFile(imgSavingPath, imageB, 0o644)
+	if err != nil {
+		fmt.Printf("Image saved to: \n")
+		fmt.Println("Error saving image:", err)
+		return "", err
+	}
+
+	imgServingPath := imguuid.String() + ".jpg"
+
+	return imgServingPath, nil
 }

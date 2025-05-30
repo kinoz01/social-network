@@ -17,20 +17,20 @@ export default async function GroupLayout({
     await checkMembership(id);
 
     return (
-            <GroupSyncProvider>
-                <div className={style.groupLayout}>
-                    <div className={style.menuLayout}>
-                        <GroupMenu />
-                        <RequestsMenu />
-                    </div>
-                    <div className={style.contentLayout}>
-                        {children}
-                    </div>
-                    <div className={style.menuLayout}>
-                        <MembersMenu />
-                        <InviteMenu />
-                    </div>
+        <GroupSyncProvider>
+            <div className={style.groupLayout}>
+                <div className={style.menuLayout}>
+                    <GroupMenu />
+                    <RequestsMenu />
                 </div>
-            </GroupSyncProvider>
+                <div className={style.contentLayout}>
+                    {children}
+                </div>
+                <div className={style.menuLayout}>
+                    <MembersMenu />
+                    <InviteMenu />
+                </div>
+            </div>
+        </GroupSyncProvider>
     );
 }
