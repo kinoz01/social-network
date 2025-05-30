@@ -134,7 +134,7 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Save optional profile pic
-	profilePicPath := "avatar.webp"
+	profilePicPath := "profile.png"
 	if len(profilePic) > 0 {
 		profilePicPath, err = help.SaveImg(profilePic, "avatars/")
 		if err != nil {

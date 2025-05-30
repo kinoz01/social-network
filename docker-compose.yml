@@ -1,3 +1,6 @@
+networks:
+  i_zahid:
+    driver: bridge
 services:
   backend:
     build:
@@ -16,3 +19,5 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - i_zahid

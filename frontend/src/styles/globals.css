@@ -14,7 +14,8 @@ body {
 }
 
 /******************* Welcome Popup *******************/
-.welcome-popup {
+.welcome-popup,
+.popup {
     position: fixed;
     top: 1%;
     left: 50%;
@@ -33,6 +34,14 @@ body {
     transition: opacity 1.5s ease;
     opacity: 1;
     /* Start fully visible */
+}
+
+.popup.succ {
+    background-color: #8dc572;
+}
+
+.popup.fail {
+    background-color: #be6464;
 }
 
 /* Close Button */
@@ -55,7 +64,8 @@ body {
         font-weight: bold;
     }
 
-    .welcome-popup {
+    .welcome-popup,
+    .popup {
         padding: 1.5rem 2rem;
         font-size: 1.2rem;
         font-weight: normal;
