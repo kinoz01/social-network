@@ -1,5 +1,5 @@
 # Run everything
-run: check-npm check-nextjs run-backend run-frontend
+run:  check-npm check-nextjs killPorts run-backend run-frontend
 	@echo "Frontend signal killed"
 
 # Check if npm is installed
@@ -26,13 +26,15 @@ kill-8080:
 kill-3000:
 	@fuser -k 3000/tcp 2>/dev/null || lsof -ti:3000 | xargs -r kill -9
 
+killPorts: kill-3000 kill-8080
+
 # Run backend on background
-run-backend: kill-8080
+run-backend: 
 	@echo "Starting Go backend..."
 	@cd backend && go run main.go &
 
 # Run backend with Fresh
-fresh-backend: kill-8080
+fresh-backend:
 	@echo "Checking if Fresh is installed..."
 	@test -f "$$(go env GOPATH)/bin/fresh" || { \
 		echo "Fresh not found, installing..."; \
@@ -47,7 +49,7 @@ go:
 	@cd backend && go run main.go
 
 # Run frontend
-run-frontend: kill-3000
+run-frontend:
 	@echo "Starting Next.js frontend..."
 	cd frontend && npm run dev
 
@@ -125,7 +127,7 @@ followers:
 	@echo "INSERT INTO follow_requests (id, follower_id, followed_id, status, created_at) VALUES" > follow_requests.sql
 	@for i in $$(seq 1 7001); do \
 		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
-		echo "('foll-$$i','uuid-$$i','734ea577-cc80-4974-ba12-adc0dbe2e7b3','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
+		echo "('foll-$$i','uuid-$$i','d8506a0f-e788-4b71-8aaa-952b87e91cb5','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
 	done
 	@echo "✅ follow_requests.sql generated with x accepted follow requests."
 

@@ -1,81 +1,174 @@
-import { fetchUsers } from "@/apiService/users/apiUsers";
-import styles from "../posts.module.css"
+"use client";
+
+import { throttle } from "@/components/utils";
+import styles from "../posts.module.css";
 import { BackIcon } from "@/components/icons";
-import React, { useState, useEffect } from "react";
-import { User } from "@/components/types";
+import Loading from "@/components/Loading";
 import Image from "next/image";
+import React, {
+    useState, useEffect, useRef, useCallback
+} from "react";
+import { User } from "@/components/types";
 import { API_URL } from "@/lib/api_url";
 
-type UsersListParams = {
+const SLICE = 50;
+
+/* ------------ props ------------ */
+type Props = {
     onBack: () => void;
-    onUserCHange: (users: string[]) => void;
-    userID: string
-}
-interface FollowerInfo {
-    id: string;
-    username: string;
-}
+    onUserCHange: (ids: string[]) => void;
+    userID: string;
+};
+const fullName = (u: User) =>
+    u.first_name && u.last_name
+        ? `${u.first_name} ${u.last_name}`
+        : u.username ?? u.email ?? "—";
 
-const ShowUsers = (props: UsersListParams) => {
-    const [selectedUser, setSelected] = useState<FollowerInfo[]>([])
-    const [List_Users, setLIstUsers] = useState<User[]>([])
+/* ------------ component ------------ */
+export default function ShowUsers({ onBack, onUserCHange }: Props) {
+    /* selection ------------------------------------------------ */
+    const [picked, setPicked] = useState<Map<string, string>>(new Map());
 
+    /* push IDs to parent **after** render, not during */
+    useEffect(() => {
+        onUserCHange([...picked.keys()]);
+    }, [picked, onUserCHange]);
 
-    const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const valueID = e.target.value
-        const isChecked = e.target.checked
-        const valueName = e.target.dataset.username || "undefined"
-        const listUsers = isChecked ? ([...selectedUser, { id: valueID, username: valueName }]) :
-            (selectedUser.filter((elem) => elem.id != valueID))
-        setSelected(listUsers)
-        props.onUserCHange(listUsers.map((u) => u.id))
-    }
+    const toggle = (u: User) =>
+        setPicked(prev => {
+            const m = new Map(prev);
+            m.has(u.id) ? m.delete(u.id) : m.set(u.id, fullName(u));
+            return m;
+        });
+    const remove = (id: string) =>
+        setPicked(prev => {
+            const m = new Map(prev);
+            m.delete(id);
+            return m;
+        });
+
+    /* search / paging ----------------------------------------- */
+    const [query, setQuery] = useState("");
+    const [offset, setOff] = useState(0);
+    const [hasMore, setMore] = useState(true);
+    const [loading, setLoad] = useState(false);
+    const [data, setData] = useState<User[]>([]);
+    const listRef = useRef<HTMLUListElement>(null);
+
+    const fetchSlice = async (q: string, off: number) => {
+        const qs = `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
+        const r = await fetch(`${API_URL}/api/followers?${qs}`, {
+            credentials: "include",
+        });
+        if (r.status === 204) return [];
+        if (!r.ok) throw new Error();
+        return (await r.json()) as User[];
+    };
+
+    const runSearch = useCallback(async (q: string) => {
+        setQuery(q); setOff(0); setMore(true); setData([]);
+        if (!q.trim()) return;
+        setLoad(true);
+        try {
+            const slice = await fetchSlice(q, 0);
+            setData(slice);
+            setOff(slice.length);
+            setMore(slice.length === SLICE);
+        } finally { setLoad(false); }
+    }, []);
+
+    const loadMore = useCallback(async () => {
+        if (!hasMore || loading || !query.trim()) return;
+        setLoad(true);
+        try {
+            const slice = await fetchSlice(query, offset);
+            setData(prev => [...prev, ...slice]);
+            setOff(o => o + slice.length);
+            setMore(slice.length === SLICE);
+        } finally { setLoad(false); }
+    }, [hasMore, loading, query, offset]);
 
     useEffect(() => {
-        fetchUsers()
-            .then(data => setLIstUsers(data.Users))
-    }, [])
+        const el = listRef.current;
+        if (!el) return;
+        const h = throttle(() => {
+            const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 200;
+            if (nearBottom) loadMore();
+        }, 250);
+        el.addEventListener("scroll", h);
+        return () => el.removeEventListener("scroll", h);
+    }, [loadMore]);
 
-
+    /* ui ------------------------------------------------------- */
     return (
         <div className={styles.postAud}>
             <div className={styles.header}>
-                <button className={styles.backBtn} onClick={(e) => {
-                    e.preventDefault()
-                    props.onBack()
-                }}>
+                <button type="button" className={styles.backBtn} onClick={onBack}>
                     <BackIcon />
                 </button>
                 <span className={styles.title}>User List</span>
             </div>
+
             <div className={styles.listUsers}>
                 <label>Who can view your post:</label>
-                {selectedUser.map((elem, i) => (
-                    <div key={i} className={styles.chip}>
-                        <p className={styles.chipLabel}>{elem.username}</p>
+                {picked.size === 0 && <p className={styles.placeholder}>No one selected</p>}
+                {[...picked].map(([id, name]) => (
+                    <div key={id} className={styles.chip}>
+                        <p className={styles.chipLabel}>{name}</p>
+                        <button
+                            type="button"
+                            className={styles.removeBtn}
+                            onClick={() => remove(id)}
+                        >
+                            ×
+                        </button>
                     </div>
                 ))}
             </div>
-            <div className={styles.content}>
-                {List_Users && List_Users.map((elem) => (
-                    <div key={elem.id} className={styles.checkboxElem}>
-                        <input type="checkbox" name="vipUsers" id={elem.id} value={elem.id} data-username={elem.username || elem.email} onChange={handleSelect}
-                            checked={selectedUser.some((u) => u.id === elem.id)} />
-                        <Image
-                            className={styles.userIcon}
-                            src={`${API_URL}/api/storage/avatars/${elem.profile_pic}`}
-                            alt={elem.first_name}
-                            width={30}
-                            height={30}
-                        />
 
-                        <label htmlFor={elem.id}>{elem.username}</label>
-                        <span>{elem.email}</span>
-                    </div>
-                ))}
-            </div>
+            <input
+                className={styles.search}
+                value={query}
+                placeholder="Start typing to search…"
+                onChange={e => runSearch(e.target.value)}
+            />
+
+            {loading && offset === 0 && <Loading />}
+            {!loading && query && data.length === 0 && (
+                <p className={styles.status}>No match</p>
+            )}
+
+            <ul ref={listRef} className={styles.results}>
+                {data.map(u => {
+                    const active = picked.has(u.id);
+                    return (
+                        <li
+                            key={u.id}
+                            className={`${styles.item} ${active ? styles.checked : ""}`}
+                            onClick={() => toggle(u)}
+                        >
+                            <Image
+                                className={styles.userIcon}
+                                src={
+                                    u.profile_pic
+                                        ? `${API_URL}/api/storage/avatars/${u.profile_pic}`
+                                        : "/img/default-avatar.png"
+                                }
+                                alt=""
+                                width={30}
+                                height={30}
+                            />
+                            <span className={styles.name}>{fullName(u)}</span>
+                            <span className={styles.tick}>{active ? "✓" : "+"}</span>
+                        </li>
+                    );
+                })}
+            </ul>
+
+            {loading && offset > 0 && <Loading />}
+            {!hasMore && !loading && offset > SLICE && (
+                <p className={styles.loadingText}>— no more results —</p>
+            )}
         </div>
-    )
+    );
 }
-
-export { ShowUsers }

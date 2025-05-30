@@ -3,9 +3,9 @@
 import React from "react";
 import styles from "./posts.module.css";
 import { MainDiv } from "./creation/mainDiv";
-import { ShowUsers } from "./creation/users";
+import ShowUsers from "./creation/users";
 import { PostAudience } from "./creation/audience";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HandleCreation } from "@/apiService/posts/savePost";
 import { User, Post } from "../types";
 
@@ -26,6 +26,7 @@ export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
     // throw new Error("user not exist")
     return
   }
+  
   const showUsersList = () => {
     setShow(showAudiance)
     setUsers(!showUsers)
@@ -33,7 +34,6 @@ export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
 
   const showCHoice = () => {
     setShow(true)
-    // setUsers(true)
   }
 
   const handleBack = () => {
@@ -56,15 +56,15 @@ export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
             {/* {!showAudiance ? */}
             <input type="hidden" name="privacy" value={privacy} />
 
-            <div style={{ display: showAudiance || showUsers ? "none" : "block", width: "100%", boxSizing: "border-box", padding: "20px", overflow: "auto" }}>
+            <div style={{ display: showAudiance || showUsers ? "none" : "block", width: "100%", boxSizing: "border-box", padding: "20px", overflow: "auto", scrollbarWidth: "none" }}>
               <MainDiv onClose={onClose} privacy={privacy} showCHoice={showCHoice} userName={userData.first_name} />
             </div>
 
-            <div style={{ display: showAudiance && !showUsers ? "block" : "none", overflow: "auto" }}>
+            <div style={{ display: showAudiance && !showUsers ? "block" : "none", overflow: "auto", scrollbarWidth: "none" }}>
               <PostAudience onBack={handleBack} selectedPrivacy={privacy} onPrivacyChange={handleOnChange} />
             </div>
 
-            <div style={{ display: showUsers ? "block" : "none", overflow: "auto" }}>
+            <div style={{ display: showUsers ? "block" : "none", overflow: "auto", scrollbarWidth: "none" }}>
               <ShowUsers onBack={handleBack} onUserCHange={setSelectedUsers} userID={userData.id} />
             </div>
 
