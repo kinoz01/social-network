@@ -27,7 +27,6 @@ type UserContextValue = {
     clear: () => void;
 };
 
-
 // Context creation
 // This context will hold the user information and provide methods to refresh or clear it
 const UserContext = createContext<UserContextValue | undefined>(undefined);
@@ -56,7 +55,7 @@ export function UserProvider({ children }: {children: React.ReactNode }) {
 
     const refresh = async () => {
         const fetchedUser = await fetchUser();
-        setUser(fetchedUser); // trigger a re-render of any consuming component.
+        setUser(fetchedUser);
     };
 
     const clear = () => {
@@ -67,7 +66,6 @@ export function UserProvider({ children }: {children: React.ReactNode }) {
         refresh();
     }, []);
 
-    // make { user, refresh, clear } available to all children of the Provider.
     return (
         <UserContext.Provider value={{ user, refresh, clear }}>
             {children}
@@ -76,7 +74,7 @@ export function UserProvider({ children }: {children: React.ReactNode }) {
 }
 
 // Consumer hook
-// This hook can be used in any client component to access the user context
+// This hook can be used in any component to access the user context
 export function useUser(): UserContextValue {
     const ctx = useContext(UserContext);
     if (!ctx) {

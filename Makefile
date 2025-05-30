@@ -43,7 +43,7 @@ run-frontend:
 	cd frontend && npm run dev
 
 #------------------------- Docker -------------------------#
-buildDocker: kill-ports
+buildDocker:
 	-docker-compose down --volumes --remove-orphans
 	docker-compose up --build
 
@@ -60,7 +60,6 @@ deepClean:
 	-docker rm $$(docker ps -aq)
 	-docker rmi $$(docker images -q)
 	-docker system prune -a -f --volumes
-
 #------------------------- Docker -------------------------#
 
 #------------------------ Migration -----------------------#
@@ -85,3 +84,22 @@ migrate-sqlite:
 		migrate create -seq -ext sql -dir "./backend/database/migrations/sqlite" "create_$${t}_table"; \
 	done; \
 	echo "Created $$(echo $$tables | wc -w) table migrations"
+
+users:
+	@echo "Generating users_insert.sql with static IDs (uuid-1 to uuid-x)..."
+	@echo "INSERT INTO users (id, email, username, password, first_name, last_name, birthday, about_me, profile_pic, account_type, created_at) VALUES" > users_insert.sql
+	@for i in $$(seq 1 7001); do \
+		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
+		echo "('uuid-$$i','aaa$$i@example.com','aaa$$i','\$$2b\$$10\$$z4Pf6EjZPcwJuGdH83zEIOXYOB6jzyOPlFqzAf9MiTzVJ7GyaH0Ca','aaaa','aaaa','1995-01-01','','avatar.webp','public',CURRENT_TIMESTAMP)$$end" >> users_insert.sql; \
+	done
+	@echo "✅ users_insert.sql generated with x static UUIDs."
+
+
+followers:
+	@echo "Generating follow_requests.sql with uuid-1 to uuid-x as followers..."
+	@echo "INSERT INTO follow_requests (id, follower_id, followed_id, status, created_at) VALUES" > follow_requests.sql
+	@for i in $$(seq 1 7001); do \
+		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
+		echo "('foll-$$i','uuid-$$i','a8cce8ce-4e99-4cdd-8eee-db6ac0cdada1','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
+	done
+	@echo "✅ follow_requests.sql generated with x accepted follow requests."

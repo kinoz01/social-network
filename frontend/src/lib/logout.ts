@@ -1,11 +1,12 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 
-// This function handles the logout process
 export function useLogout() {
     const router = useRouter();
     const { clear } = useUser();
-
+    
     const handleLogout = async () => {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
@@ -17,7 +18,6 @@ export function useLogout() {
                 console.error("Logout failed");
                 return;
             }
-            // Clear user context and redirect to login
             clear();
             router.push("/login");
         } catch (error) {

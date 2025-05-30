@@ -34,6 +34,48 @@ func Routes() http.Handler {
 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
+	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))
+
+	// posts
+	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
+	mux.Handle("/api/allPosts/", rl.RateLimitMW(http.HandlerFunc(posts.AllPosts)))
+
+	// comments / groups comments
+	mux.HandleFunc("/api/get-comments", cmnts.GetComments)
+	mux.HandleFunc("/api/create-comment", cmnts.CreateComment)
+
+	// reactions
+	mux.Handle("/api/react", rl.RateLimitMW(http.HandlerFunc(posts.HandleLike)))
+
+	// Groups-dashboard:
+	mux.HandleFunc("/api/groups/owned", grpsD.GetOwnedGroups)
+	mux.HandleFunc("/api/groups/joined", grpsD.GetJoinedGroups)
+	mux.HandleFunc("/api/groups/available", grpsD.AvailableGroups)
+	mux.HandleFunc("/api/groups/invitations", grpsD.Invitations)
+	mux.HandleFunc("/api/groups/create", grps.CreateGroup)
+	mux.HandleFunc("/api/groups/join-request", grpsRequest.JoinRequest)
+	mux.HandleFunc("/api/groups/accept-invitation", grpsInvite.AcceptInvitation)
+	mux.HandleFunc("/api/groups/refuse-invitation", grpsInvite.RefuseInvitation)
+	// Groups:
+	mux.HandleFunc("/api/groups/is-member", grps.IsGroupMember)
+	mux.HandleFunc("/api/groups/groupInfo", grps.GetGroupInfo)
+	mux.HandleFunc("/api/groups/invite", grpsInvite.InviteFollowers)
+	mux.HandleFunc("/api/groups/requests", grpsRequest.ListJoinRequests)
+	mux.HandleFunc("/api/groups/accept-request", grpsRequest.AcceptJoinRequest)
+	mux.HandleFunc("/api/groups/refuse-request", grpsRequest.RefuseJoinRequest)
+	// Groups posts:
+	mux.HandleFunc("/api/groups/posts", grpsPost.GroupPosts)
+	mux.HandleFunc("/api/groups/create-post", grpsPost.CreateGroupPost)
+	// Groups ws/chat:
+	mux.HandleFunc("/api/groups/chat", grps.ChatPage)
+	mux.HandleFunc("/api/ws", grps.GlobalWS)	
+	// Group Events:
+	mux.HandleFunc("/api/groups/create-event", grpevent.CreateEvent)
+	mux.HandleFunc("/api/groups/get-events", grpevent.GetEvents)
+	mux.HandleFunc("/api/groups/event-response", grpevent.EventResponse)
+
+	// Followers search:
+	mux.HandleFunc("/api/followers", flw.GetFollowers)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

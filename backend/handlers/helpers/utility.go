@@ -42,6 +42,8 @@ func SaveImg(imageB []byte, genre string) (string, error) {
 
 	err = os.WriteFile(imgSavingPath, imageB, 0o644)
 	if err != nil {
+		fmt.Printf("Image saved to: \n")
+		fmt.Println("Error saving image:", err)
 		return "", err
 	}
 

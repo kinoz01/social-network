@@ -1,4 +1,4 @@
-import Events from "@/components/events/Events";
+import Events from "@/components/groups/Events";
 
 
 export default async function GroupPage() {
