@@ -4,7 +4,7 @@ This is "hopefully" a complete social web application built using **Golang** and
 - Run locally:
 
 ```bash
-make
+make run
 ```
 
 - Run with Docker:

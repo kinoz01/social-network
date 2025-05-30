@@ -10,7 +10,6 @@ import (
 	"time"
 
 	// Import the SQLite3 driver
-
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/mattn/go-sqlite3"
 
@@ -36,7 +35,7 @@ func InitialiseDB() {
 	db.DB.SetMaxOpenConns(10)                 // Simultaneously opened connections
 	db.DB.SetMaxIdleConns(5)                  // Reuse some opened connections
 	db.DB.SetConnMaxLifetime(5 * time.Minute) // Remove stale connections
-	
+
 	runMigrations("./database/socNet.db")
 }
 
@@ -75,4 +74,27 @@ func Shutdown() {
 		log.Fatal("Error closing DB:", err)
 	}
 	os.Exit(0)
+}
+
+// Reallow users to send group invitations after 15 days.
+// Reallow users to send group requests after 15 days.
+func ResetDBRoutines() {
+	for {
+		time.Sleep(48 * time.Hour) // Run every 2 days
+
+		log.Println("Running DB rejects cleanup...")
+		_, err1 := db.DB.Exec(`
+			DELETE FROM group_invitations
+			WHERE status = 'rejected' AND invited_at <= DATETIME('now', '-15 days')
+		`)
+		_, err2 := db.DB.Exec(`
+			DELETE FROM group_requests
+			WHERE status = 'rejected' AND created_at <= DATETIME('now', '-15 days')
+		`)
+		if err1 != nil || err2 != nil {
+			log.Println("Cleanup errors:", err1, err2)
+		} else {
+			log.Println("DB rejects cleanup completed.")
+		}
+	}
 }

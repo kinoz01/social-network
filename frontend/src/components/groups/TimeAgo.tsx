@@ -1,25 +1,8 @@
 "use client";
-
 import { useState, useEffect } from "react";
 
-export default function TimeAgo({ dateStr }: { dateStr: string }) {
-    const [label, setLabel] = useState(() => formatTimeAgo(dateStr));
-
-    useEffect(() => {
-        const update = () => setLabel(formatTimeAgo(dateStr));
-        const interval = setInterval(update, 60000); // update every minute
-        update(); // immediate initial update
-
-        return () => clearInterval(interval); // cleanup on unmount
-    }, [dateStr]);
-
-    return <time dateTime={dateStr}>• {label}</time>;
-}
-
-// Input date in local time (but ends with Z(UTC))
-export function formatTimeAgo(dateStr: string) {
-    if (!dateStr) return 'just now';
-    
+// Input date in local time (but ends with Z)
+export function formatTimeAgo(dateStr: string) {    
     const dStr = dateStr.endsWith('Z') ? dateStr.slice(0, -1) : dateStr;
     const date = new Date(dStr); // if UTC converts to local time, if local time keeps it
 
@@ -45,4 +28,18 @@ export function formatTimeAgo(dateStr: string) {
     }
 
     return 'just now';
+}
+
+export default function TimeAgo({ dateStr }: { dateStr: string }) {
+    const [label, setLabel] = useState(() => formatTimeAgo(dateStr));
+
+    useEffect(() => {
+        const update = () => setLabel(formatTimeAgo(dateStr));
+        const interval = setInterval(update, 60000); // update every minute
+        update(); // immediate initial update
+
+        return () => clearInterval(interval); // cleanup on unmount
+    }, [dateStr]);
+
+    return <time dateTime={dateStr}>• {label}</time>;
 }

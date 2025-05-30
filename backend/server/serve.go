@@ -28,5 +28,4 @@ func Serve(handler http.Handler) {
 	if err := httpServer.Serve(listener); err != nil && err != http.ErrServerClosed {
 		log.Printf("Server error: %v", err)
 	}
-
 }

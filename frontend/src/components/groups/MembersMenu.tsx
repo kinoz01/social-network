@@ -8,15 +8,13 @@ import styles from "./style/membersMenu.module.css";
 import { useWS } from "@/context/wsClient";
 import { useGroupSync } from "@/context/GroupSyncContext";
 import Loading from "@/components/Loading";
-import { API_URL } from "@/lib/api_url";
-
 
 export default function MembersMenu() {
     const { id: groupId } = useParams() as { id: string };
     const { groupMembers, getGroupMembers, online } = useWS();
     const { version } = useGroupSync();
 
-    const members = groupMembers.get(groupId);    
+    const members = groupMembers.get(groupId);
 
     /* refresh snapshot when groupId or version changes */
     useEffect(() => {
@@ -53,7 +51,7 @@ export default function MembersMenu() {
                             <Image
                                 src={
                                     m.profile_pic
-                                        ? `${API_URL}/api/storage/avatars/${m.profile_pic}`
+                                        ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${m.profile_pic}`
                                         : "/img/default-avatar.png"
                                 }
                                 alt=""

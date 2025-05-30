@@ -8,7 +8,6 @@ export const metadata: Metadata = {
     description: "Social platform",
 };
 
-
 export default function RootLayout({
     children,
 }: {

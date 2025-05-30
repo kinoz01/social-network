@@ -14,7 +14,7 @@ import (
 
 // Handles the acceptance of an invitation to join a group.
 // If the invitation is valid, it adds the user to the group and deletes the invitation.
-func AcceptInvitation(w http.ResponseWriter, r *http.Request) {
+func AcceptInvitationHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

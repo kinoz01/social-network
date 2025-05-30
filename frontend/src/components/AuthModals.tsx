@@ -4,7 +4,6 @@ import "@/styles/auth.css";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { API_URL } from "@/lib/api_url";
 
 interface AuthModalProps {
     authSuccess: () => void; // called after successful auth
@@ -64,7 +63,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
         if (formData.profilePic) signupData.append("profile_pic", formData.profilePic);
 
         try {
-            const res = await fetch(`${API_URL}/api/signup`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
                 method: "POST",
                 body: signupData,
                 credentials: "include",
@@ -83,7 +82,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${API_URL}/api/login`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -242,7 +241,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                                     </button>
                                 ))}
                             </div>
-                            {/* //emani */}
+
                             <div className="file-upload-container">
                                 <label htmlFor="signupImage" className="file-upload">
                                     <span className="upload-icon">

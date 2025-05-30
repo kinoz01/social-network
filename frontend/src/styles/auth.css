@@ -11,6 +11,7 @@
     align-items: center;
     background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
         url('https://i.postimg.cc/vHrFddXr/bgbg.png');
+    backdrop-filter: blur(30px);
     z-index: 1000;
 }
 
@@ -221,6 +222,7 @@
 .upload-text {
     font-weight: 500;
     color: var(--title-color) !important;
+    font-size: 1rem;
 }
 
 .drag-over {

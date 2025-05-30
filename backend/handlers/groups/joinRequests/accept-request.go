@@ -12,7 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func AcceptJoinRequest(w http.ResponseWriter, r *http.Request) {
+func AcceptJoinRequestHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", 401, err)

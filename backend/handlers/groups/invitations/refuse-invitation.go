@@ -10,7 +10,7 @@ import (
 )
 
 // Handles the refusal of a group invitation.
-func RefuseInvitation(w http.ResponseWriter, r *http.Request) {
+func RefuseInvitationHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
@@ -25,7 +25,8 @@ func RefuseInvitation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = tp.DB.Exec(`
-		DELETE FROM group_invitations
+		UPDATE group_invitations
+		   SET status = 'rejected'
 		 WHERE id = ? AND invitee_id = ?`,
 		body.InvitationID, user.ID)
 	if err != nil {

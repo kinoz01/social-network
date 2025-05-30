@@ -1,0 +1,111 @@
+.notificationDashboard {
+  width: 100%;
+  padding: 2rem;
+  border-radius: 15px;
+  background-color: var(--color2);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.notifications {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+
+  /* scrollbar-width: none; */
+}
+
+.noNotifications {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.notification {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1rem;
+  border-radius: 15px;
+  margin-bottom: 1rem;
+  background-color: var(--color2);
+}
+
+.options {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: 15px;
+}
+
+.notification.notRead {
+  .info {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .info .profilePic {
+    border: 1px solid var(--color1);
+    border-radius: 50%;
+  }
+
+  button {
+    padding: 1rem;
+    background-color: var(--color1);
+    color: var(--color2);
+    width: clamp(30px, 40px, 50px);
+    border: none;
+    width: auto;
+    border-radius: 15px;
+    cursor: pointer;
+  }
+}
+
+.read {
+  background-color: rgba(209, 209, 209, 0.137);
+  color: grey;
+
+  .info {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .info .profilePic {
+    border: 1px solid grey;
+    border-radius: 50%;
+  }
+
+  .link {
+    text-decoration: underline;
+  }
+
+  button {
+    padding: 1rem;
+    background-color: var(--color5);
+    width: clamp(30px, 40px, 50px);
+    border: none;
+    width: auto;
+    border-radius: 15px;
+  }
+}
+
+@keyframes rollout {
+  0% {
+    transform: translateY(-100px);
+  }
+  100% {
+    transform: none;
+  }
+}

@@ -3,11 +3,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import styles from "./style/chat.module.css";
 import { useWS } from "@/context/wsClient";
+import { throttle } from "./GroupFeed";
 import Loading from "../Loading";
 import Image from "next/image";
-import { API_URL } from "@/lib/api_url";
-import { throttle } from "../utils";
-
 
 interface ChatMsg {
     id: string; sender_id: string; first_name: string; last_name: string;
@@ -44,7 +42,7 @@ export default function Chat() {
     const fetchPage = async (o: number) => {
         const qs = `group_id=${groupId}&limit=${PAGE}&offset=${o}`;
         const r = await fetch(
-            `${API_URL}/api/groups/chat?${qs}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/chat?${qs}`,
             { credentials: "include", cache: "no-store" });
         if (!r.ok) return [];
         return await r.json() as ChatMsg[];
@@ -171,7 +169,7 @@ export default function Chat() {
                             {div}
                             <div className={styles.msg}>
                                 <img src={m.profile_pic
-                                    ? `${API_URL}/api/storage/avatars/${m.profile_pic}`
+                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${m.profile_pic}`
                                     : "/img/default-avatar.png"} className={styles.avatar} />
                                 <div className={styles.bubble}>
                                     <span className={styles.name}>{m.first_name} {m.last_name}

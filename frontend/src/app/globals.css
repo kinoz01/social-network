@@ -1,11 +1,10 @@
 :root {
-  --color1: #161616;
-  --color2: #fcfaf6;
+  --color1: #040404;
+  --color2: #ffffff;
   --color3: #303030;
   --color4: #ddff8e;
   --color5: #eaffb9;
   --color6: #c4c4c4;
-  --color7: red;
 }
 
 html,
@@ -40,9 +39,6 @@ main {
   flex-wrap: nowrap;
   justify-content: space-between;
   height: 100vh;
-  overflow-x: scroll;
-  scrollbar-width: none;
-  overflow-y: hidden;
 }
 
 body {
@@ -54,11 +50,10 @@ body {
 }
 
 .mainContent {
-  background-color: var(--color2);
+  background-color: whitesmoke;
   width: 100%;
   height: 100%;
   padding: 1rem;
-  border-radius: 25px 0 0 25px;
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -67,9 +62,8 @@ body {
 }
 
 /* Sidebar */
-
 .sideBar {
-  width: 1%;
+  width: 10%;
   height: 100%;
   padding: 3rem;
   display: flex;
@@ -89,6 +83,12 @@ body {
 
 .sideBar:hover {
   width: 18rem;
+}
+
+.icon {
+  min-width: 2rem;
+  max-width: 3rem;
+  width: 2.5rem;
 }
 
 .logo {
@@ -133,6 +133,7 @@ body {
 }
 
 .navSection {
+  position: relative;
   width: 3rem;
   display: flex;
   flex-wrap: nowrap;
@@ -162,6 +163,23 @@ body {
 
 .navSection:hover .icon {
   fill: var(--color1);
+}
+
+.notificationCount {
+  color: var(--color1);
+  background-color: var(--color4);
+  position: absolute;
+  right: -10;
+  bottom: -10;
+  width: 1rem;
+  height: 1rem;
+  font-size: clamp(0.7rem, 0.8rem, 1.1rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  padding: 1rem;
+  animation: expand 0.2s ease-in-out;
 }
 
 /* Create Button */
@@ -263,7 +281,44 @@ body {
   transform: scale(1.1);
 }
 
+.no-data {
+  height: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+.no-data-msg {
+  width: 90%;
+  text-align: center;
+}
+
+.no-data .img {
+  width: 50%;
+  height: 80%;
+}
+
+/* Animations */
+
+@keyframes expand {
+  0% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+/* Responsivness */
+
 @media (max-width: 1440px) {
+  .mainContent.group {
+    overflow-y: auto;
+    height: 100%;
+  }
+
   .buttons button {
     width: 100%;
   }
@@ -271,11 +326,6 @@ body {
   .sideBar:hover {
     width: 16rem;
   }
-
-  /* .post {
-    font-size: clamp(1rem, 1.2vw, 1.2rem);
-    padding: 1.5rem;
-  } */
 }
 
 @media (max-width: 900px) {
@@ -283,22 +333,9 @@ body {
     width: 100%;
   }
 
-  /* .rightMenu {
-    width: 30%;
-    right: 20px;
-  }
-
-  .leftMenu .home {
-    display: none;
-  } */
-
-  /* .feed {
-    width: 70%;
-  } */
-
   .mainContent.chat,
   .mainContent.group {
-    width: 90%;
+    width: 89%;
   }
 
   .buttons {
@@ -309,50 +346,10 @@ body {
   }
 }
 
-@media (max-width: 700px) {
-  /* .rightMenu {
-    display: none;
-  } */
-
-  /* .feed {
-    width: 100%;
-  } */
-}
-
-@media (max-width: 500px) {
-  /* .sideBar {
-    border-radius: 0 25px 25px 0;
-    padding: 2rem;
-    position: fixed;
-    background-color: var(--color1);
-    z-index: 1;
-  } */
-
-  /* .post {
-    font-size: small;
+@media (max-width: 900px) {
+  .mainContent.chat,
+  .mainContent.group {
+    display: flex;
+    flex-direction: column;
   }
-
-  .postImage {
-    height: 10rem;
-  } */
-
-  /* .feed {
-    width: 100%;
-  } */
-  /* .main {
-    height: auto;
-  } */
-
-  /* .mainContent {
-    border-radius: 0;
-    height: auto;
-    width: 90%;
-    margin-left: 3rem;
-    padding: 0.5rem;
-  } */
-
-  /* .feed {
-    overflow: hidden;
-    height: 100%;
-  } */
 }

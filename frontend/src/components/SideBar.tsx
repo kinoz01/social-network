@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  AddIcon,
   ChatsIcon,
   GroupsIcon,
   HomeIcon,
@@ -12,10 +11,44 @@ import {
 } from "./icons";
 import Link from "next/link";
 import { useLogout } from "@/lib/logout";
+import {
+  getNotifications,
+  getUnreadNotificationsCount,
+} from "@/lib/notifications";
+import NavButton from "./NavButton";
+import { useUser } from "@/context/UserContext";
+
 export default function SideBar() {
+  const { user: loggedUser } = useUser();
+
+  // side bar hovering state management
   const [hover, setHover] = useState(false);
 
+  // logout state management
   const { handleLogout } = useLogout();
+
+  // loading state
+  const [isDataLoading, setIsDataLoading] = useState(false);
+
+  // get unread notificatios count
+  const [unreadNotificationsCount, setUnreadNotificationsCount] =
+    useState<number>(0);
+
+  useEffect(() => {
+    async function fetchNotificationsCount() {
+      if (!loggedUser) return;
+
+      setIsDataLoading(true);
+
+      const notifications = await getUnreadNotificationsCount("false");
+
+      const unreadCount = notifications || 0;
+      setUnreadNotificationsCount(unreadCount);
+      setIsDataLoading(false);
+    }
+
+    fetchNotificationsCount();
+  }, [loggedUser]);
 
   return (
     <div
@@ -31,33 +64,42 @@ export default function SideBar() {
         <div className="logo">SN</div>
       </Link>
       <div className="navIcons">
-        <Link href="/home" className="navSection">
-          <HomeIcon />
-          {hover ? <span>Home</span> : null}
-        </Link>
-        <Link href="/profile/1" className="navSection">
-          <UserIcon />
-          {hover ? <span>Profile</span> : null}
-        </Link>
-        <Link href="/groups" className="navSection">
-          <GroupsIcon />
-          {hover ? <span>Groups</span> : null}
-        </Link>
-        <Link href="/notifications/1" className="navSection">
-          <NotificationIcon />
-          {hover ? <span>Notifications</span> : null}
-        </Link>
-        <Link href="/chat/1" className="navSection">
-          <ChatsIcon />
-          {hover ? <span>Chats</span> : null}
-        </Link>
+        <NavButton state={hover} title="Home" link="home" icon={<HomeIcon />} />
 
+        <NavButton
+          state={hover}
+          title="Profile"
+          link={`profile/${loggedUser?.id}`}
+          icon={<UserIcon />}
+        />
+
+        <NavButton
+          state={hover}
+          title="Groups"
+          link="groups"
+          icon={<GroupsIcon />}
+        />
+
+        <NavButton
+          state={hover}
+          title="Notifications"
+          link={`notifications/${loggedUser?.id}`}
+          icon={<NotificationIcon />}
+          count={unreadNotificationsCount}
+          loading={isDataLoading}
+        />
+
+        <NavButton
+          state={hover}
+          title="Chats"
+          link={`chat/${loggedUser?.id}`}
+          icon={<ChatsIcon />}
+        />
       </div>
+
       <button className="navSection" onClick={handleLogout}>
         <LogoutIcon />
-        {hover ? (
-          <span>Logout</span>
-        ) : null}
+        {hover ? <span>Logout</span> : null}
       </button>
     </div>
   );

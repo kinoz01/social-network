@@ -9,8 +9,6 @@ import {
     ReactNode,
 } from "react";
 
-import { API_URL_WS } from "@/lib/api_url"
-
 /* ───────── types ───────── */
 export interface Member {
     id: string;
@@ -36,11 +34,13 @@ export function WSProvider({ children }: { children: ReactNode }) {
     const socketRef = useRef<WebSocket | null>(null); // store ws connexion
 
     const [online, setOnline] = useState<Set<string>>(new Set()); // strore online users
-    const [groupMembers, setGroupMembers] = useState<Map<string, Member[]>>(new Map());
+    const [groupMembers, setGroupMembers] = useState<
+        Map<string, Member[]>
+    >(new Map());
 
     /* 1. open socket once */
     useEffect(() => {
-        const ws = new WebSocket(`${API_URL_WS}/api/ws`);
+        const ws = new WebSocket(`ws://localhost:8080/api/ws`);
         socketRef.current = ws;
 
         ws.onopen = () => console.log("[WS] open");

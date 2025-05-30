@@ -10,7 +10,7 @@ import (
 )
 
 // Select groups with pending invitations for the user.
-func Invitations(w http.ResponseWriter, r *http.Request) {
+func InvitationsHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

@@ -12,7 +12,7 @@ import (
 
 // This is used when a user wants to join a group
 // Inserts a row into group_requests (if it isn't there already)
-func JoinRequest(w http.ResponseWriter, r *http.Request) {
+func JoinRequestHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
@@ -40,6 +40,16 @@ func JoinRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	if exists {
 		help.JsonError(w, "You are already a member of this group", http.StatusConflict, nil)
+		return
+	}
+
+	// Clear rejected invitations before creating join request
+	_, err = tp.DB.Exec(`
+		DELETE FROM group_invitations
+ 		WHERE group_id = ? AND invitee_id = ? AND status = 'rejected'
+`	, body.GroupID, user.ID)
+	if err != nil {
+		help.JsonError(w, "Failed to clear old rejected invitations", http.StatusInternalServerError, err)
 		return
 	}
 

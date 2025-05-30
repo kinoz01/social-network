@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	maxEmailSize    = 30
+	maxEmailSize    = 20
 	maxUsernameSize = 16
 	maxNameSize     = 16
 	maxPasswordSize = 30
@@ -79,7 +79,11 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			profilePic, err = help.LimitRead(part, maxPicSize)
 			if err != nil {
-				help.JsonError(w, "Profile picture too large (1 MB max)", http.StatusBadRequest, err)
+				help.JsonError(w, "Profile picture too large (2 MB max)", http.StatusBadRequest, err)
+				return
+			}
+			if help.IsSVG(profilePic) {
+				help.JsonError(w, "svg images aren't supported", http.StatusUnauthorized, nil)
 				return
 			}
 			continue
@@ -130,12 +134,8 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Save optional profile pic
-	profilePicPath := "avatar.webp" // Default profile pic
+	profilePicPath := "avatar.webp"
 	if len(profilePic) > 0 {
-		if help.IsSVG(profilePic) {
-			help.JsonError(w, "svg images aren't supported", http.StatusUnauthorized, nil)
-			return
-		}
 		profilePicPath, err = help.SaveImg(profilePic, "avatars/")
 		if err != nil {
 			help.JsonError(w, "Failed to save profile image", http.StatusInternalServerError, err)
@@ -168,7 +168,7 @@ func ValidateSignUp(user tp.User) error {
 	if match, _ := regexp.MatchString(emailRegex, user.Email); !match {
 		return fmt.Errorf("invalid email format")
 	}
-	if len(user.Email) > maxEmailSize {
+	if len(user.Email) > 20 {
 		return fmt.Errorf("email is too long")
 	}
 

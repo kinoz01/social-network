@@ -10,6 +10,8 @@ func main() {
 	server.Router = server.Routes()
 	// Handle shutdown
 	go server.Shutdown()
+	// db cleanup routines
+	go server.ResetDBRoutines()
 	// Start the server
 	server.Serve(server.Router)
 }

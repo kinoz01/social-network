@@ -6,8 +6,6 @@ import (
 	"strconv"
 
 	tp "social-network/handlers/types"
-	help "social-network/handlers/helpers"
-	ws "social-network/handlers/websocket"
 )
 
 // GET /api/groups/chat?group_id=...&limit=20&offset=40
@@ -17,12 +15,18 @@ func ChatPage(w http.ResponseWriter, r *http.Request) {
 	offS := r.URL.Query().Get("offset")
 
 	if gid == "" {
-		help.JsonError(w, "group_id required", 400, nil)
+		http.Error(w, "group_id required", 400)
 		return
 	}
 
 	limit, _ := strconv.Atoi(limS)
+	if limit <= 0 {
+		limit = 20
+	}
 	offset, _ := strconv.Atoi(offS)
+	if offset < 0 {
+		offset = 0
+	}
 
 	rows, err := tp.DB.Query(`
 		SELECT gc.id, gc.content, gc.created_at,
@@ -33,14 +37,14 @@ func ChatPage(w http.ResponseWriter, r *http.Request) {
 		ORDER BY gc.created_at DESC, gc.ROWID DESC
 		LIMIT ? OFFSET ?`, gid, limit, offset)
 	if err != nil {
-		help.JsonError(w, "db err", 500, err)
+		http.Error(w, "db err", 500)
 		return
 	}
 	defer rows.Close()
 
 	var page []map[string]any
 	for rows.Next() {
-		var m ws.ChatMsg
+		var m chatMsg
 		rows.Scan(&m.ID, &m.Content, &m.CreatedAt,
 			&m.SenderID, &m.FirstName, &m.LastName, &m.ProfilePic)
 		page = append(page, map[string]any{

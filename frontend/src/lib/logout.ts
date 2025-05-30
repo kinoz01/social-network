@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import { API_URL } from "./api_url";
 
 export function useLogout() {
     const router = useRouter();
@@ -10,7 +9,7 @@ export function useLogout() {
     
     const handleLogout = async () => {
         try {
-            const res = await fetch(`${API_URL}/api/logout`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
                 method: "POST",
                 credentials: "include",
             });
