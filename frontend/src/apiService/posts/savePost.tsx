@@ -1,6 +1,8 @@
 import React from "react";
 import { Post, User } from "@/components/types";
-import { popup } from "@/components/posts/utils";
+import { popup } from "@/components/utils";
+import { API_URL } from "@/lib/api_url";
+
 
 type handleSbmtParams = {
     e: React.FormEvent<HTMLFormElement>;
@@ -23,7 +25,7 @@ const HandleCreation = async (props: handleSbmtParams) => {
     }
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/createPost`,
+        const res = await fetch(`${API_URL}/api/createPost`,
             {
                 method: "POST",
                 body: formData,

@@ -11,8 +11,8 @@
   gap: 1rem;
   overflow-y: auto;
   scrollbar-width: none;
-  z-index: 1;
 }
+
 
 .insideFOrm {
   border: 1px solid;
@@ -20,6 +20,11 @@
   color: gray;
   background-color: #fff;
   padding: 0.7rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: none;
 }
 
 .toggleForm {
@@ -34,10 +39,9 @@
   background: #e4e6e9;
 }
 
-.insideForm {
+/* .insideForm {
   color: #65676b;
-  font-weight: 500;
-}
+} */
 
 .loadingIndicator {
   display: flex;
@@ -113,6 +117,8 @@
   flex-wrap: wrap;
   justify-content: end;
   gap: 4;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .postFooter {
@@ -311,7 +317,7 @@
 
 .postContentInput::placeholder {
   color: #65686c;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 
 }
 
@@ -342,10 +348,6 @@
 .postUser {
   font-weight: bolder;
   color: #080809;
-}
-
-.postUser:hover {
-  color: rgb(66, 66, 66);
 }
 
 .submitBtn:hover,
@@ -415,7 +417,6 @@
   transition: border-color 0.2s, background-color 0.2s;
   text-align: center;
   gap: 8px;
-  /* space between icon and text */
 }
 
 .fileUpload:hover {
@@ -523,94 +524,6 @@
   }
 }
 
-.commentInputContainer {
-  margin: 10px 0;
-}
-
-.commentForm {
-  position: relative;
-  width: 100%;
-}
-
-.inputWrapper {
-  display: flex;
-  align-items: center;
-  background-color: #f0f2f5;
-  border-radius: 20px;
-  padding: 8px 12px;
-  min-height: 40px;
-}
-
-.leftIcons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 10px;
-}
-
-.icon {
-  font-size: 20px;
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-.icon:hover {
-  opacity: 1;
-}
-
-.uploadImgBtn {
-  display: none;
-  /* Hide the file input, use label for styling */
-}
-
-.uploadIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.commentInput {
-  flex: 1;
-  border: none;
-  background: transparent;
-  resize: none;
-  font-size: 14px;
-  line-height: 20px;
-  min-height: 20px;
-  padding: 0;
-  margin: 0;
-  outline: none;
-  overflow-y: hidden;
-}
-
-.commentInput::placeholder {
-  color: #65676b;
-}
-
-.addCommentBtn {
-  background: none;
-  border: none;
-  padding: 0 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.sendIcon {
-  font-size: 1.7rem;
-  color: #0084ff;
-}
-
-/* .comment,
-.commentHeader,
-.commentInfo,
-.commentUser,
-.commentContent, */
-.commentCreationDate {
-  font-size: .8rem;
-  color: #1c1c1c;
-}
-
 .postGroup {
   background-color: #ffffff;
   border-radius: 15px;
@@ -627,3 +540,17 @@
   font-size: 1rem;
 }
 
+.search {
+  width: 100%;
+  padding: .45rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: .9rem;
+  margin: .4rem 0;
+}
+.search:focus { outline: none; border-color: #000; }
+
+/* visually indicate picked user in results */
+.checkboxElem.checked { background:#f0f0f0; border:1px solid #000; }
+.checkboxElem input { pointer-events:none; }   /* click on row toggles */
+.status { font-size:.85rem; margin:.3rem 0; }

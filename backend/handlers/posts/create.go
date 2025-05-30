@@ -2,8 +2,8 @@ package posts
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	postDB "social-network/database/repositories/db_posts"
@@ -23,18 +23,16 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 
 	user, err := auth.GetUser(r)
 	if err != nil {
-		fmt.Println("not exist user", err)
-		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		helpers.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 
-	err = r.ParseMultipartForm(10 << 20)
-	if err != nil {
-		helpers.JsonError(w, "Error in parsing form data", http.StatusBadRequest, nil)
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		helpers.JsonError(w, "invalid form", http.StatusBadRequest, err)
 		return
 	}
 
-	content := r.FormValue("content")
+	content := strings.TrimSpace(r.FormValue("content"))
 	visibility := r.FormValue("privacy")
 	vipUsers := append(r.Form["vipUsers"], user.ID)
 
@@ -51,7 +49,7 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	newPost.Content = content
 
-	filename, err := helpers.HamdleFIleUpload(r, "posts/")
+	filename, err := helpers.HandleFileUpload(r, "posts/", "file")
 	if err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
@@ -79,5 +77,4 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(newPost); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
-	fmt.Println("--------INSERT SUCCEFLY")
 }

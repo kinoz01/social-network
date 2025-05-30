@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import styles from "./style/eventCard.module.css";
+import { API_URL } from "@/lib/api_url";
+import { useParams } from "next/navigation";
 
 export interface Event {
     id: string;
@@ -23,6 +25,9 @@ export default function EventCard({
     ev: Event;
     onUpdate: (going: number, notGoing: number, myChoice: boolean) => void;
 }) {
+
+    const { id: groupId } = useParams() as { id: string };
+    
     const [myChoice, setMyChoice] = useState<boolean | null>(ev.going);
     const [goingCnt, setGoingCnt] = useState(ev.going_count);
     const [notCnt, setNotCnt] = useState(ev.not_going_count);
@@ -35,7 +40,7 @@ export default function EventCard({
 
         setBusy(true);
         const r = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/event-response`,
+            `${API_URL}/api/groups/event-response?group_id=${groupId}`,
             {
                 method: "POST",
                 credentials: "include",

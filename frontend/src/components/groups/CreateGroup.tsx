@@ -4,21 +4,12 @@ import { useEffect, useRef, useState, FormEvent, useCallback } from "react";
 import Image from "next/image";
 import styles from "./style/createGroup.module.css";
 import Loading from "@/components/Loading";
+import { API_URL } from "@/lib/api_url";
+import { throttle } from "../utils";
+
 
 /* ───────── helpers ───────── */
 const SLICE = 50;
-
-const throttle = (fn: (...a: any[]) => void, wait = 300) => {
-    let waiting = false, saved: any[] | null = null;
-    const timer = () => {
-        if (!saved) { waiting = false; return; }
-        fn(...saved); saved = null; setTimeout(timer, wait);
-    };
-    return (...args: any[]) => {
-        if (waiting) { saved = args; return; }
-        fn(...args); waiting = true; setTimeout(timer, wait);
-    };
-};
 
 /* ───────── types ───────── */
 interface Follower {
@@ -71,9 +62,9 @@ export default function CreateGroupModal({ onClose }: Props) {
     /* ---------------- fetch helpers ---------------- */
     const fetchSlice = async (q: string, off: number) => {
         const qs = `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
-        const r = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/followers?${qs}`,
+        const r = await fetch(`${API_URL}/api/followers?${qs}`,
             { credentials: "include" });
-        if (r.status === 404) return [];
+        if (r.status === 204) return [];
         if (!r.ok) throw new Error();
         return (await r.json()) as Follower[];
     };
@@ -123,7 +114,7 @@ export default function CreateGroupModal({ onClose }: Props) {
         (async () => {
             try {
                 const r = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/api/followers?status=accepted&limit=1`,
+                    `${API_URL}/api/followers?status=accepted&limit=1`,
                     { credentials: "include" });
                 if (!r.ok) throw new Error();
                 const list: Follower[] = await r.json();
@@ -153,7 +144,7 @@ export default function CreateGroupModal({ onClose }: Props) {
         body.append("invitee_ids", JSON.stringify(Array.from(formData.invitees)));
 
         try {
-            const r = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/groups/create`,
+            const r = await fetch(`${API_URL}/api/groups/create`,
                 { method: "POST", body, credentials: "include" });
             if (!r.ok) throw new Error((await r.json()).msg);
             onClose();
@@ -228,7 +219,7 @@ export default function CreateGroupModal({ onClose }: Props) {
                                     return (
                                         <div key={id} className={styles.invitedRow}>
                                             <Image src={f.profile_pic
-                                                ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
+                                                ? `${API_URL}/api/storage/avatars/${f.profile_pic}`
                                                 : "/img/default-profile.png"}
                                                 alt={f.first_name} width={28} height={28}
                                                 className={styles.followerAvatar} />
@@ -267,7 +258,7 @@ export default function CreateGroupModal({ onClose }: Props) {
                                     <div key={f.id} className={styles.resultRow}
                                         onClick={() => toggleInvitee(f.id)}>
                                         <Image src={f.profile_pic
-                                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
+                                            ? `${API_URL}/api/storage/avatars/${f.profile_pic}`
                                             : "/img/default-profile.png"}
                                             alt={f.first_name} width={32} height={32}
                                             className={styles.followerAvatar} />

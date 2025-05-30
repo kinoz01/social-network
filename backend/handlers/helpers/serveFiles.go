@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	// hlp "social-network/handlers/helpers"
-	// help "social-network/handlers/helpers"
-	// "social-network/handlers/helpers"
-	"social-network/service/service_posts"
+	"path/filepath"
 	"strings"
 	"time"
+
+	"social-network/service/service_posts"
 )
+
+const fileLimit = 4 << 20 // 4MB
 
 // Handle serving static content.
 // Api files available at /api/storage/...
@@ -29,15 +29,20 @@ func FilesHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, filePath, time.Now(), bytes.NewReader(filesBytes))
 }
 
-func HamdleFIleUpload(r *http.Request, genre string) (string, error) {
-	file, handler, err := r.FormFile("file")
+func HandleFileUpload(r *http.Request, genre string, formFile string) (string, error) {
+	file, handler, err := r.FormFile(formFile)
 	if err != nil {
-		fmt.Println("read file--", err)
 		return "", nil
 	}
-	buff, err := LimitRead(file, 4<<20)
+	buff, err := LimitRead(file, fileLimit)
 	if err != nil {
-		return "", fmt.Errorf("file size exceeds %s limit: %w", "4MB", err)
+		return "", fmt.Errorf("file size exceeds %d limit: %w", fileLimit, err)
+	}
+	ext := strings.ToLower(filepath.Ext(handler.Filename))
+	switch ext {
+	case ".jpg", ".jpeg", ".png", ".gif", ".webp":
+	default:
+		return "", fmt.Errorf("unsupported image format")
 	}
 	if handler != nil {
 		if err := service_posts.ValidFile(handler); err != nil {

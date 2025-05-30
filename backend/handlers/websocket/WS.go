@@ -1,4 +1,4 @@
-package groups
+package websocket
 
 import (
 	"encoding/json"
@@ -25,7 +25,7 @@ type wsMember struct {
 }
 
 // chat message sent to clients
-type chatMsg struct {
+type ChatMsg struct {
 	ID         string    `json:"id"`
 	GroupID    string    `json:"group_id"`
 	SenderID   string    `json:"sender_id"`
@@ -63,7 +63,7 @@ var upgrader = websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return
 /*────────── Incoming message ─────────*/
 // client → server
 type inbound struct {
-	Type    string `json:"type"` // subscribeGroup | subscribeChat | groupChatMessage
+	Type    string `json:"type"` // subscribeGroup | subscribeChat | chatMessage
 	GroupID string `json:"groupId,omitempty"`
 	Content string `json:"content,omitempty"`
 }
@@ -140,7 +140,7 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		chatHubs.mu.Unlock()
 		sendChatHistory(c, msg.GroupID)
 
-	case "groupChatMessage":
+	case "chatMessage":
 		if msg.Content == "" || len(msg.Content) > 500 {
 			return
 		}
@@ -215,12 +215,12 @@ func sendChatHistory(c *client, gid string) {
       ORDER BY gc.created_at DESC LIMIT 20`, gid)
 	defer rows.Close()
 
-	var hist []chatMsg
+	var hist []ChatMsg
 	for rows.Next() {
-		var m chatMsg
+		var m ChatMsg
 		rows.Scan(&m.ID, &m.Content, &m.CreatedAt,
 			&m.SenderID, &m.FirstName, &m.LastName, &m.ProfilePic)
-		hist = append([]chatMsg{m}, hist...) // reverse to ascending
+		hist = append([]ChatMsg{m}, hist...) // reverse to ascending
 	}
 	c.mu.Lock()
 	_ = c.conn.WriteJSON(map[string]any{
@@ -229,14 +229,14 @@ func sendChatHistory(c *client, gid string) {
 	c.mu.Unlock()
 }
 
-func storeAndBuildMessage(gid string, u *tp.User, content string) chatMsg {
+func storeAndBuildMessage(gid string, u *tp.User, content string) ChatMsg {
 	id := uuid.Must(uuid.NewV4()).String()
 	tp.DB.Exec(`INSERT INTO group_chats(id, group_id, sender_id, content) VALUES(?,?,?,?)`, id, gid, u.ID, content)
-	return chatMsg{ID: id, GroupID: gid, SenderID: u.ID, Content: content, CreatedAt: time.Now(), FirstName: u.FirstName, LastName: u.LastName, ProfilePic: u.ProfilePic}
+	return ChatMsg{ID: id, GroupID: gid, SenderID: u.ID, Content: content, CreatedAt: time.Now(), FirstName: u.FirstName, LastName: u.LastName, ProfilePic: u.ProfilePic}
 }
 
-func broadcastChat(gid string, m chatMsg) {
-	payload := map[string]any{"type": "groupChatMessage", "groupId": gid, "message": m}
+func broadcastChat(gid string, m ChatMsg) {
+	payload := map[string]any{"type": "chatMessage", "groupId": gid, "message": m}
 	chatHubs.mu.RLock()
 	defer chatHubs.mu.RUnlock()
 	for cl := range chatHubs.m[gid] {

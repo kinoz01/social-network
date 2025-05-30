@@ -1,6 +1,6 @@
 # Run everything
-run: check-npm check-nextjs kill-ports run-backend run-frontend
-	@echo "Live and running!"
+run: check-npm check-nextjs run-backend run-frontend
+	@echo "Frontend signal killed"
 
 # Check if npm is installed
 check-npm:
@@ -20,17 +20,26 @@ check-nextjs:
 		echo "Next.js is installed."; \
 	fi
 
-# Kill processes on ports 8080 (backend) and 3000 (frontend) if running
-kill-ports:
-	@echo "Checking for running services on ports 8080 and 3000..."
-	@lsof -ti:8080 | xargs kill -9 2>/dev/null || echo "No process on port 8080"
-	@lsof -ti:3000 | xargs kill -9 2>/dev/null || echo "No process on port 3000"
+kill-8080:
+	@fuser -k 8080/tcp 2>/dev/null || lsof -ti:8080 | xargs -r kill -9
 
+kill-3000:
+	@fuser -k 3000/tcp 2>/dev/null || lsof -ti:3000 | xargs -r kill -9
 
 # Run backend on background
-run-backend:
+run-backend: kill-8080
 	@echo "Starting Go backend..."
 	@cd backend && go run main.go &
+
+# Run backend with Fresh
+fresh-backend: kill-8080
+	@echo "Checking if Fresh is installed..."
+	@test -f "$$(go env GOPATH)/bin/fresh" || { \
+		echo "Fresh not found, installing..."; \
+		go install github.com/gravityblast/fresh@latest; \
+	}
+	@echo "Starting Go backend with Fresh..."
+	@cd backend && "$$(go env GOPATH)/bin/fresh" &
 
 # Run backend.
 go:
@@ -38,7 +47,7 @@ go:
 	@cd backend && go run main.go
 
 # Run frontend
-run-frontend:
+run-frontend: kill-3000
 	@echo "Starting Next.js frontend..."
 	cd frontend && npm run dev
 
@@ -60,6 +69,22 @@ deepClean:
 	-docker rm $$(docker ps -aq)
 	-docker rmi $$(docker images -q)
 	-docker system prune -a -f --volumes
+
+# Install Docker rootless
+installDocker:
+	@wget https://get.docker.com/rootless -O docker.sh
+	@chmod +x docker.sh
+	@./docker.sh
+	$(MAKE) fixDocker
+	@rm docker.sh
+
+# Fix Docker rootless environment
+fixDocker:
+	@export PATH=$$HOME/bin:$$PATH
+	@$$HOME/bin/dockerd-rootless.sh > /tmp/dockerd.log 2>&1 &
+	@export DOCKER_HOST=unix:///run/user/$$(id -u)/docker.sock
+	@echo 'export DOCKER_HOST=unix:///run/user/$$(id -u)/docker.sock' >> $$HOME/.bashrc
+	@. $$HOME/.bashrc
 #------------------------- Docker -------------------------#
 
 #------------------------ Migration -----------------------#
@@ -100,6 +125,16 @@ followers:
 	@echo "INSERT INTO follow_requests (id, follower_id, followed_id, status, created_at) VALUES" > follow_requests.sql
 	@for i in $$(seq 1 7001); do \
 		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
-		echo "('foll-$$i','uuid-$$i','a8cce8ce-4e99-4cdd-8eee-db6ac0cdada1','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
+		echo "('foll-$$i','uuid-$$i','734ea577-cc80-4974-ba12-adc0dbe2e7b3','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
 	done
 	@echo "✅ follow_requests.sql generated with x accepted follow requests."
+
+group_users:
+	@echo "Generating group_users_insert.sql with static IDs (uuid-1 to uuid-7001)..."
+	@echo "INSERT INTO group_users (id, group_id, users_id) VALUES" > group_users_insert.sql
+	@for i in $$(seq 1 7001); do \
+		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
+		echo "('gu-$$i','e2cfe1f0-fc0b-459b-953c-8cb2e8ccb100','uuid-$$i')$$end" >> group_users_insert.sql; \
+	done
+	@echo "✅ group_users_insert.sql generated with 7001 entries."
+

@@ -4,6 +4,7 @@ import { BackIcon } from "@/components/icons";
 import React, { useState, useEffect } from "react";
 import { User } from "@/components/types";
 import Image from "next/image";
+import { API_URL } from "@/lib/api_url";
 
 type UsersListParams = {
     onBack: () => void;
@@ -35,9 +36,7 @@ const ShowUsers = (props: UsersListParams) => {
             .then(data => setLIstUsers(data.Users))
     }, [])
 
-    // console.log("liste of users", selectedUser);
 
-    // console.log("here, -------", List_Users && List_Users[0].id)
     return (
         <div className={styles.postAud}>
             <div className={styles.header}>
@@ -64,8 +63,7 @@ const ShowUsers = (props: UsersListParams) => {
                             checked={selectedUser.some((u) => u.id === elem.id)} />
                         <Image
                             className={styles.userIcon}
-                            // src={`/storage/avatars/${elem.profile_pic}`}
-                            src={`${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${elem.profile_pic}`}
+                            src={`${API_URL}/api/storage/avatars/${elem.profile_pic}`}
                             alt={elem.first_name}
                             width={30}
                             height={30}

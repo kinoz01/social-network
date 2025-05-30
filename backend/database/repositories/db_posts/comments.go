@@ -7,7 +7,6 @@ import (
 )
 
 func CreateCommentDB(newComment types.Comment) error {
-	// fmt.Println("before dqtqBQSE", newComment)
 	var imgComment sql.NullString
 	if newComment.Img_comment != "" {
 		imgComment = sql.NullString{
@@ -50,8 +49,8 @@ func CommentByPost(postID string, page int) ([]types.Comment, error) {
 		FROM comments c
 		INNER JOIN users u ON u.id = c.user_id
 		WHERE c.post_id = ?
-		ORDER BY c.created_at DESC
-		LIMIT 2 OFFSET ?
+		ORDER BY c.created_at DESC, c.ROWID DESC
+		LIMIT 20 OFFSET ?
 	`
 	rows, err := types.DB.Query(query, postID, page)
 	if err != nil {

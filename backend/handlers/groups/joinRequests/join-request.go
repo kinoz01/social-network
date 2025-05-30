@@ -43,7 +43,7 @@ func JoinRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insert join request
+	// Proceed with join request
 	_, err = tp.DB.Exec(`
 		INSERT OR IGNORE INTO group_requests (id, group_id, requester_id)
 		VALUES (?, ?, ?)`,

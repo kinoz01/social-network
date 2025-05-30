@@ -8,7 +8,6 @@ import (
 )
 
 func CreatePostDB(newPost pType.Post) error {
-	// fmt.Println("before dqtqBQSE", newPost)
 	var imgPost sql.NullString
 	if newPost.Imag_post != "" {
 		imgPost = sql.NullString{
@@ -53,39 +52,41 @@ func PostPrivacyDB(postID string, userID string) error {
 
 func GetAllPOst(currentPage int, userID string) ([]pType.PostData, error) {
 	query := `SELECT DISTINCT
-	             p.post_id AS id,
-	             p.user_id AS userID,
-		         p.body AS content,
-		         p.img_post AS imag_post,
-		         p.visibility,
-		         u.first_name AS firstName,
-		         u.last_name AS lastName,
-		         u.profile_pic,
-		         l.react_type,
-		         p.created_at,
-			 (SELECT COUNT(*) 
-              FROM like_reaction lr 
-              WHERE lr.post_id = p.post_id AND lr.react_type = '1') AS like_count,
-			 (SELECT COUNT(*) 
-              FROM comments c 
-               WHERE c.post_id = p.post_id) AS comment_count
-	          FROM
-		         posts p
-		         INNER JOIN users u ON u.id = p.user_id
-		         LEFT JOIN like_reaction l ON l.post_id = p.post_id AND l.user_id = ?
-	         WHERE
-		         p.visibility = "public"
-		         OR p.post_id IN (
-			         SELECT
-				         post_id
-			         FROM
-				         post_privacy
-			         WHERE
-				         post_privacy.allowed_users = ?
-		         )
-	         ORDER BY
+	            p.post_id AS id,
+	            p.user_id AS userID,
+		        p.body AS content,
+		        p.img_post AS imag_post,
+		        p.visibility,
+		        u.first_name AS firstName,
+		        u.last_name AS lastName,
+		        u.profile_pic,
+		        l.react_type,
+		        p.created_at,
+			(SELECT COUNT(*) 
+              	FROM like_reaction lr 
+              	WHERE lr.post_id = p.post_id AND lr.react_type = '1') AS like_count,
+			(SELECT COUNT(*) 
+              	FROM comments c 
+               	WHERE c.post_id = p.post_id) AS comment_count
+	        FROM
+		        posts p
+		        INNER JOIN users u ON u.id = p.user_id
+		        LEFT JOIN like_reaction l ON l.post_id = p.post_id AND l.user_id = ?
+	        WHERE p.group_id IS NULL
+			AND (
+		        p.visibility = "public"
+		        OR p.post_id IN (
+			        SELECT
+				        post_id
+			        FROM
+				        post_privacy
+			        WHERE
+				        post_privacy.allowed_users = ?
+		        	)
+				)
+	        ORDER BY
 		         p.created_at DESC
-			     LIMIT 2 OFFSET ?`
+			     LIMIT 20 OFFSET ?`
 	rows, err := pType.DB.Query(query, userID, userID, currentPage)
 	if err != nil {
 		return []pType.PostData{}, err

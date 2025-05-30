@@ -17,9 +17,9 @@ func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gid := r.URL.Query().Get("id")
+	gid := r.URL.Query().Get("group_id")
 	if gid == "" {
-		http.Error(w, "Missing id", http.StatusBadRequest)
+		help.JsonError(w, "Missing id", http.StatusBadRequest, nil)
 		return
 	}
 

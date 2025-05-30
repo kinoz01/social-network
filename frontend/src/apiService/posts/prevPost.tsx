@@ -1,11 +1,10 @@
-import { Post } from "@/components/types";
-import { CommentInfo } from "@/components/types";
-var i = 0
-export const fetchOldPosts = async (pageNum: number) => {
-    console.log("in fetch oldposts", i++);
+import { Post, CommentInfo } from "@/components/types";
+import { API_URL } from "@/lib/api_url";
 
+
+export const fetchOldPosts = async (pageNum: number) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/allPosts/${pageNum}`,
+        const res = await fetch(`${API_URL}/api/allPosts/${pageNum}`,
             {
                 method: "GET",
                 headers: { 'Content-Type': 'application/json' },
@@ -28,7 +27,7 @@ export const COmmentsGetter = async ({ postID, page }: { postID: string, page: n
         page: page.toString()
     })
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/comments?${queryParams.toString()}`,
+        const res = await fetch(`${API_URL}/api/comments?${queryParams.toString()}`,
             {
                 method: 'GET',
                 headers: {

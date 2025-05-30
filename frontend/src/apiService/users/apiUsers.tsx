@@ -1,6 +1,8 @@
+import { API_URL } from "@/lib/api_url";
+
 const fetchUsers = async () => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/allUsers`,
+        const res = await fetch(`${API_URL}/api/allUsers`,
             {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' }

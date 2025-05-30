@@ -1,51 +1,58 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import Image from "next/image";
 import styles from "./posts.module.css";
-import { Post } from "./Feed";
-import {
-  CloseFriendIcon,
-  CommentIcon,
-  LikeIcon,
-  PublicIcon,
-  PrivateIcon,
-} from "../icons";
-import Comment from "../comments/PostComments";
-import { useUser } from "@/context/UserContext";
+import { useState, useEffect } from "react";
+// import { Post } from "./Feed";
+import { Post } from "../types";
+import { CloseFriendIcon, CommentIcon, LikeIcon, PublicIcon, PrivateIcon } from "../icons";
+import Comment from "../comments/Comment";
 import TimeAgo from "../groups/TimeAgo";
+import { popup } from "../utils";
+import { useUser } from "@/context/UserContext";
+import Link from "next/link";
+import { API_URL } from "@/lib/api_url";
 
-export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({
-  post,
-  type,
-}) => {
-  const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0);
-  const [liked, setReaction] = useState(post.hasReact?.String === "1");
-  const [commentsOpen, setCommentsOpen] = useState(false);
-  const { user } = useUser();
+export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({ post, type }) => {
 
-  /* like handler */
+  const [showComments, setShowComments] = useState(false)
+  const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
+  const [totalCOmments, setTotalCOmments] = useState(post.totalComments || 0)
+  const [liked, setReaction] = useState(post.hasReact === "1")
+
+  const { user } = useUser()
+
   const handleLike = async () => {
-    const nextLiked = !liked;
-    setReaction(nextLiked);
-    setTotalLikes((prev) => prev + (nextLiked ? 1 : -1));
-
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/react`, {
+    const res = await fetch(`${API_URL}/api/react`, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         userID: user?.id,
         postID: post.id,
-        IsLike: nextLiked ? "1" : "0",
-      }),
-    });
-  };
+        IsLike: !liked ? "1" : ""
+      })
+
+    })
+    if (!res.ok) {
+      popup("action failed", false)
+      throw new Error((await res.json()).msg || "failed to react")
+    }
+    if (liked) {
+      setReaction(!liked)
+      totalLikes > 0 && setTotalLikes(totalLikes - 1)
+    } else {
+      setReaction(!liked)
+      setTotalLikes(totalLikes + 1)
+    }
+  }
 
   const imgName =
     typeof post.imag_post === "string"
       ? post.imag_post
-      : post.imag_post?.String ?? "";
+      : post.imag_post?? "";
 
   return (
     <div
@@ -60,13 +67,12 @@ export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({
         >
           <img
             className={styles.userIcon}
-            src={`${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${post.profile_pic}`}
+            src={`${API_URL}/api/storage/avatars/${post.profile_pic}`}
             alt={post.firstName}
             width={40}
             height={40}
           />
         </Link>
-
         <div className={styles.postInfo}>
           <Link
             href={`/profile/${post.userID}`}
@@ -75,7 +81,6 @@ export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({
               {post.firstName} {post.lastName}
             </span>
           </Link>
-
           <div className={styles.postCreationDate}>
             <div className={styles.timeAgo}>
               <TimeAgo dateStr={post.createdAt} />
@@ -83,52 +88,56 @@ export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({
             {post.visibility === "private" ? <CloseFriendIcon /> : post.visibility === "almost-private" ? <PrivateIcon /> : <PublicIcon />}
           </div>
         </div>
-      </div>
-
+      </div >
       {/* CONTENT */}
-      <div className={styles.postDesc}>
-        <div className={styles.postContent}>{post.content}</div>
-
+      < div className={styles.postDesc} >
+        <div className={styles.postContent}>
+          {post.content}
+        </div>
         {imgName && (
           <img
             className={styles.postImage}
-            src={`${process.env.NEXT_PUBLIC_API_URL}/api/storage/${type === "group" ? "groups_posts" : "posts"
-              }/${imgName}`}
+            src={`${API_URL}/api/storage/${type === "group" ? "groups_posts" : "posts"}/${imgName}`}
             alt={`${post.firstName} post`}
             width={450}
             height={450}
           />
         )}
-
         <div className={styles.reactAmount}>
           <span>{totalLikes} Likes</span>
+          <span>{totalCOmments} comments</span>
         </div>
-
         <div className={styles.postFooter}>
           <button
             className={styles.reactBtn}
-            onClick={handleLike}
+
+            onClick={
+              handleLike
+            }
           >
             <LikeIcon fill={liked ? "red" : "none"} />
             Like
           </button>
-
           <button
             className={styles.commentsBtn}
-            onClick={() => setCommentsOpen(true)}
+            onClick={() => setShowComments(true)}
           >
             <CommentIcon />
             Comment
           </button>
         </div>
 
-        {commentsOpen && (
+        {showComments && (
           <Comment
-            postId={post.id}
-            onClose={() => setCommentsOpen(false)}
+            userData={user}
+            postID={post.id}
+            postCreator={post.firstName}
+            onClose={() => setShowComments(false)}
+            onCOmmentAdded={() => setTotalCOmments(i => i + 1)}
           />
         )}
-      </div>
-    </div>
-  );
-};
+      </div >
+    </div >
+
+  )
+}

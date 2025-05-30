@@ -9,6 +9,7 @@ import Loading from "@/components/Loading";
 import { useGroupSync } from "@/context/GroupSyncContext";
 import InviteMenu from "@/components/groups/InviteMenu";
 import { RequestsModal } from "@/components/groups/RequestsMenu";
+import { API_URL } from "@/lib/api_url";
 
 
 interface Info {
@@ -37,7 +38,7 @@ export default function GroupMenu() {
 
         (async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/groups/groupInfo?id=${id}`, {
+                const res = await fetch(`${API_URL}/api/groups/groupInfo?group_id=${id}`, {
                     credentials: "include",
                     cache: "no-store",
                 });
@@ -67,7 +68,7 @@ export default function GroupMenu() {
                 <div className={styles.header}>
                     <Image
                         src={data.group_pic
-                            ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/groups_avatars/${data.group_pic}`
+                            ? `${API_URL}/api/storage/groups_avatars/${data.group_pic}`
                             : "/img/default-group.jpg"}
                         alt="group avatar"
                         width={160}

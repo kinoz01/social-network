@@ -1,6 +1,3 @@
-networks:
-  i_zahid:
-    driver: bridge
 services:
   backend:
     build:
@@ -10,7 +7,8 @@ services:
       - "8080:8080"
     volumes:
       - ./backend/database:/app/database
-
+      - ./backend/storage:/app/storage
+      
   frontend:
     build:
       context: .
@@ -19,5 +17,6 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-    networks:
-      - i_zahid
+    environment:
+      - BACKEND_URL=http://backend:8080
+      - BACKEND_WS=ws://backend:8080

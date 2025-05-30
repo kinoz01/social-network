@@ -3,8 +3,6 @@ package mw
 import (
 	"net/http"
 	"social-network/handlers/helpers"
-
-	// "social-network/handlers/helpers"
 	"sync"
 	"time"
 )

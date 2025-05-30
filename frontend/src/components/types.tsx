@@ -36,15 +36,3 @@ export interface Post {
     totalLikes: number;
     totalComments: number;
 }
-
-// export interface User {
-//   id: string;
-//   email: string;
-//   username?: string;
-//   profile_pic: string;
-//   first_name: string;
-//   last_name: string;
-//   birthday: string;
-//   about_me?: string;
-//   account_type: string;
-// }

@@ -8,6 +8,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// Api check
 func IsGroupMember(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {

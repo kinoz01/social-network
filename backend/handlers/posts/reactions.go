@@ -6,7 +6,6 @@ import (
 
 	postDB "social-network/database/repositories/db_posts"
 	auth "social-network/handlers/authentication"
-	"social-network/handlers/helpers"
 	help "social-network/handlers/helpers"
 	"social-network/handlers/types"
 
@@ -15,18 +14,18 @@ import (
 
 func HandleLike(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		helpers.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
+		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
 		return
 	}
 	_, err := auth.GetUser(r)
 	if err != nil {
-		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 	var Like types.React
 	err = json.NewDecoder(r.Body).Decode(&Like)
 	if err != nil {
-		helpers.JsonError(w, "bad request", http.StatusBadRequest, nil)
+		help.JsonError(w, "bad request", http.StatusBadRequest, nil)
 		return
 	}
 	defer r.Body.Close()

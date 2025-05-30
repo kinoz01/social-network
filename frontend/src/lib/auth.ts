@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { API_URL } from "@/lib/api_url";
 
 // Check if the user is logged in by checking the session cookie
 export async function requireSession() {
@@ -10,7 +11,7 @@ export async function requireSession() {
     if (!token) redirect("/login");
 
     // check session validity (backend call)
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/check-session`, {
+    const res = await fetch(`${API_URL}/api/check-session`, {
         headers: { cookie: cookieStore.toString() }, // The server needs to pass cookies manually
         cache: "no-store",
     });
@@ -33,7 +34,7 @@ export async function redirectToHome() {
 
     if (!token) return; // No token, stay on login page
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/check-session`, {
+    const res = await fetch(`${API_URL}/api/check-session`, {
         headers: { cookie: cookieStore.toString() },
         cache: "no-store",
     });
@@ -53,7 +54,7 @@ export async function checkMembership(groupId: string) {
     
     // back-end call
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/groups/is-member?id=${groupId}`,
+        `${API_URL}/api/groups/is-member?id=${groupId}`,
         {
             headers: { cookie: cookieStore.toString() }, // forward auth cookie
             cache: "no-store",

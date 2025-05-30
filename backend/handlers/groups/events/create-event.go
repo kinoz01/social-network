@@ -31,7 +31,7 @@ type eventResp struct {
 	StartTime     time.Time `json:"start_time"`
 	GoingCount    int       `json:"going_count"`
 	NotGoingCount int       `json:"not_going_count"`
-	Going         *bool      `json:"going"` // creator's own response
+	Going         *bool     `json:"going"` // creator's own response
 	CreatedAt     time.Time `json:"created_at"`
 }
 

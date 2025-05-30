@@ -10,10 +10,12 @@ import {
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import GroupPost from "./GroupPost";
 import Loading from "@/components/Loading";
 import styles from "./style/groupFeed.module.css";
-import { Post } from "./GroupPost";
+import { Post } from "@/components/types";
+import { PostComponent } from "../posts/Post";
+import { API_URL } from "@/lib/api_url";
+import { throttle } from "../utils";
 
 const PAGE_SIZE = 20;
 
@@ -24,7 +26,7 @@ export default function GroupFeed() {
 
     const [posts, setPosts] = useState<Post[]>([]);
     const [offset, setOffset] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
+    const [hasMore, setHasMore] = useState(false);
     const [loadingFirst, setLoadingFirst] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
 
@@ -32,7 +34,7 @@ export default function GroupFeed() {
     const fetchPage = async (off: number): Promise<Post[]> => {
         const qs = `group_id=${groupId}&limit=${PAGE_SIZE}&offset=${off}`;
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/posts?${qs}`,
+            `${API_URL}/api/groups/posts?${qs}`,
             { credentials: "include", cache: "no-store" }
         );
         if (!res.ok) throw new Error("Failed to load posts");
@@ -43,7 +45,7 @@ export default function GroupFeed() {
         setLoadingFirst(true);
         try {
             const page = await fetchPage(0);
-            if (!page) return;
+            if (!page) return
             setPosts(page);
             setOffset(page.length);
             setHasMore(page.length === PAGE_SIZE);
@@ -63,7 +65,11 @@ export default function GroupFeed() {
                 setHasMore(false);
                 return;
             }
-            setPosts((prev) => [...prev, ...next]);
+            setPosts(prev => {
+                const map = new Map(prev.map(post => [post.id, post]));   // id → post
+                next.forEach(post => map.set(post.id, post));             // add / overwrite
+                return Array.from(map.values());                          // deduped array
+            });
             setOffset((o) => o + next.length);
             setHasMore(next.length === PAGE_SIZE);
         } catch (e) {
@@ -109,7 +115,7 @@ export default function GroupFeed() {
             ) : (
                 <div ref={boxRef} className={styles.feed}>
                     {posts.map((p) => (
-                        <GroupPost key={p.post_id} p={p} />
+                        <PostComponent key={p.id} post={p} type="group" />
                     ))}
                     {loadingMore && <Loading />}
                     {!hasMore && offset > PAGE_SIZE && (
@@ -147,25 +153,27 @@ function PostInput({
 
         const fd = new FormData();
         fd.append("group_id", groupId);
-        fd.append("body", text.trim());
-        if (image) fd.append("image", image);
+        fd.append("content", text.trim());
+        if (image) fd.append("imag_post", image);
 
         setLoad(true);
         try {
             const r = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/create-post`,
+                `${API_URL}/api/groups/create-post?group_id=${groupId}`,
                 { method: "POST", body: fd, credentials: "include" }
             );
             if (!r.ok) throw new Error((await r.json()).msg || "Could not post");
 
             const added: Post = await r.json();
-            onAdd(added); // prepend to feed
+            onAdd(added);          // prepend to feed
             setText("");
             setImg(null);
             setErr("");
 
             // reset height
-            const ta = document.querySelector(`.${styles.input}`) as HTMLTextAreaElement | null;
+            const ta = document.querySelector(
+                `.${styles.input}`
+            ) as HTMLTextAreaElement | null;
             if (ta) ta.style.height = "auto";
         } catch (e: any) {
             setErr(e.message || "Could not post");
@@ -193,7 +201,7 @@ function PostInput({
     };
 
     const avatar = user.profile_pic
-        ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${user.profile_pic}`
+        ? `${API_URL}/api/storage/avatars/${user.profile_pic}`
         : "/img/default-avatar.png";
 
     /* ---------- UI ---------- */
@@ -256,15 +264,3 @@ function truncateFileName(name: string, max: number = 30): string {
     return base + "..." + ext;
 }
 
-// Throttle helper
-export const throttle = (fn: (...a: any[]) => void, wait = 300) => {
-    let waiting = false, saved: any[] | null = null;
-    const timer = () => {
-        if (!saved) { waiting = false; return; }
-        fn(...saved); saved = null; setTimeout(timer, wait);
-    };
-    return (...args: any[]) => {
-        if (waiting) { saved = args; return; }
-        fn(...args); waiting = true; setTimeout(timer, wait);
-    };
-};

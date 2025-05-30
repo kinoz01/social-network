@@ -322,3 +322,10 @@
     display: flex;
     gap: 2px;
 }
+
+/* refused label */
+.refusedText {
+    font-size: 0.8rem;
+    color: #474747;
+    font-weight: 500;
+}

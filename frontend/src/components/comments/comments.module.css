@@ -53,7 +53,7 @@
 /* single comment */
 .item {
     display: flex;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .avt {
@@ -231,14 +231,6 @@
     margin: 10px 0;
 }
 
-/* .commentForm {
-  position: relative;
-  border-top: 1px solid grey;
-  width: 100%;
-} */
-
-.formContent {}
-
 .commentForm {
     border-top: 1px solid rgb(142, 142, 142);
     display: flex;
@@ -262,10 +254,12 @@
 
 .commentInput {
     flex-grow: 1;
-    padding: 30px;
+    padding: 20px;
     border: 1px solid #e5e5e5;
-    border-radius: 4px;
+    border-radius: 15px;
     font-size: 1.2rem;
+    font-family: 'Zain';
+    resize: none;
 }
 
 .leftIcons {
@@ -318,12 +312,7 @@
     transition: background .15s, transform .15s;
 }
 
-/* .addCommentBtn{
-
-    background: none;
-        border: none;
-        cursor: pointer;
-        padding: .3rem;
-        border-radius: 50%;
-        transition: background .15s;
-} */
+.addCommentBtn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }

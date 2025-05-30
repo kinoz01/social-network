@@ -6,19 +6,8 @@ import React, {
     useEffect,
     useState,
 } from "react";
-
-// User structure
-export interface User {
-    id: string;
-    email: string;
-    username?: string;
-    profile_pic: string;
-    first_name: string;
-    last_name: string;
-    birthday: string;
-    about_me?: string;
-    account_type: string;
-}
+import { API_URL } from "@/lib/api_url";
+import { User } from "@/components/types"
 
 // Context value type
 type UserContextValue = {
@@ -36,7 +25,7 @@ const UserContext = createContext<UserContextValue | undefined>(undefined);
 async function fetchUser(): Promise<User | null> {
     try {
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/userInfo`,
+            `${API_URL}/api/userInfo`,
             { credentials: "include", cache: "no-store" }
         );
         if (!res.ok) return null;

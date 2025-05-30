@@ -12,6 +12,11 @@ import (
 )
 
 func GetEvents(w http.ResponseWriter, r *http.Request) {
+	u, err := auth.GetUser(r)
+	if err != nil {
+		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
+		return
+	}
 	gid := r.URL.Query().Get("group_id")
 	if gid == "" {
 		help.JsonError(w, "group_id required", http.StatusBadRequest, nil)
@@ -20,17 +25,8 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	if limit <= 0 {
-		limit = 20
-	}
-	if offset < 0 {
-		offset = 0
-	}
 
-	var viewerID string
-	if u, _ := auth.GetUser(r); u != nil {
-		viewerID = u.ID
-	}
+	viewerID := u.ID
 
 	rows, err := tp.DB.Query(`
 	    SELECT

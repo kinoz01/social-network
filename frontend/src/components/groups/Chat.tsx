@@ -3,9 +3,11 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import styles from "./style/chat.module.css";
 import { useWS } from "@/context/wsClient";
-import { throttle } from "./GroupFeed";
 import Loading from "../Loading";
 import Image from "next/image";
+import { API_URL } from "@/lib/api_url";
+import { throttle } from "../utils";
+
 
 interface ChatMsg {
     id: string; sender_id: string; first_name: string; last_name: string;
@@ -42,7 +44,7 @@ export default function Chat() {
     const fetchPage = async (o: number) => {
         const qs = `group_id=${groupId}&limit=${PAGE}&offset=${o}`;
         const r = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/chat?${qs}`,
+            `${API_URL}/api/groups/chat?${qs}`,
             { credentials: "include", cache: "no-store" });
         if (!r.ok) return [];
         return await r.json() as ChatMsg[];
@@ -87,7 +89,7 @@ export default function Chat() {
         if (!socket) return;
         const h = (ev: MessageEvent) => {
             let d: any; try { d = JSON.parse(ev.data); } catch { return; }
-            if (d.groupId !== groupId || d.type !== "groupChatMessage") return;
+            if (d.groupId !== groupId || d.type !== "chatMessage") return;
             if (idSetRef.current.has(d.message.id)) return;
             idSetRef.current.add(d.message.id);
             setMsgs(p => [...p, d.message]);
@@ -122,7 +124,7 @@ export default function Chat() {
 
     const sendMsg = () => {
         if (!text.trim()) return;
-        send({ type: "groupChatMessage", groupId, content: text.trim() }); setText("");
+        send({ type: "chatMessage", groupId, content: text.trim() }); setText("");
     };
 
     if (!groupId) return null;
@@ -169,7 +171,7 @@ export default function Chat() {
                             {div}
                             <div className={styles.msg}>
                                 <img src={m.profile_pic
-                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${m.profile_pic}`
+                                    ? `${API_URL}/api/storage/avatars/${m.profile_pic}`
                                     : "/img/default-avatar.png"} className={styles.avatar} />
                                 <div className={styles.bubble}>
                                     <span className={styles.name}>{m.first_name} {m.last_name}

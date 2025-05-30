@@ -4,7 +4,7 @@ import "../globals.css";
 import { requireSession } from "@/lib/auth";
 import SideBar from "@/components/SideBar";
 import { UserProvider } from "@/context/UserContext";
-import { WSProvider } from "@/context/wsClient"; // ← NEW
+import { WSProvider } from "@/context/wsClient";
 
 export const metadata: Metadata = {
     title: "Social Network",

@@ -5,8 +5,9 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import styles from "./style/inviteMenu.module.css";
 import Loading from "@/components/Loading";
+import { API_URL } from "@/lib/api_url";
+import { throttle } from "../utils";
 
-/* ───────── helpers ───────── */
 const SLICE = 50;
 
 /* ───────── types ───────── */
@@ -56,10 +57,10 @@ export default function InviteMenu({
         const qs =
             `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
         const r = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/followers?${qs}`,
+            `${API_URL}/api/followers?${qs}`,
             { credentials: "include" }
         );
-        if (r.status === 404) return [];
+        if (r.status === 204) return [];
         if (!r.ok) throw new Error();
         return (await r.json()) as Follower[];
     };
@@ -136,7 +137,7 @@ export default function InviteMenu({
         setSubmitting(true);
         try {
             const r = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/invite`,
+                `${API_URL}/api/groups/invite?group_id=${groupId}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -165,7 +166,7 @@ export default function InviteMenu({
                     <div key={id} className={styles.selItem}>
                         <Image
                             src={f.profile_pic
-                                ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
+                                ? `${API_URL}/api/storage/avatars/${f.profile_pic}`
                                 : "/img/default-avatar.png"}
                             alt="" width={24} height={24} className={styles.avt} />
                         <span className={styles.selName}>{f.first_name}</span>
@@ -203,7 +204,7 @@ export default function InviteMenu({
                             onClick={() => toggle(f.id)}>
                             <Image
                                 src={f.profile_pic
-                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${f.profile_pic}`
+                                    ? `${API_URL}/api/storage/avatars/${f.profile_pic}`
                                     : "/img/default-avatar.png"}
                                 alt="" width={28} height={28} className={styles.avt} />
                             <span className={styles.name}>{f.first_name} {f.last_name}</span>
@@ -263,16 +264,3 @@ export default function InviteMenu({
         </div>
     );
 }
-
-/* simple throttle */
-const throttle = (fn: (...a: any[]) => void, wait = 300) => {
-    let waiting = false, saved: any[] | null = null;
-    const timer = () => {
-        if (!saved) { waiting = false; return; }
-        fn(...saved); saved = null; setTimeout(timer, wait);
-    };
-    return (...args: any[]) => {
-        if (waiting) { saved = args; return; }
-        fn(...args); waiting = true; setTimeout(timer, wait);
-    };
-};

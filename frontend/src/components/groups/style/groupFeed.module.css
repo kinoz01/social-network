@@ -5,6 +5,7 @@
     overflow-y: auto;
     max-height: 90vh;
     scrollbar-width: none;
+    overflow-x: hidden;
 }
 
 /* POSTS */

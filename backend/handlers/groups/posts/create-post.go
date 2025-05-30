@@ -4,10 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
 	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
@@ -15,19 +13,6 @@ import (
 
 	"github.com/gofrs/uuid"
 )
-
-/* shape returned to frontend */
-type Post struct {
-	PostID     string    `json:"post_id"`
-	UserID     string    `json:"user_id"`
-	GroupID    string    `json:"group_id"`
-	Body       string    `json:"body"`
-	ImgPost    *string   `json:"img_post"`
-	CreatedAt  time.Time `json:"created_at"`
-	FirstName  string    `json:"first_name"`
-	LastName   string    `json:"last_name"`
-	ProfilePic *string   `json:"profile_pic"`
-}
 
 func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -47,47 +32,28 @@ func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	groupID := r.FormValue("group_id")
-	body := strings.TrimSpace(r.FormValue("body"))
+	body := strings.TrimSpace(r.FormValue("content"))
 	if groupID == "" || len(body) == 0 || len(body) > 2000 {
 		help.JsonError(w, "invalid text", http.StatusBadRequest, nil)
 		return
 	}
 
-	// collapse ≥3 newlines → 2
+	// collapse ≥3 newlines to 2
 	re := regexp.MustCompile(`(\r\n|\r|\n){3,}`)
 	body = re.ReplaceAllString(body, "\n\n")
 
-	// membership check
-	var exists int
-	if err := tp.DB.QueryRow(
-		`SELECT 1 FROM group_users WHERE group_id = ? AND users_id = ? LIMIT 1`,
-		groupID, user.ID,
-	).Scan(&exists); err != nil {
-		help.JsonError(w, "forbidden", http.StatusForbidden, err)
-		return
-	}
 
 	/* ─ optional image ─ */
 	var imgPath sql.NullString
-	if file, hdr, _ := r.FormFile("image"); file != nil {
-		defer file.Close()
-
-		buff, err := help.LimitRead(file, 4<<20) // 4 MB max
-		if err != nil {
-			help.JsonError(w, "image too large", http.StatusBadRequest, err)
-			return
-		}
-		ext := strings.ToLower(filepath.Ext(hdr.Filename))
-		switch ext {
-		case ".jpg", ".jpeg", ".png", ".gif", ".webp":
-		default:
-			help.JsonError(w, "unsupported image format", http.StatusBadRequest, nil)
-			return
-		}
-
-		if p, err := help.SaveImg(buff, "groups_posts/"); err == nil {
-			imgPath.String = p
-			imgPath.Valid = true
+	imgstr, err := help.HandleFileUpload(r, "groups_posts/", "imag_post")
+	if err != nil {
+		help.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+		return
+	}
+	if imgstr != "" {
+		imgPath = sql.NullString{
+			String: imgstr,
+			Valid:  true,
 		}
 	}
 
@@ -104,9 +70,8 @@ func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* ─ fetch full row for immediate UI update ─ */
-	var p Post
+	var p tp.PostData
 	var img sql.NullString
-	var pp sql.NullString
 	row := tp.DB.QueryRow(`
 		SELECT p.post_id, p.user_id, p.group_id, p.body, p.img_post,
 		       p.created_at, u.first_name, u.last_name, u.profile_pic
@@ -115,17 +80,14 @@ func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 		WHERE p.post_id = ? LIMIT 1`, postID)
 
 	if err := row.Scan(
-		&p.PostID, &p.UserID, &p.GroupID, &p.Body, &img,
-		&p.CreatedAt, &p.FirstName, &p.LastName, &pp,
+		&p.PostID, &p.UserID, &p.GroupID, &p.Content, &img,
+		&p.CreatedAt, &p.FirstName, &p.LastName, &p.ProfilePic,
 	); err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
 		return
 	}
 	if img.Valid {
-		p.ImgPost = &img.String
-	}
-	if pp.Valid {
-		p.ProfilePic = &pp.String
+		p.Imag_post = img.String
 	}
 
 	w.Header().Set("Content-Type", "application/json")

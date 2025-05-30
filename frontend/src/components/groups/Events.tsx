@@ -5,6 +5,8 @@ import EventCard, { Event } from "./EventCard";
 import styles from "./style/events.module.css";
 import { useParams } from "next/navigation";
 import Loading from "@/components/Loading";
+import { API_URL } from "@/lib/api_url";
+
 
 const PAGE_SIZE = 20;
 
@@ -24,7 +26,7 @@ export default function Events() {
     const fetchPage = async (off: number) => {
         const qs = `group_id=${groupId}&limit=${PAGE_SIZE}&offset=${off}`;
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/get-events?${qs}`,
+            `${API_URL}/api/groups/get-events?${qs}`,
             { credentials: "include", cache: "no-store" }
         );
         if (!res.ok) throw new Error("Failed to load events");
@@ -100,7 +102,7 @@ export default function Events() {
         };
 
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/groups/create-event`,
+            `${API_URL}/api/groups/create-event?group_id=${groupId}`,
             {
                 method: "POST",
                 credentials: "include",

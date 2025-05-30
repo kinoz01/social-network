@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import styles from "./style/requestsMenu.module.css";
 import { useGroupSync } from "@/context/GroupSyncContext";
+import { API_URL } from "@/lib/api_url";
 
 /* ─────────── types ─────────── */
 type Req = {
@@ -27,7 +28,7 @@ function useRequests(groupId: string) {
         try {
             setLoad(true);
             const r = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/groups/requests?group_id=${groupId}`,
+                `${API_URL}/api/groups/requests?group_id=${groupId}`,
                 { credentials: "include", cache: "no-store" }
             );
             if (r.ok) setList(await r.json());
@@ -52,7 +53,7 @@ function useRequests(groupId: string) {
                 : "/api/groups/refuse-request";
 
         try {
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
+            await fetch(`${API_URL}${endpoint}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -91,7 +92,7 @@ function RequestsList({
                         <Image
                             src={
                                 r.profile_pic
-                                    ? `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${r.profile_pic}`
+                                    ? `${API_URL}/api/storage/avatars/${r.profile_pic}`
                                     : "/img/default-avatar.png"
                             }
                             alt=""
