@@ -22,10 +22,8 @@ check-nextjs:
 
 kill-8080:
 	@fuser -k 8080/tcp 2>/dev/null || lsof -ti:8080 | xargs -r kill -9
-
 kill-3000:
 	@fuser -k 3000/tcp 2>/dev/null || lsof -ti:3000 | xargs -r kill -9
-
 killPorts: kill-3000 kill-8080
 
 # Run backend on background
@@ -71,22 +69,6 @@ deepClean:
 	-docker rm $$(docker ps -aq)
 	-docker rmi $$(docker images -q)
 	-docker system prune -a -f --volumes
-
-# Install Docker rootless
-installDocker:
-	@wget https://get.docker.com/rootless -O docker.sh
-	@chmod +x docker.sh
-	@./docker.sh
-	$(MAKE) fixDocker
-	@rm docker.sh
-
-# Fix Docker rootless environment
-fixDocker:
-	@export PATH=$$HOME/bin:$$PATH
-	@$$HOME/bin/dockerd-rootless.sh > /tmp/dockerd.log 2>&1 &
-	@export DOCKER_HOST=unix:///run/user/$$(id -u)/docker.sock
-	@echo 'export DOCKER_HOST=unix:///run/user/$$(id -u)/docker.sock' >> $$HOME/.bashrc
-	@. $$HOME/.bashrc
 #------------------------- Docker -------------------------#
 
 #------------------------ Migration -----------------------#

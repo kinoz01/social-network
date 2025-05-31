@@ -1,13 +1,11 @@
 package helpers
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"social-network/service/service_posts"
 )
@@ -17,16 +15,22 @@ const fileLimit = 4 << 20 // 4MB
 // Handle serving static content.
 // Api files available at /api/storage/...
 func FilesHandler(w http.ResponseWriter, r *http.Request) {
-	filePath := "./" + strings.TrimLeft(r.URL.Path, "/api")
-
-	filesBytes, err := os.ReadFile(filePath)
-	// Prevent directory traversal attacks, ex: http://127.0.0.1:8080/..%2F..%2Fmain.go
-	if err != nil || strings.Contains(filePath, "..") {
-		JsonError(w, http.StatusText(http.StatusForbidden), http.StatusForbidden, err)
+	// Prevent directory traversal attacks, ex: http://127.0.0.1:8080/api/storage/..%2Fdatabase/socNet.db
+	if strings.Contains(r.URL.Path, "..") {
+		JsonError(w, http.StatusText(http.StatusForbidden), http.StatusForbidden, nil)
 		return
 	}
 
-	http.ServeContent(w, r, filePath, time.Now(), bytes.NewReader(filesBytes))
+	filePath := "./" + strings.TrimLeft(r.URL.Path, "/api")
+
+	info, err := os.Stat(filePath)
+	if info.IsDir() || err != nil {
+		JsonError(w, http.StatusText(http.StatusForbidden), http.StatusForbidden, nil)
+		return
+	}
+
+	// Serve the image file
+	http.ServeFile(w, r, filePath)
 }
 
 func HandleFileUpload(r *http.Request, genre string, formFile string) (string, error) {
@@ -49,7 +53,6 @@ func HandleFileUpload(r *http.Request, genre string, formFile string) (string, e
 			return "", fmt.Errorf("invalid file: %w", err)
 		}
 		if p, err := SaveImg(buff, genre); err == nil {
-			fmt.Printf("Image saved to: %s\n", p)
 			return p, nil
 		}
 	}

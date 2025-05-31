@@ -58,6 +58,7 @@
   padding: 20px;
   color: #65676b;
   font-style: italic;
+  font-size: 0.9rem;
 }
 
 /* ///////////////////// */
@@ -235,6 +236,9 @@
   border-radius: 25px;
   max-width: 600px;
   height: max-content;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  max-height: 90%;
 }
 
 .content {
@@ -338,7 +342,11 @@
 
 .postUser {
   font-weight: bolder;
-  color: #080809;
+  color: #1a1a1a;
+}
+
+.postUser:hover {
+  color: #666666;
 }
 
 .submitBtn:hover,

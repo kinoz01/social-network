@@ -26,7 +26,7 @@ export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
     // throw new Error("user not exist")
     return
   }
-  
+
   const showUsersList = () => {
     setShow(showAudiance)
     setUsers(!showUsers)
@@ -68,6 +68,9 @@ export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
               <ShowUsers onBack={handleBack} onUserCHange={setSelectedUsers} userID={userData.id} />
             </div>
 
+            {selectedUsers.map(id => (
+              <input type="hidden" name="vipUsers" value={id} key={id} />
+            ))}
           </form>
         </div >
       )

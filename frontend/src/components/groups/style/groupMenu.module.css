@@ -17,7 +17,6 @@
     margin-left: 20px;
     scrollbar-width: none;
     font-family: 'Zain', sans-serif;
-
 }
 
 .header {
@@ -142,7 +141,6 @@
         top: 0;
         z-index: 100;
         border-radius: 10px;
-        min-width: 350px;
     }
 
     .menu {

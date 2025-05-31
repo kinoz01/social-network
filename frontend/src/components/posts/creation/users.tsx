@@ -6,7 +6,7 @@ import { BackIcon } from "@/components/icons";
 import Loading from "@/components/Loading";
 import Image from "next/image";
 import React, {
-    useState, useEffect, useRef, useCallback
+    useState, useEffect, useRef
 } from "react";
 import { User } from "@/components/types";
 import { API_URL } from "@/lib/api_url";
@@ -19,17 +19,13 @@ type Props = {
     onUserCHange: (ids: string[]) => void;
     userID: string;
 };
-const fullName = (u: User) =>
-    u.first_name && u.last_name
-        ? `${u.first_name} ${u.last_name}`
-        : u.username ?? u.email ?? "—";
 
 /* ------------ component ------------ */
 export default function ShowUsers({ onBack, onUserCHange }: Props) {
     /* selection ------------------------------------------------ */
     const [picked, setPicked] = useState<Map<string, string>>(new Map());
 
-    /* push IDs to parent **after** render, not during */
+    /* push IDs to parent */
     useEffect(() => {
         onUserCHange([...picked.keys()]);
     }, [picked, onUserCHange]);
@@ -37,7 +33,7 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
     const toggle = (u: User) =>
         setPicked(prev => {
             const m = new Map(prev);
-            m.has(u.id) ? m.delete(u.id) : m.set(u.id, fullName(u));
+            m.has(u.id) ? m.delete(u.id) : m.set(u.id, `${u.first_name} ${u.last_name}`);
             return m;
         });
     const remove = (id: string) =>
@@ -65,7 +61,7 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
         return (await r.json()) as User[];
     };
 
-    const runSearch = useCallback(async (q: string) => {
+    const runSearch = async (q: string) => {
         setQuery(q); setOff(0); setMore(true); setData([]);
         if (!q.trim()) return;
         setLoad(true);
@@ -75,9 +71,9 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
             setOff(slice.length);
             setMore(slice.length === SLICE);
         } finally { setLoad(false); }
-    }, []);
+    };
 
-    const loadMore = useCallback(async () => {
+    const loadMore = async () => {
         if (!hasMore || loading || !query.trim()) return;
         setLoad(true);
         try {
@@ -86,7 +82,7 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
             setOff(o => o + slice.length);
             setMore(slice.length === SLICE);
         } finally { setLoad(false); }
-    }, [hasMore, loading, query, offset]);
+    };
 
     useEffect(() => {
         const el = listRef.current;
@@ -158,7 +154,7 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
                                 width={30}
                                 height={30}
                             />
-                            <span className={styles.name}>{fullName(u)}</span>
+                            <span className={styles.name}>{u.first_name} {u.last_name}</span>
                             <span className={styles.tick}>{active ? "✓" : "+"}</span>
                         </li>
                     );

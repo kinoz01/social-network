@@ -2,7 +2,6 @@ package posts
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -36,8 +35,6 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 	content := strings.TrimSpace(r.FormValue("content"))
 	visibility := r.FormValue("privacy")
 	vipUsers := append(r.Form["vipUsers"], user.ID)
-
-	fmt.Println(vipUsers)
 
 	postID := uuid.Must(uuid.NewV4())
 	newPost := typeP.Post{
