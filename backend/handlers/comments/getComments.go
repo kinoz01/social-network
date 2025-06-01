@@ -3,14 +3,21 @@ package comments
 import (
 	"encoding/json"
 	"net/http"
-	db_comment "social-network/database/repositories/db_posts"
-	"social-network/handlers/helpers"
 	"strconv"
+
+	db_comment "social-network/database/repositories/db_posts"
+	auth "social-network/handlers/authentication"
+	"social-network/handlers/helpers"
 )
 
 func GetComments(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		helpers.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
+		return
+	}
+	user, err := auth.GetUser(r)
+	if err != nil {
+		helpers.JsonError(w, "user not found", http.StatusUnauthorized, nil)
 		return
 	}
 	postID := r.URL.Query().Get("postId")
@@ -25,7 +32,7 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	comments, err := db_comment.CommentByPost(postID, currentPage)
+	comments, err := db_comment.CommentByPost(postID, currentPage, user.ID)
 	if err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
 		return
@@ -34,6 +41,6 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if err := json.NewEncoder(w).Encode(comments); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		helpers.JsonError(w, "Failed to encode response", http.StatusInternalServerError, err)
 	}
 }

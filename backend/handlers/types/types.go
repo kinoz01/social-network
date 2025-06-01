@@ -68,6 +68,8 @@ type Comment struct {
 	LastName    string `json:"last_name"`
 	Avatar      string `json:"avatar"`
 	CreatedAt   string `json:"createdAt"`
+	LikesCount int    `json:"likesCount"`
+	HasReact   string `json:"hasReact"`
 }
 
 type Group struct {

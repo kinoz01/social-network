@@ -30,6 +30,7 @@ export const COmmentsGetter = async ({ postID, page }: { postID: string, page: n
         const res = await fetch(`${API_URL}/api/comments?${queryParams.toString()}`,
             {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },

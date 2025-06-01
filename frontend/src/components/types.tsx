@@ -8,6 +8,8 @@ export interface CommentInfo {
     last_name: string;
     avatar: string;
     createdAt: string;
+    hasReact?: string;
+    likesCount: number;
 }
 
 export interface User {

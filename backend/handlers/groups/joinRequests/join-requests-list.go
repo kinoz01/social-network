@@ -40,7 +40,7 @@ func ListJoinRequests(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if ownerID != u.ID {
-		help.JsonError(w, "Forbidden", 403, err)
+		help.JsonError(w, "unauthorized", http.StatusNoContent , err)
 		return
 	}
 

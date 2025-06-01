@@ -6,6 +6,7 @@ import { CommentInfo, User } from "../types";
 import { popup } from "../utils";
 import { useState, useRef } from "react";
 import { API_URL } from "@/lib/api_url";
+import { Heart } from "../icons";
 
 type FormParams = {
   userData: User | null
@@ -18,7 +19,7 @@ export const CommentForm = (props: FormParams) => {
   const [comment, setComment] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fileSelected, setFile] = useState(false);
-  const canSend = comment.trim().length > 0 || fileSelected;
+  const canSend = comment.trim().length > 0;
 
   const handleComment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,7 +27,7 @@ export const CommentForm = (props: FormParams) => {
     const formDAta = new FormData(commentINputs)
     const content = formDAta.get('content')?.toString().trim()
 
-    if (!content && !fileInputRef.current?.value) {
+    if (!content) {
       popup("comment content cannot be empty", false)
       return
     }
@@ -54,7 +55,7 @@ export const CommentForm = (props: FormParams) => {
       const data = await res.json()
 
       setComment('')
-      setFile(false); 
+      setFile(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
@@ -66,7 +67,7 @@ export const CommentForm = (props: FormParams) => {
     } catch (err: any) {
       console.error("failed to send comment", err)
       document.querySelector(".popup")?.remove()
-      setFile(false); 
+      setFile(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
@@ -97,6 +98,7 @@ export const CommentForm = (props: FormParams) => {
             placeholder="Add a comment…"
             rows={2}
             className={styles.commentInput}
+            maxLength={500}
           />
         </div>
         <div className={styles.leftIcons}>
@@ -130,14 +132,53 @@ export const CommentForm = (props: FormParams) => {
   )
 }
 
-
 export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
+  const [liked, setLiked] = useState(comments.hasReact === "1");
+  const [count, setCount] = useState(comments.likesCount ?? 0);
+
+  const toggle = async () => {
+    /* 1 — decide new state from current one */
+    const nextLiked = !liked;
+
+    /* 2 — optimistic UI */
+    setLiked(nextLiked);
+    setCount(prev => prev + (nextLiked ? 1 : -1));
+
+    try {
+      /* 3 — tell backend *what we just did* */
+      const res = await fetch(`${API_URL}/api/comment/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          commentId: comments.commentId,
+          like: nextLiked          // explicit!
+        }),
+      });
+      if (!res.ok) throw new Error();
+
+      /* 4 — reconcile with truth from server */
+      const { liked: srvLiked, count: srvCount } = await res.json();
+      setLiked(srvLiked);
+      setCount(srvCount);
+    } catch (e) {
+      /* 5 — rollback if request failed */
+      setLiked(comments.hasReact === "1");
+      setCount(comments.likesCount ?? 0);
+    }
+  };
+
   return (
     <div className={styles.bubble}>
+      {/* ------- existing header ------- */}
       <div className={styles.headerRow}>
         <Link href={`/profile/${comments.userID}`} className={styles.linkWrapper}>
           <Image
-            src={comments.avatar ? `${API_URL}/api/storage/avatars/${comments.avatar}` : "/img/default-avatar.png"}
+            src={
+              comments.avatar
+                ? `${API_URL}/api/storage/avatars/${comments.avatar}`
+                : "/img/default-avatar.png"
+            }
             alt={comments.first_name}
             width={40}
             height={40}
@@ -151,15 +192,25 @@ export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
         </Link>
         <TimeAgo dateStr={comments.createdAt} />
       </div>
+
+      {/* ------- existing body ------- */}
       <p>{comments.content}</p>
-      {comments.img_comment &&
+      {comments.img_comment && (
         <Image
           className={styles.img}
           src={`${API_URL}/api/storage/posts/${comments.img_comment}`}
           alt={comments.first_name}
           width={200}
           height={200}
-        />}
+        />
+      )}
+
+      <div className={styles.footer}>
+        <button type="button" onClick={toggle} className={styles.likeBtn}>
+          <Heart filled={liked} className={styles.heartIcon} />
+        </button>
+        <span className={styles.likeCnt}>{count}</span>
+      </div>
     </div>
-  )
-}
+  );
+};

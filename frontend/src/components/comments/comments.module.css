@@ -315,4 +315,30 @@
 .addCommentBtn:disabled {
     opacity: 0.4;
     cursor: default;
-  }
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: .4rem;
+    margin-left: auto;
+}
+
+.likeBtn {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.heartIcon {
+    width: 18px;
+    height: 18px;
+    color: #000000;
+}
+
+.likeCnt {
+    font-size: .8rem;
+}

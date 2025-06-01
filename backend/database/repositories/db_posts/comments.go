@@ -3,6 +3,7 @@ package repoPosts
 import (
 	"database/sql"
 	"fmt"
+
 	"social-network/handlers/types"
 )
 
@@ -33,56 +34,40 @@ func CreateCommentDB(newComment types.Comment) error {
 	return nil
 }
 
-func CommentByPost(postID string, page int) ([]types.Comment, error) {
-	var comments []types.Comment
-	query := `
-	SELECT
-		c.comment_id,
-		c.user_id,
-		c.post_id,
-		c.content,
-		c.img_comment,
-		c.created_at,
-		u.first_name,
-		u.last_name,
-		u.profile_pic
-		FROM comments c
-		INNER JOIN users u ON u.id = c.user_id
-		WHERE c.post_id = ?
-		ORDER BY c.created_at DESC, c.ROWID DESC
-		LIMIT 20 OFFSET ?
-	`
-	rows, err := types.DB.Query(query, postID, page)
+func CommentByPost(postID string, page int, viewerID string) ([]types.Comment, error) {
+	var out []types.Comment
+	rows, err := types.DB.Query(`
+	  SELECT
+	    c.comment_id, c.user_id, c.post_id, c.content, c.img_comment,
+	    c.created_at, u.first_name, u.last_name, u.profile_pic,
+	    (SELECT COUNT(*) FROM like_reaction lr
+	       WHERE lr.comment_id = c.comment_id AND lr.react_type='1')         AS likes,
+	    COALESCE((
+	      SELECT lr.react_type FROM like_reaction lr
+	       WHERE lr.comment_id = c.comment_id AND lr.user_id = ? LIMIT 1),''
+	    ) AS reacted
+	  FROM comments c
+	  JOIN users u ON u.id = c.user_id
+	  WHERE c.post_id = ?
+	  ORDER BY likes DESC, c.ROWID DESC
+	  LIMIT 20 OFFSET ?`, viewerID, postID, page)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
 	for rows.Next() {
-		var comment types.Comment
-		var imgComment sql.NullString
-		err := rows.Scan(
-			&comment.ID,
-			&comment.UserID,
-			&comment.PostID,
-			&comment.Content,
-			&imgComment,
-			&comment.CreatedAt,
-			&comment.FirstName,
-			&comment.LastName,
-			&comment.Avatar,
-		)
-		if err != nil {
+		var c types.Comment
+		var img sql.NullString
+		if err := rows.Scan(
+			&c.ID, &c.UserID, &c.PostID, &c.Content, &img, &c.CreatedAt,
+			&c.FirstName, &c.LastName, &c.Avatar, &c.LikesCount, &c.HasReact); err != nil {
 			return nil, err
 		}
-		if imgComment.Valid {
-			comment.Img_comment = imgComment.String
-		} else {
-			comment.Img_comment = ""
+		if img.Valid {
+			c.Img_comment = img.String
 		}
-		comments = append(comments, comment)
+		out = append(out, c)
 	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return comments, nil
+	return out, rows.Err()
 }

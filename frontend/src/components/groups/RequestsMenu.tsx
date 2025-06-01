@@ -31,6 +31,7 @@ function useRequests(groupId: string) {
                 `${API_URL}/api/groups/requests?group_id=${groupId}`,
                 { credentials: "include", cache: "no-store" }
             );
+            if (r.status == 204 ) return setList([])
             if (r.ok) setList(await r.json());
             else setList([]);
         } catch {

@@ -412,6 +412,19 @@ const PrivateIcon = () => (
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
 )
+function Heart({ filled=false, ...p }:
+  { filled?: boolean } & React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" {...p}
+         fill={filled ? "currentColor" : "none"}
+         stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+      <path d="M12 21s-8-7.63-8-12.6C4 5.52 6.24 3 9 3
+               c1.66 0 3.15.8 4 2 .85-1.2 2.34-2 4-2
+               2.76 0 5 2.52 5 5.4 0 4.97-8 12.6-8 12.6z"/>
+    </svg>
+  );
+}
+
 export {
   PrivateIcon,
   PublicIcon,
@@ -432,4 +445,5 @@ export {
   LogoutIcon,
   CreateIcon,
   SendIcon,
+  Heart,
 };
