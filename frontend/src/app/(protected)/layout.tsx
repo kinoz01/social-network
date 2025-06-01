@@ -19,11 +19,11 @@ export default async function HomeLayout({
     await requireSession();
 
     return (
-        <WSProvider>
-            <UserProvider>
+        <UserProvider>
+            <WSProvider>
                 <SideBar />
                 {children}
-            </UserProvider>
-        </WSProvider>
+            </WSProvider>
+        </UserProvider>
     );
 }

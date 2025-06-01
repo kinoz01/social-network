@@ -105,7 +105,7 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ modal = false, onClose }) => {
     /* ===== render body ===== */
     const body = (
         <>
-            <h4 className={styles.section}>DIRECT MESSAGES</h4>
+            <h4 className={styles.section}>AVAILABLE USERS</h4>
 
             <input
                 className={styles.search}

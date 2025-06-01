@@ -2,14 +2,17 @@ package server
 
 import (
 	"net/http"
+	"time"
+
 	"social-network/handlers/posts"
 	"social-network/handlers/users"
-	"time"
 
 	auth "social-network/handlers/authentication"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 
+	"social-network/handlers/chat"
+	"social-network/handlers/profile"
 	cmnts "social-network/handlers/comments"
 	flw "social-network/handlers/follows"
 	grps "social-network/handlers/groups"
@@ -19,7 +22,7 @@ import (
 	grpsRequest "social-network/handlers/groups/joinRequests"
 	grpsPost "social-network/handlers/groups/posts"
 	ws "social-network/handlers/websocket"
-	"social-network/handlers/chat"
+
 )
 
 var Router http.Handler
@@ -49,7 +52,7 @@ func Routes() http.Handler {
 	// comments
 	mux.Handle("/api/addcomment", rl.RateLimitMW(http.HandlerFunc(cmnts.AddComment)))
 	mux.Handle("/api/comments", rl.RateLimitMW(http.HandlerFunc(cmnts.GetComments)))
-	
+
 	// reactions
 	mux.Handle("/api/comment/like", rl.RateLimitMW(http.HandlerFunc(cmnts.HandleCommentLike)))
 	mux.Handle("/api/react", rl.RateLimitMW(http.HandlerFunc(posts.HandleLike)))
@@ -66,7 +69,7 @@ func Routes() http.Handler {
 	// Groups:
 	mux.Handle("/api/groups/is-member", rl.RateLimitMW(http.HandlerFunc(grps.IsGroupMember)))
 	mux.Handle("/api/groups/groupInfo", rl.RateLimitMW(http.HandlerFunc(grps.GetGroupInfo)))
-	mux.Handle("/api/groups/invite", rl.RateLimitMW(http.HandlerFunc( grpsInvite.InviteFollowers)))
+	mux.Handle("/api/groups/invite", rl.RateLimitMW(http.HandlerFunc(grpsInvite.InviteFollowers)))
 	mux.Handle("/api/groups/requests", rl.RateLimitMW(http.HandlerFunc(grpsRequest.ListJoinRequests)))
 	mux.Handle("/api/groups/accept-request", rl.RateLimitMW(http.HandlerFunc(grpsRequest.AcceptJoinRequest)))
 	mux.Handle("/api/groups/refuse-request", rl.RateLimitMW(http.HandlerFunc(grpsRequest.RefuseJoinRequest)))
@@ -84,6 +87,11 @@ func Routes() http.Handler {
 
 	// Chat menu:
 	mux.HandleFunc("/api/chat/list", chat.GetChatList)
+	// Chat Rest DMs:
+	mux.HandleFunc("/api/chat/messages", chat.GetPrivateMessages)
+
+	mux.HandleFunc("/api/users/profile", profile.GetDMProfile)
+
 
 	// Followers search:
 	mux.HandleFunc("/api/followers", flw.GetFollowers)
