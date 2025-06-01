@@ -40,13 +40,8 @@
     margin-bottom: 10px;
 }
 
-@media (max-width: 600px) {
-    .name {
-        font-size: 1rem !important;
-    }
-}
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
     .name {
         display: none;
     }
@@ -63,7 +58,7 @@
     margin-top: 20px;
 }
 
-@media (min-width: 500px) {
+@media (min-width: 600px) {
     .nameTitle {
         display: none;
     }
