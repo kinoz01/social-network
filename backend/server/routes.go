@@ -78,6 +78,9 @@ func Routes() http.Handler {
 	mux.Handle("/api/groups/create-event", rl.RateLimitMW(http.HandlerFunc(grpevent.CreateEvent)))
 	mux.Handle("/api/groups/get-events", rl.RateLimitMW(http.HandlerFunc(grpevent.GetEvents)))
 	mux.Handle("/api/groups/event-response", rl.RateLimitMW(http.HandlerFunc(grpevent.EventResponse)))
+	// Restful members menu:
+	mux.HandleFunc("/api/groups/members", grps.GetMembers)
+
 
 	// Followers search:
 	mux.HandleFunc("/api/followers", flw.GetFollowers)

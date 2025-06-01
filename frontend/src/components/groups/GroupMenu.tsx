@@ -9,6 +9,7 @@ import Loading from "@/components/Loading";
 import { useGroupSync } from "@/context/GroupSyncContext";
 import InviteMenu from "@/components/groups/InviteMenu";
 import { RequestsModal } from "@/components/groups/RequestsMenu";
+import AllMembersMenu from "@/components/groups/AllMembersMenu";
 import { API_URL } from "@/lib/api_url";
 
 
@@ -30,6 +31,7 @@ export default function GroupMenu() {
     const { version } = useGroupSync();
     const [inviteOpen, setInviteOpen] = useState(false);
     const [requestsOpen, setRequestsOpen] = useState(false);
+    const [allMembersOpen, setAllMembersOpen] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -110,13 +112,25 @@ export default function GroupMenu() {
                             <span className={styles.label}>Join Requests</span>
                         </button>
                     )}
+                    <button
+                        className={`${styles.menuItem} ${styles.responsiveOnly}`}
+                        onClick={() => setAllMembersOpen(true)}
+                    >
+                        <Image src="/img/menu-members.svg" alt="" width={22} height={22} />
+                        <span className={styles.label}>Members</span>
+                    </button>
                 </nav>
             </div>
 
             {/* Invite Modal */}
-            {inviteOpen && <InviteMenu modal={true} onClose={() => setInviteOpen(false)} />}
+            {inviteOpen && (
+                <InviteMenu modal onClose={() => setInviteOpen(false)} />
+            )}
             {requestsOpen && (
                 <RequestsModal modal onClose={() => setRequestsOpen(false)} />
+            )}
+            {allMembersOpen && (
+                < AllMembersMenu modal onClose={() => setAllMembersOpen(false)}/>
             )}
         </>
     );

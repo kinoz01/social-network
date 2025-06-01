@@ -118,7 +118,7 @@ group_users:
 	@echo "INSERT INTO group_users (id, group_id, users_id) VALUES" > group_users_insert.sql
 	@for i in $$(seq 1 7001); do \
 		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
-		echo "('gu-$$i','e2cfe1f0-fc0b-459b-953c-8cb2e8ccb100','uuid-$$i')$$end" >> group_users_insert.sql; \
+		echo "('gu-$$i','f3e570de-10fc-4bd2-91ce-98d3f7faf500','uuid-$$i')$$end" >> group_users_insert.sql; \
 	done
 	@echo "✅ group_users_insert.sql generated with 7001 entries."
 

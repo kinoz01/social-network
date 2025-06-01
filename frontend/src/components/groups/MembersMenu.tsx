@@ -15,33 +15,30 @@ export default function MembersMenu() {
     const { id: groupId } = useParams() as { id: string };
     const { groupMembers, getGroupMembers, online } = useWS();
     const { version } = useGroupSync();
-
-    const members = groupMembers.get(groupId);    
+   
+    const snapshot = groupMembers.get(groupId); 
 
     /* refresh snapshot when groupId or version changes */
     useEffect(() => {
         if (groupId) getGroupMembers(groupId);
     }, [groupId, version, getGroupMembers]);
 
-    /* ---------- sort: online first, then alphabetically ---------- */
-    const ordered = useMemo(() => {
-        if (!members) return [];
-        return [...members].sort((a, b) => {
-            const aOn = online.has(a.id) ? 0 : 1;   // online users => 0
-            const bOn = online.has(b.id) ? 0 : 1;   // offline users => 1
-            if (aOn !== bOn) return aOn - bOn;      // online block first
-            return a.first_name.localeCompare(b.first_name); // tie-break
-        });
-    }, [members, online]);
+    /* ---------- ---------- */
+    const onlineMembers = useMemo(() => {
+        if (!snapshot) return [];
+        return snapshot
+          .filter(m => online.has(m.id))                              // ✨ filter here
+          .sort((a, b) => a.first_name.localeCompare(b.first_name));  // simple alpha
+      }, [snapshot, online]);
 
-    if (!members) return <Loading />;
-    if (members.length === 0) return null;
+    if (!snapshot) return <Loading />;
+    if (snapshot.length === 0) return null;
 
     return (
         <aside className={styles.menu}>
-            <h4 className={styles.section}>Members</h4>
+            <h4 className={styles.section}>Online Members</h4>
             <div className={styles.list}>
-                {ordered.map((m) => {
+                {onlineMembers.map((m) => {
                     const isOn = online.has(m.id);
                     return (
                         <Link

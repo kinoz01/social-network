@@ -5,6 +5,7 @@ import RequestsMenu from "@/components/groups/RequestsMenu";
 import { checkMembership } from "@/lib/auth";
 import style from "@/components/groups/style/groupLayout.module.css";
 import { GroupSyncProvider } from "@/context/GroupSyncContext";
+import AllMembersMenu from "@/components/groups/AllMembersMenu";
 
 export default async function GroupLayout({
     params: paramsPromise,
@@ -28,6 +29,7 @@ export default async function GroupLayout({
                 </div>
                 <div className={style.menuLayout}>
                     <MembersMenu />
+                    <AllMembersMenu />
                     <InviteMenu />
                 </div>
             </div>

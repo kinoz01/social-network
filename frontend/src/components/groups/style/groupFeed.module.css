@@ -95,6 +95,7 @@
     -ms-overflow-style: none;
     /* IE 10+ */
     scrollbar-width: none;
+    font-size: 1.3rem;
 }
 
 .status {
