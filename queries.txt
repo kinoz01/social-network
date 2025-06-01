@@ -1,8 +1,0 @@
-{
-	"postid" : "f2216ae6-bb0e-4abf-a32d-45ee7bc0cfd2",
-	"content": "hhhh",
-	"userid" :  "e0ae77af-2ac0-4f34-8a2e-da190ac22fe9"
-
-}
-
-
