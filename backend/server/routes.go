@@ -19,6 +19,7 @@ import (
 	grpsRequest "social-network/handlers/groups/joinRequests"
 	grpsPost "social-network/handlers/groups/posts"
 	ws "social-network/handlers/websocket"
+	"social-network/handlers/chat"
 )
 
 var Router http.Handler
@@ -81,6 +82,8 @@ func Routes() http.Handler {
 	// Restful members menu:
 	mux.HandleFunc("/api/groups/members", grps.GetMembers)
 
+	// Chat menu:
+	mux.HandleFunc("/api/chat/list", chat.GetChatList)
 
 	// Followers search:
 	mux.HandleFunc("/api/followers", flw.GetFollowers)

@@ -76,3 +76,7 @@ body {
         font-size: 1.3rem;
     }
 }
+
+.chat-box {
+    width: 100%;
+}

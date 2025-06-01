@@ -1,0 +1,103 @@
+.menu {
+    border: 1px solid rgb(214, 214, 214);
+    box-shadow: 0 4px 5px #63636336;
+    border-radius: 12px;
+    background: #fff;
+    padding: 1.4rem;
+    max-width: 600px;
+    min-width: 280px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+    font-family: 'Zain';
+    font-size: 1.2rem;
+    margin-top: 30px;
+}
+
+.section {
+    margin: 0;
+    font-size: .9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.search {
+    width: 100%;
+    padding: .45rem .6rem;
+    border: 1px solid grey;
+    border-radius: 8px;
+    font-size: .9rem;
+}
+
+.search:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: 5px;
+    border-radius: 25px;
+    text-decoration: none;
+    color: #000;
+    transition: background .15s;
+}
+
+.item:hover {
+    background: #eeeeee;
+}
+
+.avt {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.badge {
+    margin-left: auto;
+    font-size: 1rem;
+    opacity: .8;
+    margin-top: 5px;
+}
+
+.end {
+    text-align: center;
+    font-size: .85rem;
+    color: #666;
+}
+
+/* ── modal helpers (reuse pattern from InviteMenu) ───────────────── */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .4);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 3rem;
+    z-index: 1000;
+}
+
+.modal {
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: .6rem;
+    top: .4rem;
+    font-size: 1.3rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
