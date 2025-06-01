@@ -100,7 +100,10 @@ export default function Feed({ type }: { type: "home" | "group" }) {
                 {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
 
                 {currentPage === 0 && postedContent.length === 0 ?
-                    <div>EMPTY FEED</div>
+                    <div className={styles.status}>
+                        <p>EMPTY FEED.</p>
+                        <Image src="/img/empty.svg" alt="" width={200} height={200} />
+                    </div>
                     :
                     <>
                         {postedContent.map((post, index) => (

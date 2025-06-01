@@ -106,7 +106,7 @@ export default function Comment(props: Params) {
                   </div>
                 )}
 
-                {!hasMOre && !isLoading && curentPage > 1 && (
+                {!hasMOre && !isLoading && curentPage > 3 && (
                   <div className={style.noMorePosts}>
                     no more comments to load - Check back later
                   </div>

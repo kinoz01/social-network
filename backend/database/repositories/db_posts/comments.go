@@ -49,7 +49,7 @@ func CommentByPost(postID string, page int, viewerID string) ([]types.Comment, e
 	  FROM comments c
 	  JOIN users u ON u.id = c.user_id
 	  WHERE c.post_id = ?
-	  ORDER BY likes DESC, c.ROWID DESC
+	  ORDER BY c.created_at DESC, c.ROWID DESC
 	  LIMIT 20 OFFSET ?`, viewerID, postID, page)
 	if err != nil {
 		return nil, err
