@@ -11,7 +11,7 @@
 
 /* white card - centre */
 .card {
-    width: min(680px, 92vw);
+    width: min(800px, 95vw);
     height: 70vh;
     background: #fff;
     border-radius: 16px;

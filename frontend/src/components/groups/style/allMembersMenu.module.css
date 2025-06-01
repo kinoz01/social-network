@@ -2,7 +2,23 @@
 /* reuse palette / variables */
 
 .menu {
-    composes: menu from "./membersMenu.module.css";
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background-color: #fff;
+    overflow-y: auto;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+    position: sticky;
+    top: 1rem;
+    overflow-wrap: anywhere;
+    margin-left: 20px;
+    scrollbar-width: none;
+    font-family: 'Zain', sans-serif;
     margin-top: 10px;
 }
 
@@ -52,7 +68,8 @@
 }
 
 .avt {
-    composes: avt from "./membersMenu.module.css";
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .name {
