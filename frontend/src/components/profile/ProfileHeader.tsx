@@ -67,7 +67,6 @@ function UserProfile() {
       </div>
       <section className={styles.posts}>
         <div className={styles.profile_posts}>
-         
           {
             userData.posts.map((elem, i) => <PostComponent post={elem} key={i}/> )
           }

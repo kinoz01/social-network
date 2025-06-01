@@ -1,4 +1,4 @@
-package profil
+package profile
 
 import (
 	"database/sql"
@@ -11,7 +11,7 @@ import (
 	Error "social-network/handlers/helpers"
 )
 
-func GetDateFollow(w http.ResponseWriter, r *http.Request) {
+func ProfileData(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		Error.JsonError(w, "Method not allowed", 405, nil)
 		return
@@ -128,8 +128,10 @@ ORDER BY
 		return
 	}
 	userdata.PostNbr = len(userdata.Posts)
-	userdata.Posts[0].FirstName = userdata.Firstname
-	userdata.Posts[0].LastName = userdata.Lastname
+	if  len(userdata.Posts)>0{
+		userdata.Posts[0].FirstName = userdata.Firstname
+		userdata.Posts[0].LastName = userdata.Lastname
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata)
 }
