@@ -1,10 +1,11 @@
-import ProfileCard from "@/components/menus/ProfileCrad";
 import ProfileHeader from "@/components/profile/ProfileHeader";
+export default function ProfilePAge({params}) {
+  const { id } = params;
 
-export default function ProfilePAge() {
   return (
     <div className="mainContent profile">
-      <ProfileHeader />
+
+      <ProfileHeader userId={id} />
     </div>
   );
 }

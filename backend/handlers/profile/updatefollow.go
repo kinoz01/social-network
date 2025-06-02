@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	tp "social-network/handlers/types"
 
@@ -17,25 +18,27 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := r.Cookie("session_token")
-	if err != nil {
-		Error.JsonError(w, "session not found", http.StatusUnauthorized, err)
-		return
-	}
+	// cookie, err := r.Cookie("session_token")
+	// if err != nil {
+	// 	Error.JsonError(w, "session not found", http.StatusUnauthorized, err)
+	// 	return
+	// }
+	fmt.Println("r", r.URL.Path)
 
-	token := cookie.Value
-	var useid string
+	// token := cookie.Value
+	// var useid string
 	var userdata tp.UserData
-	if err := tp.DB.QueryRow(`SELECT user_id FROM sessions WHERE token=?`, token).Scan(&useid); err != nil {
-		if err == sql.ErrNoRows {
-			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-			return
-		}
-		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-		return
-	}
-
-	err = tp.DB.QueryRow(`SELECT 
+	useid := strings.Split(r.URL.Path, "/")[3]
+	// if err := tp.DB.QueryRow(`SELECT user_id FROM sessions WHERE token=?`, token).Scan(&useid); err != nil {
+	// 	if err == sql.ErrNoRows {
+	// 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+	// 		return
+	// 	}
+	// 	Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+	// 	return
+	// }
+	fmt.Println("iddd", useid)
+	err := tp.DB.QueryRow(`SELECT 
 	first_name,
 	last_name,
 	birthday,
@@ -73,6 +76,9 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
     posts.visibility,
     posts.created_at,
     posts.post_id,
+    users.first_name,
+    users.last_name,
+    users.profile_pic,
     (
         select
             count(*)
@@ -89,12 +95,13 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
         WHERE
             c.post_id = posts.post_id
     ) AS comment_count
-FROM
-    posts
+FROM posts 
+LEFT JOIN users ON users.id = posts.user_id
 WHERE
     user_id = ?
 ORDER BY
-    created_at DESC;
+    posts.created_at DESC;
+
 `
 
 	rows, err := tp.DB.Query(postsQuery, useid)
@@ -107,31 +114,30 @@ ORDER BY
 	for rows.Next() {
 		var post tp.PostData
 		err := rows.Scan(
-			&post.Group_id,
+			&post.GroupID,
 			&post.Content,
 			&post.Imag_post,
 			&post.Visibility,
 			&post.CreatedAt,
-			&post.Post_id,
-			&post.Cte_likes,
-			&post.Comments_nbr,
+			&post.PostID,
+			&post.FirstName,
+			&post.LastName,
+			&post.ProfilePic,
+			&post.TotalLIKes,
+			&post.TotalComments,
 		)
 		if err != nil {
-			Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
 		userdata.Posts = append(userdata.Posts, post)
 	}
-
+	fmt.Println("posr======", userdata.Posts)
 	if err = rows.Err(); err != nil {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
 	userdata.PostNbr = len(userdata.Posts)
-	if  len(userdata.Posts)>0{
-		userdata.Posts[0].FirstName = userdata.Firstname
-		userdata.Posts[0].LastName = userdata.Lastname
-	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata)
 }

@@ -37,7 +37,7 @@ type PostData struct {
 	PostID        string   `json:"id"`
 	UserID        string   `json:"userID"`
 	Content       string   `json:"content"`
-	Imag_post     any   `json:"imag_post,omitempty"`
+	Imag_post     any      `json:"imag_post,omitempty"`
 	Visibility    string   `json:"visibility"`
 	VipUsers      []string `json:"vipUsers"`
 	FirstName     string   `json:"firstName"`
@@ -47,14 +47,7 @@ type PostData struct {
 	TotalLIKes    int      `json:"totalLikes"`
 	TotalComments int      `json:"totalComments"`
 	CreatedAt     string   `json:"createdAt"`
-	GroupID       string   `json:"groupID,omitempty"`
-
-
-
-	Group_id     any            `json:"group_id,omitempty"`
-	Post_id      string         `json:"post_id"`
-	Cte_likes    int            `json:"cte_likes"`
-	Comments_nbr int            `json:"comments_nbr"`
+	GroupID       any      `json:"groupID,omitempty"`
 }
 
 type React struct {
@@ -75,8 +68,8 @@ type Comment struct {
 	LastName    string `json:"last_name"`
 	Avatar      string `json:"avatar"`
 	CreatedAt   string `json:"createdAt"`
-	LikesCount int    `json:"likesCount"`
-	HasReact   string `json:"hasReact"`
+	LikesCount  int    `json:"likesCount"`
+	HasReact    string `json:"hasReact"`
 }
 
 type Group struct {

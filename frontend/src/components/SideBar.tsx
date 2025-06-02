@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import {
   AddIcon,
   ChatsIcon,
@@ -12,9 +13,10 @@ import {
 } from "./icons";
 import Link from "next/link";
 import { useLogout } from "@/lib/logout";
+import { useUser } from "@/context/UserContext";
 export default function SideBar() {
   const [hover, setHover] = useState(false);
-
+  const user = useUser();
   const { handleLogout } = useLogout();
 
   return (
@@ -35,7 +37,7 @@ export default function SideBar() {
           <HomeIcon />
           {hover ? <span>Home</span> : null}
         </Link>
-        <Link href="/profile/1" className="navSection">
+        <Link href={`/profile/${user.user?.id}`} className="navSection">
           <UserIcon />
           {hover ? <span>Profile</span> : null}
         </Link>
