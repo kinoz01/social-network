@@ -202,7 +202,7 @@ export default function DirectChatBox() {
                         width={150}
                         height={150}
                     />
-                    <p className={styles.emptyStatus}>User not found<br></br>Try selecting user from available menus</p>
+                    <p className={styles.emptyStatus}>User not found<br></br>Try selecting available users</p>
                 </div>
             </div>
         );

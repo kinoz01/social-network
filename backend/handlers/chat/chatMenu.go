@@ -37,9 +37,7 @@ func GetChatList(w http.ResponseWriter, r *http.Request) {
 	// ── query params ────────────────────────────────────────────────────────
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	if limit == 0 {
-		limit = 50
-	}
+	
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	like := q + "%"
 

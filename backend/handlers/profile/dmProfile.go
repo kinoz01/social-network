@@ -5,14 +5,20 @@ import (
 	"encoding/json"
 	"net/http"
 
+	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
 
-
 func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
+		return
+	}
+
+	u, err := auth.GetUser(r)
+	if err != nil {
+		help.JsonError(w, "user not found", http.StatusUnauthorized, nil)
 		return
 	}
 
@@ -22,12 +28,12 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var fn, ln, pic sql.NullString
-	err := tp.DB.QueryRow(`
-        SELECT first_name, last_name, profile_pic
+	var fn, ln, pic, accType sql.NullString
+	err = tp.DB.QueryRow(`
+        SELECT first_name, last_name, profile_pic, account_type
         FROM users
         WHERE id = ?
-    `, userID).Scan(&fn, &ln, &pic)
+    `, userID).Scan(&fn, &ln, &pic, &accType)
 	if err == sql.ErrNoRows {
 		help.JsonError(w, "user not found", http.StatusNotFound, nil)
 		return
@@ -35,6 +41,26 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
 		return
+	}
+
+	if accType.String == "private" {
+		var count int
+		err = tp.DB.QueryRow(`
+            SELECT COUNT(*)
+            FROM follow_requests
+            WHERE status = 'accepted' AND (
+                (follower_id = ? AND followed_id = ?) OR
+                (follower_id = ? AND followed_id = ?)
+            )
+        `, u.ID, userID, userID, u.ID).Scan(&count)
+		if err != nil {
+			help.JsonError(w, "db error", http.StatusInternalServerError, err)
+			return
+		}
+		if count == 0 {
+			help.JsonError(w, "user not found", http.StatusNotFound, nil)
+			return
+		}
 	}
 
 	resp := map[string]string{

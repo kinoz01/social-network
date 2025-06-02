@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
@@ -16,22 +15,10 @@ import (
 GET /api/groups/members?group_id=<id>&limit=50&offset=0&q=john
 */
 func GetMembers(w http.ResponseWriter, r *http.Request) {
+	
 	gid := r.URL.Query().Get("group_id")
-	if gid == "" {
-		help.JsonError(w, "missing group_id", http.StatusBadRequest, nil)
-		return
-	}
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	if limit == 0 {
-		limit = 50
-	}
-
-	// viewer must belong to the group
-	if _, err := auth.GetUser(r); err != nil {
-		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
-		return
-	}
 
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 	like := q + "%"
@@ -57,11 +44,11 @@ func GetMembers(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	type member struct {
-		ID         string         `json:"id"`
-		FirstName  string         `json:"first_name"`
-		LastName   string         `json:"last_name"`
+		ID         string `json:"id"`
+		FirstName  string `json:"first_name"`
+		LastName   string `json:"last_name"`
 		ProfilePic string `json:"profile_pic"`
-		IsOwner    bool           `json:"isOwner"`
+		IsOwner    bool   `json:"isOwner"`
 	}
 
 	list := make([]member, 0, limit)
@@ -78,7 +65,7 @@ func GetMembers(w http.ResponseWriter, r *http.Request) {
 		}
 		list = append(list, m)
 	}
-	
+
 	if len(list) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return
