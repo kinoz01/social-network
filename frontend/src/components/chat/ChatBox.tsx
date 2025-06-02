@@ -253,7 +253,7 @@ export default function DirectChatBox() {
                             width={150}
                             height={150}
                         />
-                        <p className={styles.emptyStatus}>No conversation yet</p>
+                        <p className={styles.emptyStatus}>No conversation yet<br></br>Say Hey</p>
                     </div>
                 ) : (
                     msgs.map((m) => {

@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: .8rem;
+  scrollbar-width: none;
 }
 
 .emojiBtn {
@@ -153,6 +154,7 @@
   border: 1px solid #ddd;
   border-radius: 12px;
   overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 .status {
@@ -216,7 +218,7 @@
 }
 
 .emptyStatus {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: #666;
   margin: 1rem 0;
   text-align: center;

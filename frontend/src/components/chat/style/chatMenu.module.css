@@ -6,13 +6,13 @@
     padding: 1.4rem;
     max-width: 600px;
     min-width: 280px;
-    max-height: 90vh;
     display: flex;
     flex-direction: column;
     gap: .8rem;
     font-family: 'Zain';
     font-size: 1.2rem;
     margin-top: 30px;
+    flex-shrink: 0;
 }
 
 .section {
@@ -55,7 +55,7 @@
 }
 
 .item:hover {
-    background: #eeeeee;
+    background: #e0e0e0;
 }
 
 .avt {

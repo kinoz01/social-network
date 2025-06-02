@@ -47,7 +47,7 @@ export default function SideBar() {
           <NotificationIcon />
           {hover ? <span>Notifications</span> : null}
         </Link>
-        <Link href="/chat/1" className="navSection">
+        <Link href="/chat" className="navSection">
           <ChatsIcon />
           {hover ? <span>Chats</span> : null}
         </Link>
