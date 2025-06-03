@@ -102,7 +102,6 @@ WHERE
     user_id = ?
 ORDER BY
     posts.created_at DESC;
-
 `
 
 	rows, err := tp.DB.Query(postsQuery, useid)
@@ -132,14 +131,34 @@ ORDER BY
 			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
+		resction , err := GitReaction(w ,post.PostID, post.UserID)
+		fmt.Println("react", resction)
+		post.HasReact = resction
 		userdata.Posts = append(userdata.Posts, post)
 	}
 	fmt.Println("posr======", userdata.Posts)
 	if err = rows.Err(); err != nil {
-		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
 	userdata.PostNbr = len(userdata.Posts)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata)
+}
+
+func GitReaction(w http.ResponseWriter, postid string, useid string) (string, error) {
+	var react string
+	err := tp.DB.QueryRow(`SELECT
+    react_type
+FROM
+    like_reaction
+where
+    like_reaction.user_id = ?
+    AND like_reaction.post_id = ?
+`, useid, postid).Scan(&react)
+	if err != nil {
+		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+		return "", err
+	}
+	return react, nil
 }
