@@ -1,5 +1,7 @@
 import ProfileHeader from "@/components/profile/ProfileHeader";
-export default function ProfilePAge({params}) {
+export default async function ProfilePAge({params}) {
+  console.log("params",await params);
+  
   const { id } = params;
 
   return (

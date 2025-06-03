@@ -79,6 +79,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
     users.first_name,
     users.last_name,
     users.profile_pic,
+	users.id,
     (
         select
             count(*)
@@ -123,6 +124,7 @@ ORDER BY
 			&post.FirstName,
 			&post.LastName,
 			&post.ProfilePic,
+			&post.UserID,
 			&post.TotalLIKes,
 			&post.TotalComments,
 		)

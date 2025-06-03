@@ -14,6 +14,7 @@ import Link from "next/link";
 import { API_URL } from "@/lib/api_url";
 
 export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({ post, type }) => {
+console.log("postyy",post);
 
   const [showComments, setShowComments] = useState(false)
   const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
@@ -83,7 +84,7 @@ export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({ post, 
           </Link>
           <div className={styles.postCreationDate}>
             <div className={styles.timeAgo}>
-              <TimeAgo dateStr={post.createdAt} />
+              <TimeAgo dateStr={post.createdAt}/>
             </div>
             {post.visibility === "private" ? <CloseFriendIcon /> : post.visibility === "almost-private" ? <PrivateIcon /> : <PublicIcon />}
           </div>

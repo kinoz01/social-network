@@ -8,14 +8,15 @@ import { Profile } from "../types";
 import { API_URL } from "@/lib/api_url";
 
 import { useUser } from "@/context/UserContext";
-
+//to-do
 //clicksurpofile
 //hasreact
-//acuntstatu
+//accountstatu
+//profilpublic or priv
 
 function UserProfile({ userId }: any) {
   const [userData, setData] = useState<Profile | null>(null);
-  const user = useUser();
+  // const user = useUser();
 
   useEffect(() => {
     async function fetchData() {
