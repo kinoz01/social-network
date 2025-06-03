@@ -27,7 +27,7 @@ export default function MembersMenu() {
     const onlineMembers = useMemo(() => {
         if (!snapshot) return [];
         return snapshot
-          .filter(m => online.has(m.id))                              // ✨ filter here
+          .filter(m => online.has(m.id))                              // filter offline
           .sort((a, b) => a.first_name.localeCompare(b.first_name));  // simple alpha
       }, [snapshot, online]);
 

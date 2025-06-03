@@ -8,6 +8,7 @@ import styles from "./style/allMembersMenu.module.css";
 import Loading from "@/components/Loading";
 import { throttle } from "@/components/utils";
 import { API_URL } from "@/lib/api_url";
+import { useGroupSync } from "@/context/GroupSyncContext";
 
 interface Member {
     id: string;
@@ -33,6 +34,7 @@ export default function AllMembersMenu({
     const [offset, setOffset] = useState(0);
     const [hasMore, setMore] = useState(true);
     const [loading, setLoad] = useState(false);
+    const { version } = useGroupSync();
 
     /** search ------------------------------------------------------- */
     const [q, setQ] = useState("");
@@ -75,8 +77,7 @@ export default function AllMembersMenu({
 
     useEffect(() => {
         runSearch("");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [groupId]);
+    }, [groupId, version]);
 
     /** infinite scroll --------------------------------------------- */
     useEffect(() => {

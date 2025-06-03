@@ -182,4 +182,5 @@
     border: 1px solid #ddd;
     border-radius: 12px;
     overflow-y: scroll;
+    scrollbar-width: none;
 }

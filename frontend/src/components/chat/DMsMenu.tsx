@@ -192,10 +192,8 @@ export default function DMsMenu() {
                                 </div>
                                 <div className={styles.meta}>
                                     <span className={styles.time}>
-                                        {new Date(e.last_time).toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })}
+                                        {String(new Date(e.last_time).getUTCHours()).padStart(2, '0')}:
+                                        {String(new Date(e.last_time).getUTCMinutes()).padStart(2, '0')}
                                     </span>
                                     {e.unread_count > 0 && (
                                         <span className={styles.badge}>{e.unread_count >= 100 ? "99+" : e.unread_count}</span>
