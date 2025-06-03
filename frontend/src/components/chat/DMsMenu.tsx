@@ -9,19 +9,9 @@ import { useUser } from "@/context/UserContext";
 import Loading from "@/components/Loading";
 import styles from "./style/dmsMenu.module.css";
 import { API_URL } from "@/lib/api_url";
+import { usePathname } from "next/navigation";
 
-/*
-  Each entry returned by GET /api/chat/dm-list
-  {
-    peer_id: string,
-    first_name: string,
-    last_name: string,
-    profile_pic: string | null,
-    last_content: string,
-    last_time: string,       // ISO timestamp
-    unread_count: number
-  }
-*/
+
 interface DMEntry {
     peer_id: string;
     first_name: string;
@@ -32,22 +22,18 @@ interface DMEntry {
     unread_count: number;
 }
 
-interface DMsMenuProps {
-    modal?: boolean;
-    onClose?: () => void;
-}
+
 
 const MAX_DMS = 300;
 
-export default function DMsMenu({
-    modal = false,
-    onClose,
-}: DMsMenuProps) {
+export default function DMsMenu() {
     const { meId, online, subscribeDM, onNewDM } = useWS();
     const { user } = useUser();
 
     const [list, setList] = useState<DMEntry[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+
+    const pathname = usePathname();
 
     // 1) Fetch initial DM‐list (up to MAX_DMS). After loading, subscribe each peer's DM channel.
     const fetchDMList = useCallback(async () => {
@@ -64,12 +50,10 @@ export default function DMsMenu({
                 return;
             }
             if (!res.ok) throw new Error("Failed to load DM list");
-            const data = (await res.json()) as DMEntry[];
+            const raw: DMEntry[] = await res.json();
+            const data = dedupePeerId(raw);
             setList(data);
-            // Subscribe to WebSocket channel for each peer
-            data.forEach((peer) => {
-                subscribeDM(peer.peer_id);
-            });
+            data.forEach((peer) => subscribeDM(peer.peer_id));
         } catch (err) {
             console.error(err);
         } finally {
@@ -92,24 +76,29 @@ export default function DMsMenu({
             const peerId = peer.peer_id;
             const unsub = onNewDM(peerId, (incoming: ChatMsg) => {
                 // incoming.type === "dmMessage"
-                // “incoming.sender_id === meId” means I sent it; otherwise I received it.
                 const iAmReceiver = incoming.receiver_id === meId;
+                // If the user is already viewing /chat/<peerId>, treat as “read” immediately:
+                const isOpen = pathname === `/chat/${peerId}`;
 
                 setList((prev) => {
-                    // Find the entry we are updating
-                    const idx = prev.findIndex((e) => e.peer_id === peerId);
-                    if (idx === -1) {
-                        // (If somehow this peer wasn't in the list yet, we could re‐fetch, but for now ignore.)
-                        return prev;
-                    }
+                    const filtered = prev.filter((e) => e.peer_id !== peerId);
 
-                    // Compute new unread_count
-                    const existing = prev[idx];
-                    const newUnread = iAmReceiver
-                        ? existing.unread_count + 1
-                        : existing.unread_count;
+                    // compute new unread count, etc. (as before)…
+                    const iAmReceiver = incoming.receiver_id === meId;
+                    const isOpen = pathname === `/chat/${peerId}`;
+                    const existing = prev.find((e) => e.peer_id === peerId) || {
+                        first_name: incoming.first_name,
+                        last_name: incoming.last_name,
+                        profile_pic: incoming.profile_pic,
+                        unread_count: 0,
+                        last_content: "",
+                        last_time: "",
+                    };
 
-                    // Build an updated entry with fresh last_content/last_time
+                    const newUnread = iAmReceiver && !isOpen
+                        ? (existing.unread_count || 0) + 1
+                        : 0;
+
                     const updatedEntry: DMEntry = {
                         peer_id: peerId,
                         first_name: existing.first_name,
@@ -120,15 +109,10 @@ export default function DMsMenu({
                         unread_count: newUnread,
                     };
 
-                    // Build a new list: put updatedEntry at index 0, then all others in original order
-                    const newList: DMEntry[] = [updatedEntry];
-                    prev.forEach((e, i) => {
-                        if (i !== idx) {
-                            newList.push(e);
-                        }
-                    });
-                    // If the list exceeded MAX_DMS, slice to MAX_DMS
-                    return newList.slice(0, MAX_DMS);
+                    // build a new array with updatedEntry at the front, then the rest
+                    const newList = [updatedEntry, ...filtered];
+
+                    return newList.slice(0, MAX_DMS); // keep at most 300
                 });
             });
 
@@ -138,7 +122,7 @@ export default function DMsMenu({
         return () => {
             unsubscribers.forEach((u) => u());
         };
-    }, [list, meId, onNewDM]);
+    }, [list, meId, onNewDM, pathname]);
 
     // 3) When I click a peer’s Link, mark all messages from that peer → me as read.
     //    Then locally zero unread_count.
@@ -172,12 +156,15 @@ export default function DMsMenu({
                 ) : (
                     list.map((e) => {
                         const isOn = online.has(e.peer_id);
+                        const href = `/chat/${e.peer_id}`;
+                        const isSelected = pathname === href;
                         return (
                             <Link
                                 key={e.peer_id}
-                                href={`/chat/${e.peer_id}`}
+                                href={href}
                                 onClick={() => handlePeerClick(e.peer_id)}
-                                className={styles.item}
+                                className={`${styles.item} ${isSelected ? styles.selected : ""
+                                    }`}
                             >
                                 <div className={styles.avatarWrapper}>
                                     <Image
@@ -211,7 +198,7 @@ export default function DMsMenu({
                                         })}
                                     </span>
                                     {e.unread_count > 0 && (
-                                        <span className={styles.badge}>{e.unread_count}</span>
+                                        <span className={styles.badge}>{e.unread_count >= 100 ? "99+" : e.unread_count}</span>
                                     )}
                                 </div>
                             </Link>
@@ -222,20 +209,14 @@ export default function DMsMenu({
         </>
     );
 
-    // ─── modal wrapper ───
-    if (!modal) return <aside className={styles.menu}>{body}</aside>;
+    return <aside className={styles.menu}>{body}</aside>;
+}
 
-    return (
-        <div className={styles.backdrop} onClick={onClose}>
-            <div
-                className={`${styles.menu} ${styles.modal}`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button className={styles.close} onClick={onClose}>
-                    ×
-                </button>
-                {body}
-            </div>
-        </div>
-    );
+function dedupePeerId(arr: DMEntry[]): DMEntry[] {
+    const seen = new Set<string>();
+    return arr.filter((e) => {
+        if (seen.has(e.peer_id)) return false;
+        seen.add(e.peer_id);
+        return true;
+    });
 }

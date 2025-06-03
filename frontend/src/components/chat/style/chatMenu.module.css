@@ -1,6 +1,5 @@
 .menu {
     border: 1px solid rgb(214, 214, 214);
-    box-shadow: 0 4px 5px #63636336;
     border-radius: 12px;
     background: #fff;
     padding: 1.4rem;
@@ -13,6 +12,8 @@
     font-size: 1.2rem;
     margin-top: 30px;
     flex-shrink: 0;
+    max-height: 90vh;
+    height: fit-content;
 }
 
 .section {
@@ -55,7 +56,11 @@
 }
 
 .item:hover {
-    background: #e0e0e0;
+    background: #e9e9e9;
+}
+
+.selected {
+    background: #e9e9e9;
 }
 
 .avt {
@@ -74,30 +79,4 @@
     text-align: center;
     font-size: .85rem;
     color: #666;
-}
-
-/* ── modal helpers (reuse pattern from InviteMenu) ───────────────── */
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .4);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 3rem;
-    z-index: 1000;
-}
-
-.modal {
-    position: relative;
-}
-
-.close {
-    position: absolute;
-    right: .6rem;
-    top: .4rem;
-    font-size: 1.3rem;
-    background: none;
-    border: none;
-    cursor: pointer;
 }

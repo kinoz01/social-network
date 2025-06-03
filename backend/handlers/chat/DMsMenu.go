@@ -13,13 +13,13 @@ import (
 
 // DMEntry mirrors the JSON shape returned to the frontend.
 type DMEntry struct {
-	PeerID      string         `json:"peer_id"`
-	FirstName   string         `json:"first_name"`
-	LastName    string         `json:"last_name"`
-	ProfilePic  sql.NullString `json:"profile_pic"`
-	LastContent string         `json:"last_content"`
-	LastTime    string         `json:"last_time"` // ISO timestamp
-	UnreadCount int            `json:"unread_count"`
+	PeerID      string `json:"peer_id"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	ProfilePic  string `json:"profile_pic"`
+	LastContent string `json:"last_content"`
+	LastTime    string `json:"last_time"` // ISO timestamp
+	UnreadCount int    `json:"unread_count"`
 }
 
 // GET /api/chat/dm-list?limit=…
@@ -101,19 +101,23 @@ func ChatDMList(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	var out []DMEntry
+	var img sql.NullString
 	for rows.Next() {
 		var e DMEntry
 		if err := rows.Scan(
 			&e.PeerID,
 			&e.FirstName,
 			&e.LastName,
-			&e.ProfilePic,
+			&img,
 			&e.LastContent,
 			&e.LastTime,
 			&e.UnreadCount,
 		); err != nil {
 			help.JsonError(w, "scan error", http.StatusInternalServerError, err)
 			return
+		}
+		if img.Valid {
+			e.ProfilePic = img.String
 		}
 		out = append(out, e)
 	}

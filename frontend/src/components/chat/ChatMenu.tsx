@@ -3,12 +3,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./style/chatMenu.module.css";
+import { usePathname } from "next/navigation";
 import Loading from "@/components/Loading";
 import { throttle } from "@/components/utils";
 import { API_URL } from "@/lib/api_url";
+import styles from "./style/chatMenu.module.css";
 
-/* ───────── types from handler ───────── */
+/* ───────── type from handler ───────── */
 interface Person {
     id: string;
     first_name: string;
@@ -18,29 +19,20 @@ interface Person {
     followsMe: boolean;
 }
 
-/* ───────── props ───────── */
-export interface ChatMenuProps {
-    modal?: boolean;
-    onClose?: () => void;
-}
-
 /* ───────── constants ───────── */
 const SLICE = 50;
 
-/* ───────── component ───────── */
-const ChatMenu: React.FC<ChatMenuProps> = ({ modal = false, onClose }) => {
-    /* list */
+export default function ChatMenu() {
     const [list, setList] = useState<Person[]>([]);
     const [offset, setOffset] = useState(0);
     const [hasMore, setMore] = useState(true);
     const [loading, setLoad] = useState(false);
 
-    /* search */
     const [q, setQ] = useState("");
-
     const boxRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
 
-    /* fetch helper */
+    // Fetch a "slice" of users
     const fetchSlice = async (off = 0, qry = ""): Promise<Person[]> => {
         const qs = new URLSearchParams({
             limit: String(SLICE),
@@ -55,7 +47,7 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ modal = false, onClose }) => {
         return res.json();
     };
 
-    /* initial & search */
+    // Initial load and search
     const runSearch = useCallback(
         async (qry: string) => {
             setQ(qry);
@@ -76,15 +68,15 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ modal = false, onClose }) => {
         runSearch("");
     }, [runSearch]);
 
-    /* infinite scroll */
+    // Infinite scroll (load next slice when near bottom)
     useEffect(() => {
         const el = boxRef.current;
         if (!el) return;
-        const h = throttle(() => {
+        const handler = throttle(() => {
             if (loading || !hasMore) return;
-            const near =
+            const nearBottom =
                 el.scrollHeight - el.scrollTop - el.clientHeight < 200;
-            if (near) {
+            if (nearBottom) {
                 (async () => {
                     setLoad(true);
                     try {
@@ -98,13 +90,12 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ modal = false, onClose }) => {
                 })();
             }
         }, 300);
-        el.addEventListener("scroll", h);
-        return () => el.removeEventListener("scroll", h);
+        el.addEventListener("scroll", handler);
+        return () => el.removeEventListener("scroll", handler);
     }, [offset, q, hasMore, loading]);
 
-    /* ===== render body ===== */
-    const body = (
-        <>
+    return (
+        <aside className={styles.menu}>
             <h4 className={styles.section}>AVAILABLE USERS</h4>
 
             <input
@@ -118,68 +109,74 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ modal = false, onClose }) => {
                 {list.length === 0 && !loading ? (
                     <p className={styles.end}>— user not found —</p>
                 ) : (
-                    list.map((p) => (
-                        <Link key={p.id} href={`/chat/${p.id}`} className={styles.item}>
-                            <Image
-                                src={
-                                    p.profile_pic
-                                        ? `${API_URL}/api/storage/avatars/${p.profile_pic}`
-                                        : "/img/default-avatar.png"
-                                }
-                                alt=""
-                                width={32}
-                                height={32}
-                                className={styles.avt}
-                            />
-                            <span className={styles.name}>
-                                {p.first_name} {p.last_name}
-                            </span>
+                    list.map((p) => {
+                        const href = `/chat/${p.id}`;
+                        const isSelected = pathname === href;
 
-                            {p.iFollow && !p.followsMe && (
-                                <span className={styles.badge} title="You follow">
-                                    <Image src="/img/following.svg" alt="You follow" width={16} height={16} />
+                        return (
+                            <Link
+                                key={p.id}
+                                href={href}
+                                className={`${styles.item} ${isSelected ? styles.selected : ""
+                                    }`}
+                            >
+                                <Image
+                                    src={
+                                        p.profile_pic
+                                            ? `${API_URL}/api/storage/avatars/${p.profile_pic}`
+                                            : "/img/default-avatar.png"
+                                    }
+                                    alt=""
+                                    width={32}
+                                    height={32}
+                                    className={styles.avt}
+                                />
+                                <span className={styles.name}>
+                                    {p.first_name} {p.last_name}
                                 </span>
-                            )}
 
-                            {p.followsMe && !p.iFollow && (
-                                <span className={styles.badge} title="Follows you">
-                                    <Image src="/img/followed-by.svg" alt="Follows you" width={16} height={16} />
-                                </span>
-                            )}
+                                {p.iFollow && !p.followsMe && (
+                                    <span className={styles.badge} title="You follow">
+                                        <Image
+                                            src="/img/following.svg"
+                                            alt="You follow"
+                                            width={16}
+                                            height={16}
+                                        />
+                                    </span>
+                                )}
 
-                            {p.iFollow && p.followsMe && (
-                                <span className={styles.badge} title="Mutual follow">
-                                    <Image src="/img/mutual-follow.svg" alt="Mutual follow" width={16} height={16} />
-                                </span>
-                            )}
-                        </Link>
-                    ))
+                                {p.followsMe && !p.iFollow && (
+                                    <span className={styles.badge} title="Follows you">
+                                        <Image
+                                            src="/img/followed-by.svg"
+                                            alt="Follows you"
+                                            width={16}
+                                            height={16}
+                                        />
+                                    </span>
+                                )}
+
+                                {p.iFollow && p.followsMe && (
+                                    <span className={styles.badge} title="Mutual follow">
+                                        <Image
+                                            src="/img/mutual-follow.svg"
+                                            alt="Mutual follow"
+                                            width={16}
+                                            height={16}
+                                        />
+                                    </span>
+                                )}
+                            </Link>
+                        );
+                    })
                 )}
 
                 {loading && <Loading />}
-                {!hasMore && !loading && offset > 50 && (
+                {!hasMore && !loading && offset > SLICE && (
                     <p className={styles.end}>— end —</p>
                 )}
             </div>
-        </>
+        </aside>
     );
-
-    /* ===== modal wrapper ===== */
-    if (!modal) return <aside className={styles.menu}>{body}</aside>;
-
-    return (
-        <div className={styles.backdrop} onClick={onClose}>
-            <div
-                className={`${styles.menu} ${styles.modal}`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button className={styles.close} onClick={onClose}>
-                    ×
-                </button>
-                {body}
-            </div>
-        </div>
-    );
-};
-
-export default ChatMenu;
+}

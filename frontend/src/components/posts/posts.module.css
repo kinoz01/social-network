@@ -642,6 +642,7 @@
   padding: 6px 0;
   cursor: pointer;
   border-bottom: 1px solid #cacaca;
+  padding-left: 8px;
 }
 
 .item:hover {

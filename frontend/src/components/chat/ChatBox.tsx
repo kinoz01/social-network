@@ -7,6 +7,7 @@ import Loading from "@/components/Loading";
 import Image from "next/image";
 import styles from "./style/chat.module.css";
 import { API_URL } from "@/lib/api_url";
+import Link from "next/link";
 
 export const EMOJIS = [
     "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍", "😘", "😗", "😙", "😚", "🙂", "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮", "🤐", "😯", "😪", "😫", "🥱",
@@ -148,6 +149,14 @@ export default function DirectChatBox() {
                 idSetRef.current.add(incoming.id);
                 setMsgs((prev) => [...prev, incoming]);
                 setOffset((o) => o + 1);
+
+                // ─── NEW: if I'm the receiver here, immediately mark as read ───
+                if (incoming.receiver_id === meId) {
+                    fetch(`${API_URL}/api/chat/mark-read?peer_id=${peerId}`, {
+                        method: "POST",
+                        credentials: "include",
+                    }).catch(console.error);
+                }
             }
         });
         return () => unsubscribe();
@@ -214,27 +223,30 @@ export default function DirectChatBox() {
 
     let lastDay = "";
     return (
-        <div className={styles.chatBox}>
+        <>
             {/* ─── HEADER ─── */}
             <div className={styles.headerRow}>
-                <Image
-                    src={
-                        peerName.profile_pic
-                            ? `${API_URL}/api/storage/avatars/${peerName.profile_pic}`
-                            : "/img/default-avatar.png"
-                    }
-                    alt=""
-                    width={40}
-                    height={40}
-                    className={styles.avatar}
-                />
+                <Link href={`/profile/${peerId}`} className={styles.headerAvatarLink}>
+                    <Image
+                        src={
+                            peerName.profile_pic
+                                ? `${API_URL}/api/storage/avatars/${peerName.profile_pic}`
+                                : "/img/default-avatar.png"
+                        }
+                        alt={`${peerName.first_name} ${peerName.last_name}`}
+                        width={40}
+                        height={40}
+                        className={styles.avatar}
+                    />
+                </Link>
 
                 <div className={styles.headerText}>
-                    <span className={styles.name}>
-                        {peerName.first_name} {peerName.last_name}
-                    </span>
+                    <Link href={`/profile/${peerId}`} className={styles.nameLink}>
+                        <span className={styles.name}>
+                            {peerName.first_name} {peerName.last_name}
+                        </span>
+                    </Link>
                 </div>
-
                 <span
                     className={styles.status}
                     style={{ color: isPeerOnline ? "#28c76f" : "#888" }}
@@ -359,6 +371,6 @@ export default function DirectChatBox() {
                     </div>
                 )}
             </div>
-        </div>
+        </>
     );
 }
