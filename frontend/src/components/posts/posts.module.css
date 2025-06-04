@@ -512,12 +512,12 @@
 }
 
 .postGroup {
-  background-color: #ffffff;
+  background-color: #e5e5e5;
   border-radius: 15px;
   padding: 1rem;
   width: 100%;
-  font-family: 'Zain';
-  box-shadow: rgba(0, 0, 0, 0.45) 0px 5px 5px -5px;
+  font-family: Zain;
+  box-shadow: 0 5px 5px -5px #00000073;
   border: 1px solid #b0b0b0;
   margin-bottom: 20px;
 }

@@ -2,32 +2,27 @@
 .rightMenu,
 .leftMenu {
   border-radius: 15px;
-  border: 1px solid var(--color1);
-  background-color: transparent;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 1rem;
   width: 30%;
-  overflow-y: auto;
   scrollbar-width: none;
   font-size: clamp(1rem, 1.2rem, 1.3rem);
+  padding: 0 1rem;
 }
 
-.List {
+.list {
   overflow: hidden;
-}
+  background-color: var(--color2);
+  border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
-.List .profileCard {
-  height: 50%;
-}
-
-.List:not(.event):not(:last-of-type) {
-  border-bottom: 1px solid var(--color1);
 }
 
 .header {
   padding: 15px 15px 0px 15px;
+  position: sticky;
   top: 0;
   left: 0;
   display: flex;
@@ -52,7 +47,7 @@
   border-bottom: 1px solid black;
 }
 
-.List {
+.list {
   width: 100%;
   overflow-y: auto;
   scrollbar-width: none;
@@ -60,13 +55,14 @@
 
 .users {
   width: 100%;
-  padding: 1.2rem 0.5rem;
+  padding: 1.2rem 0.2rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: none;
 }
 
@@ -74,7 +70,7 @@
   display: none;
 }
 
-.ListItem {
+.listItem {
   font-size: clamp(0.8rem, 1rem, 1.4rem);
   display: flex;
   flex-wrap: nowrap;
@@ -87,12 +83,43 @@
   transition: all 0.2s ease;
 }
 
-.ListItem:hover {
+.profileBtn button {
+  width: 5rem;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: var(--color1);
+  color: var(--color2);
+  cursor: pointer;
+}
+
+.options {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.options button {
+  border: none;
+  border: none;
+  padding: 0.8rem;
+  width: 4rem;
+  border-radius: 10px;
+  background-color: var(--color1);
+  color: var(--color2);
+  cursor: pointer;
+}
+
+.listItem:hover {
   background-color: var(--color5);
   transform: translateY(-10px);
 }
 
-.ListItem .userIcon {
+.listItem .userIcon {
+  border: 1px solid var(--color1);
   width: clamp(30px, 40px, 70px);
   height: clamp(30px, 40px, 70px);
   object-fit: cover;
@@ -100,38 +127,15 @@
   border-radius: 50%;
 }
 
-.ListItemInfo {
+.listItemInfo {
+  text-wrap: wrap;
   width: 100%;
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
   gap: 8;
 }
-
-.options {
-  width: 6rem;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* posts */
-/* input[type="checkbox"] {
-  color: beige;
-  cursor: pointer;
-} */
-
-
-
-/* 
-label {
-  font-size: 0.8rem;
-  color: #343434;
-  margin-left: 0.5rem;
-  cursor: pointer;
-} */
 
 /* GROUP LIST */
 .leftMenu.chat {
@@ -152,126 +156,22 @@ label {
     scrollbar-width: none;
   }
 
-  .List.groups {
+  .list.groups {
     width: 100%;
     height: 100%;
   }
 
-  .ListItem {
+  .listItem {
+    width: 100%;
     font-size: clamp(1rem, 1.2rem, 1.5rem);
     padding: 1rem;
     margin: 0.3rem 0.5rem;
     border: 1px solid var(--color1);
   }
-
-  /* .users,
-  .events {
-    padding: 0.8rem 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    flex-wrap: wrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-  } */
-
-  /* .groupEvent {
-    font-size: clamp(0.8rem, 0.9rem, 1.2rem);
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 10px;
-    transition: all 0.2s ease;
-  } */
-
-  /* .groupEvent:hover {
-    background-color: var(--color5);
-    transform: translateY(-10px);
-  } */
-
-  /* .groupEvent .userIcon {
-    width: 30px;
-    height: 30px;
-    object-fit: cover;
-    flex-shrink: 0;
-    border-radius: 50%;
-  }
-
-  .groupEvent {
-    background-color: var(--color5);
-    width: auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    border: none;
-    height: 5rem;
-  } */
-
-  /* .ListItem .userIcon {
-    width: 50px;
-    height: 50px;
-  } */
-
-  /* .options {
-    display: none;
-  }
-
-  
-/* 
- 
-
-  .groupCard {
-    border: 1px solid black;
-    border-radius: 15px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-  } */
-
-  /* .groupName {
-    height: 10rem;
-    padding: 4.3rem 0.5rem;
-    background-color: var(--color1);
-    color: var(--color5);
-  }
-
-  .title {
-    width: 100%;
-    padding: 0 1rem;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-  } */
-
-  /* .groupCard .groupName,
-  .groupCard .groupUsers,
-  .groupCard .groupEvents {
-    border: 1px solid black;
-    border-radius: 15px;
-    height: 100%;
-  }
-
-  .groupCard .groupEvents,
-  .groupCard .groupUsers {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    height: 10rem;
-    width: 13rem;
-  } */
 }
 
 /* EVENTS LIST */
-.List.event {
+.list.event {
   .header {
     padding: 0;
     background-color: transparent;
@@ -293,7 +193,10 @@ label {
 /* USER SECTION */
 .profileCard {
   background-color: var(--color2);
-  padding: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+  border-radius: 15px;
+  padding: 2rem;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -301,7 +204,6 @@ label {
   text-align: center;
   gap: 1rem;
   width: 100%;
-  border-bottom: 1px solid var(--color1);
 }
 
 .profileCard .profileCardHeader {
@@ -329,7 +231,8 @@ label {
 
 .userImage {
   border-radius: 50%;
-  border: 1px solid var(--color1);
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
 }
 
 @media (max-width: 1200px) {
@@ -358,22 +261,15 @@ label {
 
   /* PRIVATE CHAT MENU */
   .leftMenu.chat {
+    flex-direction: row;
+    height: 10%;
     width: 100%;
 
-    .menuSection {
-      height: 100%;
-      border: none;
-    }
-
-    .menuSection:last-of-type {
+    .list .header {
       display: none;
     }
 
-    .List .header {
-      display: none;
-    }
-
-    .List.chat {
+    .list.chat {
       width: 100%;
       height: 100%;
     }
@@ -388,14 +284,57 @@ label {
       scrollbar-width: none;
     }
 
-    .ListItem {
+    .listItem {
       width: auto;
       flex-wrap: wrap;
       justify-content: center;
       border: none;
     }
 
-    .ListItem .userIcon {
+    .listItem .userIcon {
+      width: 50px;
+      height: 50px;
+    }
+
+    .options {
+      display: none;
+    }
+  }
+
+  .leftMenu.groups {
+    flex-direction: row;
+    height: 10%;
+    width: 100%;
+
+    .list .header {
+      display: none;
+    }
+
+    .list.groups {
+      width: 100%;
+      height: 100%;
+    }
+
+    .groups {
+      width: 100%;
+      align-items: center;
+      height: 100%;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+
+    .listItem.group {
+      background-color: var(--color1);
+      color: var(--color2);
+      width: auto;
+      flex-wrap: wrap;
+      justify-content: center;
+      border: none;
+    }
+
+    .listItem .userIcon {
       width: 50px;
       height: 50px;
     }

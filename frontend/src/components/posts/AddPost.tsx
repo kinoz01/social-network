@@ -7,7 +7,7 @@ import ShowUsers from "./creation/users";
 import { PostAudience } from "./creation/audience";
 import { useState } from "react";
 import { HandleCreation } from "@/apiService/posts/savePost";
-import { User, Post } from "../types";
+import { User, Post } from "../../lib/types";
 
 type PostParams = {
   isOpen?: boolean;
