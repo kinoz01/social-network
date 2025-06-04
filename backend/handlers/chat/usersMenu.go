@@ -1,7 +1,7 @@
+// handlers/chat/get_chat_list.go
 package chat
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -13,12 +13,12 @@ import (
 )
 
 /*
-Route:  GET /api/people/explore
-Query:
+Route:  GET /api/chat/list
+Query parameters:
 
-	q         (optional search string)
-	limit     (default 50)
-	offset    (default 0)
+	q       (optional search string)
+	limit   (default 50)
+	offset  (default 0)
 
 Returns 200 + []Person or 204 when no rows.
 A “person” is shown when:
@@ -27,47 +27,90 @@ A “person” is shown when:
   - they follow the viewer
 */
 func GetChatList(w http.ResponseWriter, r *http.Request) {
-	// ── viewer ──────────────────────────────────────────────────────────────
+	// ── 1) Authenticate viewer ──────────────────────────────────────────────────────
 	u, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 
-	// ── query params ────────────────────────────────────────────────────────
+	// ── 2) Parse query params ─────────────────────────────────────────────────────
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
-	like := q + "%"
 
-	// ── query ───────────────────────────────────────────────────────────────
-	rows, err := tp.DB.Query(`
-	  SELECT u.id, u.first_name, u.last_name, u.profile_pic,
-	         EXISTS(SELECT 1 FROM follow_requests fr
-	                  WHERE fr.follower_id = ? AND fr.followed_id = u.id
-	                  AND   fr.status = 'accepted')      AS i_follow,
-	         EXISTS(SELECT 1 FROM follow_requests fr
-	                  WHERE fr.follower_id = u.id AND fr.followed_id = ?
-	                  AND   fr.status = 'accepted')      AS follows_me
-	  FROM   users u
-	  WHERE  u.id <> ? -- exclude self
-	    AND (
-	          u.account_type = 'public'           OR
-	          EXISTS(SELECT 1 FROM follow_requests fr
-	                   WHERE fr.follower_id = ? AND fr.followed_id = u.id
-	                   AND   fr.status = 'accepted')    OR
-	          EXISTS(SELECT 1 FROM follow_requests fr
-	                   WHERE fr.follower_id = u.id AND fr.followed_id = ?
-	                   AND   fr.status = 'accepted')
-	        )
-	    AND (? = '' OR
-	         u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ?)
-	  ORDER BY u.first_name
-	  LIMIT  ? OFFSET ?`,
-		u.ID, u.ID, u.ID, u.ID, u.ID,
-		q, like, like, like,
-		limit, offset)
+	// ── 3) Build base SQL & args slice ────────────────────────────────────────────
+	//
+	// We always filter out "self" (u.ID) and only show users who are either:
+	//   • public account, OR
+	//   • viewer follows them, OR
+	//   • they follow the viewer
+	//
+	base := `
+	  SELECT u.id,
+	         u.first_name,
+	         u.last_name,
+	         u.profile_pic,
+	         EXISTS(
+	           SELECT 1
+	             FROM follow_requests fr
+	            WHERE fr.follower_id = ? AND fr.followed_id = u.id
+	              AND fr.status = 'accepted'
+	         ) AS i_follow,
+	         EXISTS(
+	           SELECT 1
+	             FROM follow_requests fr
+	            WHERE fr.follower_id = u.id AND fr.followed_id = ?
+	              AND fr.status = 'accepted'
+	         ) AS follows_me
+	    FROM users u
+	   WHERE u.id <> ?  -- exclude self
+	     AND (
+	       u.account_type = 'public'
+	       OR EXISTS(
+	         SELECT 1
+	           FROM follow_requests fr
+	          WHERE fr.follower_id = ? AND fr.followed_id = u.id
+	            AND fr.status = 'accepted'
+	       )
+	       OR EXISTS(
+	         SELECT 1
+	           FROM follow_requests fr
+	          WHERE fr.follower_id = u.id AND fr.followed_id = ?
+	            AND fr.status = 'accepted'
+	       )
+	     )
+	`
+	// args for the four “?” above:
+	//   1) check if viewer follows this user
+	//   2) check if this user follows viewer
+	//   3) exclude self
+	//   4) (duplicate of 1) for the second EXISTS
+	args := []any{u.ID, u.ID, u.ID, u.ID, u.ID}
+
+	// ── 4) If q != "", append search clause ────────────────────────────────────────
+	if q != "" {
+		base += `
+	     AND (
+	       u.first_name   LIKE ? COLLATE NOCASE OR
+	       u.last_name    LIKE ? COLLATE NOCASE OR
+	       u.username     LIKE ? COLLATE NOCASE OR
+	       (u.first_name || ' ' || u.last_name) LIKE ? COLLATE NOCASE
+	     )
+		`
+		pattern := q + "%"
+		args = append(args, pattern, pattern, pattern, pattern)
+	}
+
+	// ── 5) Append ORDER BY + LIMIT/OFFSET ────────────────────────────────────────
+	base += `
+	   ORDER BY u.first_name
+	   LIMIT ? OFFSET ?
+	`
+	args = append(args, limit, offset)
+
+	// ── 6) Execute query ───────────────────────────────────────────────────────────
+	rows, err := tp.DB.Query(base, args...)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
 		return
@@ -84,20 +127,27 @@ func GetChatList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var list []person
-	var img sql.NullString
 	for rows.Next() {
 		var p person
-		if err := rows.Scan(&p.ID, &p.FirstName, &p.LastName,
-			&img, &p.IFollow, &p.FollowsMe); err != nil {
-			help.JsonError(w, "scan error", 500, err)
+		if err := rows.Scan(
+			&p.ID,
+			&p.FirstName,
+			&p.LastName,
+			&p.ProfilePic,
+			&p.IFollow,
+			&p.FollowsMe,
+		); err != nil {
+			help.JsonError(w, "scan error", http.StatusInternalServerError, err)
 			return
-		}
-		if img.Valid {
-			p.ProfilePic = img.String
 		}
 		list = append(list, p)
 	}
+	if err := rows.Err(); err != nil {
+		help.JsonError(w, "rows iteration error", http.StatusInternalServerError, err)
+		return
+	}
 
+	// ── 7) Return results ──────────────────────────────────────────────────────────
 	if len(list) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return

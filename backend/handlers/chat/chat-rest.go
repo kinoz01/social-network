@@ -1,7 +1,6 @@
 package chat
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -14,13 +13,14 @@ import (
 /*
 Route:  GET  /api/chat/messages
 Query:  peer_id  (the other user’s ID)
-        limit    (optional, default 20)
-        offset   (optional, default 0)
+
+	limit    (optional, default 20)
+	offset   (optional, default 0)
 
 Returns:
-  • 200 + JSON array of up to <limit> messages (ascending by created_at) 
-  • Each message: { id, sender_id, content, created_at, first_name, last_name, profile_pic }
-  • 204 if no messages at all / no more messages
+  - 200 + JSON array of up to <limit> messages (ascending by created_at)
+  - Each message: { id, sender_id, content, created_at, first_name, last_name, profile_pic }
+  - 204 if no messages at all / no more messages
 */
 func GetPrivateMessages(w http.ResponseWriter, r *http.Request) {
 	// 1. Auth check
@@ -82,17 +82,13 @@ func GetPrivateMessages(w http.ResponseWriter, r *http.Request) {
 	var rev []msg
 	for rows.Next() {
 		var m msg
-		var img sql.NullString
 		if err := rows.Scan(
 			&m.ID, &m.SenderID, &m.Content, &m.CreatedAt,
-			&m.FirstName, &m.LastName, &img,
+			&m.FirstName, &m.LastName, &m.ProfilePic,
 		); err != nil {
 			help.JsonError(w, "scan error", http.StatusInternalServerError, err)
 			return
 		}
-		if img.Valid {
-			m.ProfilePic = img.String
-		} 
 		rev = append(rev, m)
 	}
 

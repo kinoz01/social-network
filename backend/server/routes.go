@@ -85,15 +85,17 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/groups/members", mw.Gm(grps.GetMembers))
 
 	// CHAT
-	// Chat menu:
+	// Chat menu
 	mux.HandleFunc("/api/chat/list", chat.GetChatList)
-	// Chat Rest DMs:
+	// Chat Rest DMs
 	mux.HandleFunc("/api/chat/messages", chat.GetPrivateMessages)
 	mux.HandleFunc("/api/users/profile", profile.GetDMProfile)
 	mux.HandleFunc("/api/chat/dm-list", chat.ChatDMList)
 	mux.HandleFunc("/api/chat/mark-read", chat.ChatMarkRead)
-
-	// Followers search:
+	
+	// Following:
+	mux.HandleFunc("/api/suggestions", flw.SuggestionsHandler)
+	// search
 	mux.HandleFunc("/api/followers", flw.GetFollowers)
 
 	// Websocket

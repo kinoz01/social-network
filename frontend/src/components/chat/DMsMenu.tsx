@@ -59,7 +59,7 @@ export default function DMsMenu() {
         } finally {
             setLoading(false);
         }
-    }, [user, subscribeDM]);
+    }, [user]);
 
     useEffect(() => {
         fetchDMList();

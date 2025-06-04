@@ -1,7 +1,6 @@
 package chat
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -101,23 +100,19 @@ func ChatDMList(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	var out []DMEntry
-	var img sql.NullString
 	for rows.Next() {
 		var e DMEntry
 		if err := rows.Scan(
 			&e.PeerID,
 			&e.FirstName,
 			&e.LastName,
-			&img,
+			&e.ProfilePic,
 			&e.LastContent,
 			&e.LastTime,
 			&e.UnreadCount,
 		); err != nil {
 			help.JsonError(w, "scan error", http.StatusInternalServerError, err)
 			return
-		}
-		if img.Valid {
-			e.ProfilePic = img.String
 		}
 		out = append(out, e)
 	}
