@@ -38,7 +38,6 @@ func CheckSession(w http.ResponseWriter, r *http.Request) {
 func GetUser(r *http.Request) (*tp.User, error) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		fmt.Println("token",cookie)
 		return nil, fmt.Errorf("no session token provided")
 	}
 
@@ -49,7 +48,7 @@ func GetUser(r *http.Request) (*tp.User, error) {
 	}
 
 	// Select user_id, expires_at from DB based on token value.
-	err = tp.DB.QueryRow(`SELECT user_id, expires_at  FROM sessions WHERE token = ?`, token).Scan(&session.UserID, &session.ExpiresAt)
+	err = tp.DB.QueryRow(`SELECT user_id, expires_at FROM sessions WHERE token = ?`, token).Scan(&session.UserID, &session.ExpiresAt)
 	if err != nil {
 		return nil, fmt.Errorf("invalid or expired session token")
 	}

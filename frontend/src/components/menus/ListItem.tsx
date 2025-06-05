@@ -17,8 +17,8 @@ import { API_URL } from "@/lib/api_url";
 function ListItem({
   type,
   name,
-  click,
-  
+  item,
+  loggedUser,
 }: {
   type:
     | "friendRequests"
@@ -60,10 +60,12 @@ function ListItem({
   const profilePic = `${API_URL}/api/storage/avatars/${item?.profile_pic}`;
 
   return (
-    <div className={`${styles.ListItem} ${styles[type]}`} onClick={click}>
-      <div className={styles.ListItemInfo}>
-        {type !== "groups" ? (
-          <>
+    <>
+      {!isResponed && (
+        <div
+          className={`${styles.listItem} ${styles[type]}`}
+        >
+          <div className={styles.listItemInfo}>
             <Image
               className={styles.userIcon}
               src={profilePic}
@@ -71,37 +73,32 @@ function ListItem({
               width={40}
               height={40}
             />
-          </>
-        ) : null}
-        <span className={styles.ListItemName}>{name}</span>
-      </div>
-      <div className={styles.options}>
-        {type === "friendRequests" ? (
-          <>
-            <AcceptIcon />
-            <RejectIcon />
-          </>
-        ) : type === "suggestions" ? (
-          <>
-            <AddFriendIcon />
-            <RejectIcon />
-          </>
-        ) : type === "followers" || type === "followings" ? (
-          <>
-            <ChatIcon />
-            {/* UNFOLLOW OCON */}
-            <RejectIcon />
-          </>
-        ) : type === "chat" || type === "group" || type ==="event" ? null : type ===
-          "groups" ? (
-          <>
-            <ChatIcon />
-            {/* UNFOLLOW OCON */}
-            <RejectIcon />
-          </>
-        ) : null}
-      </div>
-    </div>
+            <span className={styles.listItemName}>
+              {item ? item?.first_name + " " + item?.last_name : name}
+            </span>{" "}
+          </div>
+          {type !== "chat" &&
+            (type === "friendRequests" ? (
+              <div className={styles.options}>
+                <button onClick={handleResponse} value="accepted">
+                  Accept
+                </button>
+                <button onClick={handleResponse} value="rejected">
+                  Reject
+                </button>
+              </div>
+            ) : type === "suggestions" ? (
+              <Link href={`/profile/${item?.id}`} className={styles.profileBtn}>
+                <button>View Profile</button>
+              </Link>
+            ) : type === "followers" || type === "followings" ? (
+              <Link href={`/profile/${item?.id}`} className={styles.profileBtn}>
+                <button>View Profile</button>
+              </Link>
+            ) : null)}
+        </div>
+      )}
+    </>
   );
 }
 

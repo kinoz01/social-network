@@ -74,7 +74,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
 
             localStorage.setItem("showWelcome", "true")
             await handleLogin(e)
-        } catch (error: string) {
+        } catch (error: any) {
             setErrorMsg(error.message || "Signup failed.");
         }
     };

@@ -8,7 +8,6 @@ import (
 	"social-network/handlers/users"
 
 	auth "social-network/handlers/authentication"
-	ch "social-network/handlers/chat"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 
@@ -36,10 +35,6 @@ func Routes() http.Handler {
 
 	// Serving storage
 	mux.HandleFunc("/api/storage/", hlp.FilesHandler)
-
-	//chatApp
-	mux.HandleFunc("/api/fetchUsers", chat.FetchUsers)
-	mux.HandleFunc("/ws", chat.HandleConnection)
 
 	// Authentication:
 	mux.HandleFunc("/api/check-session", auth.CheckSession)
@@ -105,26 +100,6 @@ func Routes() http.Handler {
 
 	// Websocket
 	mux.HandleFunc("/api/ws", ws.GlobalWS)
-
-	//Getting users Data
-	mux.HandleFunc("/api/fetchUsers", ch.FetchUsers)
-	mux.HandleFunc("/api/fetchMessages", ch.FetchMessages)
-
-	//Fetching Followers
-	mux.HandleFunc("/api/followers", ch.FetchFollowers)
-
-	//WebSocket Connection
-	mux.HandleFunc("/ws", ch.HandleConnection)
-
-	//Getting users Data
-	mux.HandleFunc("/api/fetchUsers", ch.FetchUsers)
-	mux.HandleFunc("/api/fetchMessages", ch.FetchMessages)
-
-	//Fetching Followers
-	mux.HandleFunc("/api/followers", ch.FetchFollowers)
-
-	//WebSocket Connection
-	mux.HandleFunc("/ws", ch.HandleConnection)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

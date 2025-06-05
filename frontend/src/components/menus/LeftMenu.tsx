@@ -3,14 +3,14 @@
 import styles from "./menus.module.css";
 import ProfileCard from "./ProfileCrad";
 import List from "./List";
-import { User } from "@/lib/user";
+import { useUser } from "@/context/UserContext";
 
-const LeftMenu = ({
-  type, selectedUser
+function LeftMenu({
+  type,
 }: {
   type: "home" | "chat" | "profile" | "group" | "groups";
-  selectedUser?: (user: User) => void;
-}) => {
+}) {
+  const { user: loggedUser } = useUser();
   return (
     <div className={`${styles.leftMenu} ${styles[type]}`}>
       {type == "home" ? (
@@ -20,11 +20,7 @@ const LeftMenu = ({
         </>
       ) : type === "chat" ? (
         <>
-            <List type="chat" title="Chat" selectedUser={selectedUser}/>
-        </>
-      ) : type === "groups" ? (
-        <>
-          <List type="groups" title="Groups" />
+          <List type="chat" title="Chat" loggedUser={loggedUser} />
         </>
       ) : null}
     </div>

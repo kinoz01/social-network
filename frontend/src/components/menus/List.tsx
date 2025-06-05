@@ -1,37 +1,24 @@
-"use client"
 import Link from "next/link";
 import styles from "./menus.module.css";
 import ListItem from "./ListItem";
-import FetchUsers from "../chat/fetchUsers";
-import {  getUser, User } from "@/lib/user";
-import { useEffect, useState } from "react";
+import { User } from "@/lib/types";
+import FollowersList from "./FollowersList";
+import FollowingsList from "./FollowingsList";
+import FriendRequestList from "./FriendRequest";
+import SuggestionsList from "./SuggestionsList";
 
 function List({
   type,
   title,
-  selectedUser,
-  // currentUser
+  loggedUser,
 }: {
   type: "friendRequests" | "followers" | "followings" | "suggestions" | "chat";
   title: String;
   loggedUser: User | null;
 }) {
-  const users = FetchUsers()
-  console.log(users);  
-  const [currentUser, setCurrentUser] = useState<User|null>(null)
-      
-          useEffect(() => {
-              const getCurrentUser = async() => {
-                  const loggedUser = await getUser()
-                  setCurrentUser(loggedUser)
-              }
-              getCurrentUser()
-          },[])
-  const filterdUsers = users?.filter(user => user.id != currentUser?.id)
-  console.log(filterdUsers, currentUser?.id);
-  
   return (
-    <div className={`${styles.List} ${styles[type]} `}>
+    <div className={`${styles.list} ${styles[type]} `}>
+      {/* TOP  */}
       <div className={styles.header}>
         <span className={styles.title}>{title}</span>
         {type === "friendRequests" ? (
@@ -53,18 +40,20 @@ function List({
       </div>
       <div className={styles.users}>
         {type === "chat" ? (
+          // Fetch all users
           <>
-          {filterdUsers?.map((user) => {
-
-            return (
-              <ListItem
-                key={user.id} 
-                type={type}
-                name={user.first_name +" " + user.last_name} 
-                click={() => selectedUser?.(user)}
-                />
-              );
-            })}
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
+            <ListItem type="chat" name={"Wayne Burton"} />
           </>
         ) : type === "followers" ? (
           <FollowersList />
@@ -79,8 +68,5 @@ function List({
     </div>
   );
 }
-
-
-
 
 export default List;
