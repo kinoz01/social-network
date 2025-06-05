@@ -16,7 +16,7 @@
   overflow: hidden;
   background-color: var(--color2);
   border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
 }
 
@@ -64,6 +64,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+
 }
 
 .users::-webkit-scrollbar {
@@ -193,7 +194,7 @@
 /* USER SECTION */
 .profileCard {
   background-color: var(--color2);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 
   border-radius: 15px;
   padding: 2rem;

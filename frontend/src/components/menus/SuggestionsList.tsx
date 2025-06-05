@@ -8,7 +8,11 @@ import ListItem from "./ListItem";
 import NoData from "../NoData";
 import Loading from "../Loading";
 
-function SuggestionsList() {
+type Props = {
+  className?: string;
+}
+
+function SuggestionsList({ className = "" }: Props) {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [suggestions, setSuggestions] = useState<User[] | null>([]);
 
@@ -22,7 +26,7 @@ function SuggestionsList() {
   }, []); // Empty dependency array means this only runs once on mount
 
   return (
-    <div className={styles.users}>
+    <div className={`${styles.users} ${className}`}>
       {suggestions === null || suggestions.length === 0 ? (
         <NoData msg="No Suggestions yet" />
       ) : (

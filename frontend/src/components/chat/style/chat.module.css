@@ -159,6 +159,7 @@
   border-radius: 12px;
   overflow-y: scroll;
   scrollbar-width: none;
+  min-width: 250px;
 }
 
 .status {
@@ -261,5 +262,39 @@
 @media (max-width:700px) {
   .mainContent {
     width: fit-content;
+  }
+}
+
+.jumpBadge {
+  position: relative;
+  background-color: #0c0c0c;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.7rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  width: fit-content;
+  margin: auto;
+  font-family: 'Inter';
+}
+
+.jumpBadge:hover {
+  background-color: #222222;
+}
+
+.usersSuggestionsChat {
+  background-color: white;
+  max-width: 270px;
+  border: 1px solid #c5c5c5;
+  margin-top: 30px;
+  border-radius: 12px;
+  height: fit-content;
+}
+
+@media (max-width:1100px) {
+  .usersSuggestionsChat {
+    display: none !important;
   }
 }

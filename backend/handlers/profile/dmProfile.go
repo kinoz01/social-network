@@ -10,6 +10,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// Get user profile info (fn, ln and pic) to show in chat box.
 func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
@@ -28,7 +29,7 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var fn, ln, pic, accType sql.NullString
+	var fn, ln, pic, accType string
 	err = tp.DB.QueryRow(`
         SELECT first_name, last_name, profile_pic, account_type
         FROM users
@@ -43,7 +44,7 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accType.String == "private" {
+	if accType == "private" {
 		var count int
 		err = tp.DB.QueryRow(`
             SELECT COUNT(*)
@@ -64,9 +65,9 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := map[string]string{
-		"first_name":  fn.String,
-		"last_name":   ln.String,
-		"profile_pic": pic.String,
+		"first_name":  fn,
+		"last_name":   ln,
+		"profile_pic": pic,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)

@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
-	"time"
 
 	// Import the SQLite3 driver
 
@@ -28,15 +27,6 @@ func InitialiseDB() {
 		log.Fatal("Failed to open SQLite database:", err)
 	}
 
-	if err = db.DB.Ping(); err != nil {
-		log.Fatal("connection to the database is dead.", err)
-	}
-
-	// Connection pool configuration
-	db.DB.SetMaxOpenConns(10)                 // Simultaneously opened connections
-	db.DB.SetMaxIdleConns(5)                  // Reuse some opened connections
-	db.DB.SetConnMaxLifetime(5 * time.Minute) // Remove stale connections
-	
 	runMigrations("./database/socNet.db")
 }
 
