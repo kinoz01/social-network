@@ -33,6 +33,10 @@ func Routes() http.Handler {
 	// Serving storage
 	mux.HandleFunc("/api/storage/", hlp.FilesHandler)
 
+	//chatApp
+	mux.HandleFunc("/api/fetchUsers", chat.FetchUsers)
+	mux.HandleFunc("/ws", chat.HandleConnection)
+
 	// Authentication:
 	mux.HandleFunc("/api/check-session", auth.CheckSession)
 	mux.Handle("/api/signup", rl.RateLimitMW(http.HandlerFunc(auth.SignUpHandler)))
