@@ -2,7 +2,6 @@ package follows
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -37,7 +36,7 @@ func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetFollowers(id, limitQuery, pageQuery string) (*Followers, error) {
 	var totalCount int
-	stmnt := fmt.Sprintf(`SELECT COUNT(*) FROM follow_requests WHERE followed_id = ? AND status = "accepted"`)
+	stmnt := `SELECT COUNT(*) FROM follow_requests WHERE followed_id = ? AND status = "accepted"`
 	row := tp.DB.QueryRow(stmnt, id)
 	if err := row.Scan(&totalCount); err != nil {
 		return nil, err

@@ -2,7 +2,6 @@ package follows
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -30,9 +29,7 @@ func GetFollowingRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	limitQuery := r.URL.Query().Get("limit")
 	pageQuery := r.URL.Query().Get("page")
 
-	fmt.Println("queries: ", userId, limitQuery, pageQuery)
 	followingRequests, err := GetFollowingRequests(userId, limitQuery, pageQuery)
-	fmt.Println("errrr followingRequests requests: ", followingRequests, err)
 	if err != nil {
 		help.JsonError(w, "Unexpected error, try again later.", http.StatusInternalServerError, err)
 		return
@@ -44,15 +41,11 @@ func GetFollowingRequestsHandler(w http.ResponseWriter, r *http.Request) {
 func GetFollowingRequests(id, limitQuery, pageQuery string) (*FollowingRequests, error) {
 	var totalCount int
 
-	stmnt := fmt.Sprintf(`SELECT COUNT(*) FROM follow_requests WHERE followed_id = ? AND status = "pending"`)
+	stmnt := `SELECT COUNT(*) FROM follow_requests WHERE followed_id = ? AND status = "pending"`
 	row := tp.DB.QueryRow(stmnt, id)
 	if err := row.Scan(&totalCount); err != nil {
 		return nil, err
 	}
-
-	fmt.Println("count err: ", totalCount)
-	fmt.Println("queries: ", limitQuery, pageQuery)
-	fmt.Println("totalCount: ", totalCount)
 
 	page := 1
 	limit := 10
@@ -84,8 +77,6 @@ func GetFollowingRequests(id, limitQuery, pageQuery string) (*FollowingRequests,
 	offset := (page - 1) * limit
 
 	totalPages := (totalCount + limit - 1) / limit
-
-	fmt.Println("pagination : ", limit, offset)
 
 	selectFollowRequests := `
 SELECT

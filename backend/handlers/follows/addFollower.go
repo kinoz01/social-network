@@ -2,7 +2,6 @@ package follows
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	help "social-network/handlers/helpers"
@@ -44,10 +43,7 @@ SELECT
 		return
 	}
 
-	fmt.Println("follow req: ", followRequest)
-
 	if err := tp.DB.QueryRow(selectFollowRequest, followRequest.FollowerID, followRequest.FollowedID).Scan(&exists); err != nil {
-		fmt.Println("exist err: ", err)
 		help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 
 		return
@@ -57,7 +53,6 @@ SELECT
 
 	if followRequest.Action == "friendRequest" {
 
-		fmt.Println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhher1: ")
 		insertFollower := `
 							INSERT INTO 
 								follow_requests (id, follower_Id, followed_Id, status)
@@ -65,13 +60,11 @@ SELECT
 								(?, ?, ?, ?)`
 
 		if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, "pending"); err != nil {
-			fmt.Println("err:1 ", err)
 
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
 		}
 	} else if followRequest.Status == "accepted" {
-		fmt.Println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhher2: ")
 
 		deleteFollowRequest := `
 							UPDATE
@@ -83,14 +76,12 @@ SELECT
 							`
 
 		if _, err := tp.DB.Exec(deleteFollowRequest, followRequest.FollowerID, followRequest.FollowedID); err != nil {
-			fmt.Println("err delete1: ", err)
 
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
 		}
 
 	} else if followRequest.Action == "follow" {
-		fmt.Println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhher3: ")
 
 		insertFollower := `
 							INSERT INTO 
@@ -99,7 +90,6 @@ SELECT
 								(?, ?, ?, ?)`
 
 		if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, "accepted"); err != nil {
-			fmt.Println("err:1 ", err)
 
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
@@ -115,7 +105,6 @@ SELECT
 							`
 
 		if _, err := tp.DB.Exec(insertFollower, followRequest.FollowerID, followRequest.FollowedID); err != nil {
-			fmt.Println("err: ", err)
 
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return

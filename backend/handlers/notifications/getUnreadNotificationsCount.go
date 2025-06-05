@@ -1,14 +1,11 @@
 package notifications
 
 import (
-	"fmt"
-
 	tp "social-network/handlers/types"
 )
 
 func GetUnreadNotifications(id string, isRead bool) (int, error) {
 	var count int
-	fmt.Println("is reaaaaaaaaaaad: ", isRead)
 	getCount := `
 SELECT
     COUNT(*)

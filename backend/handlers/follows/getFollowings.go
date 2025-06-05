@@ -2,7 +2,6 @@ package follows
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -27,7 +26,6 @@ func GetFollowingsHandler(w http.ResponseWriter, r *http.Request) {
 	pageQuery := r.URL.Query().Get("page")
 
 	followings, err := GetFollowings(userId, limitQuery, pageQuery)
-	fmt.Println("here:         ", err)
 	if err != nil {
 		help.JsonError(w, "Unexpected error, try again later.", http.StatusInternalServerError, err)
 		return
@@ -39,7 +37,7 @@ func GetFollowingsHandler(w http.ResponseWriter, r *http.Request) {
 func GetFollowings(id, limitQuery, pageQuery string) (*Followings, error) {
 	var totalCount int
 
-	stmnt := fmt.Sprintf(`SELECT COUNT(*) FROM follow_requests WHERE follower_id = ? AND status = "accepted"`)
+	stmnt := `SELECT COUNT(*) FROM follow_requests WHERE follower_id = ? AND status = "accepted"`
 	row := tp.DB.QueryRow(stmnt, id)
 	if err := row.Scan(&totalCount); err != nil {
 		return nil, err
@@ -95,6 +93,7 @@ LIMIT ? OFFSET ?
 	if err != nil {
 		return nil, err
 	}
+	
 	defer rows.Close()
 
 	var followings []tp.User

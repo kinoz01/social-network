@@ -2,7 +2,6 @@ package follows
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	help "social-network/handlers/helpers"
@@ -22,7 +21,6 @@ func IsFollwedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	profileID := r.URL.Query().Get("profileid")
-	fmt.Println("profile user: ", profileID, userID)
 
 	selectFollower := `
 SELECT
@@ -47,7 +45,6 @@ SELECT
 		help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 		return
 	}
-	fmt.Println("isFolloweeeeeeeeeed : ", userID, profileID, isFollowed)
 
 	json.NewEncoder(w).Encode(isFollowed)
 }

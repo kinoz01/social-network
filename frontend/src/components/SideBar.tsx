@@ -31,7 +31,7 @@ export default function SideBar() {
   const { getCount, unreadNotificationsCount } = useWS();
 
   useEffect(() => {
-    getCount(); // only call once on mount
+    getCount(); 
   }, [getCount, unreadNotificationsCount]);
 
   return (
