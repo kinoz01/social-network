@@ -1,46 +1,38 @@
 "use client";
 
-import Image from "next/image";
 import styles from "./profile.module.css";
 import { useEffect, useState } from "react";
 import { User } from "@/lib/types";
 import { getProfileInfo, handleFollow, isUserFollowed } from "@/lib/followers";
 import { useUser } from "@/context/UserContext";
-import { useParams } from "next/navigation";
 import Loading from "../Loading";
+import { useWS } from "@/context/wsClient";
 
-function ProfileHeader({ id }: { id: string }) {
+function FollowButton({ profileId }: { profileId: string }) {
   const { user: loggedUser } = useUser();
-  const { id: profileId } = useParams() as { id: string };
   const [profileUser, setProfileUser] = useState<User | null>(null);
   const [isFollowed, setIsFollowed] = useState<boolean>(false);
   const [followingAction, setFollowingAction] = useState<Boolean>(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const { newNotification } = useWS();
 
   // Fetch profile info only when loggedUser is available
   useEffect(() => {
     const fetchProfileInfo = async () => {
-      const profileInfo = await getProfileInfo(id);
-      console.log("proingo", profileInfo);
+      const profileInfo = await getProfileInfo(profileId);
       setProfileUser(profileInfo);
     };
 
     fetchProfileInfo();
-  }, [loggedUser, profileId]);
+  }, [profileId]);
 
-  console.log("profile: ", profileUser, loggedUser);
 
   // Fetch follow status only when profileUser is ready
   useEffect(() => {
     const checkFollowStatus = async () => {
-      const res = await isUserFollowed(id);
-      console.log("reeeeeeeeeeeeeeeeeeeeeeeeees: ", res);
+      const res = await isUserFollowed(profileId);
       setIsFollowed(res === "isFollowed" ? true : false);
-      console.log(
-        "is followed res: ",
-        res,
-        res === "isFollowed" ? true : false
-      );
+
       setFollowingAction(res === "noRelationship" ? false : true);
       setIsDataLoading(false);
     };
@@ -63,7 +55,8 @@ function ProfileHeader({ id }: { id: string }) {
     }
   }
 
-  const handleClick = async () => {
+
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!loggedUser) return;
 
     if (isPublic) {
@@ -71,7 +64,7 @@ function ProfileHeader({ id }: { id: string }) {
       setIsFollowed(false);
       await handleFollow(profileUser, loggedUser, followingAction, isFollowed);
     } else {
-      // if (e.currentTarget.textContent === "Friend Request Sent") return;
+      if (e.currentTarget.textContent === "Friend Request Sent") return;
 
       if (isFollowed) {
         setIsFollowed(false);
@@ -83,49 +76,31 @@ function ProfileHeader({ id }: { id: string }) {
         await handleFollow(profileUser, loggedUser, false, isFollowed);
       }
     }
+
+    newNotification(loggedUser, profileId);
   };
 
-  console.log("profileeeeeee: ", isFollowed, profileUser);
-
-  // if (isDataLoading) {
-  //   return <Loading />;
-  // }
-
   return (
-    <div className={styles.profileHeader}>
-      <div className={styles.userInfo}>
-        <Image
-          src="https://images.unsplash.com/photo-1740768081811-e3adf4af4efe?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDExOHxibzhqUUtUYUUwWXx8ZW58MHx8fHx8"
-          alt="User Image"
-          className={styles.userImage}
-          width={150}
-          height={150}
-        />
-        <div className={styles.username}>Edward Gabriel May</div>
-        <div className={styles.numbers}>
-          <div className={styles.followersNumber}>Followers 500</div>
-          <div className={styles.followingNumber}>Following 50</div>
-          <div className={styles.postsNumber}>Posts 50</div>
-        </div>
-      </div>
-
-      {isDataLoading ? (
-        <div className={styles.followBtn}>
-          <Loading />
-        </div>
-      ) : (
+    <>
+      {
         profileUser &&
-        id !== String(loggedUser?.id) && (
-          <button
-            className={`${styles.followBtn} ${styles[buttonClass]}`}
-            onClick={handleClick}
-          >
-            {isDataLoading ? <Loading /> : buttonText}
-          </button>
-        )
-      )}
-    </div>
+        profileId !== String(loggedUser?.id) && (
+          isDataLoading ? (
+            <div className={styles.followBtn}>
+              <Loading />
+            </div>
+          ) : (
+
+            <button
+              className={`${styles.followBtn} ${styles[buttonClass]}`}
+              onClick={handleClick}
+            >
+              {isDataLoading ? <Loading /> : buttonText}
+            </button>
+          ))
+      }
+    </>
   );
 }
 
-export default ProfileHeader;
+export default FollowButton;

@@ -18,11 +18,8 @@ import (
 	grpsInvite "social-network/handlers/groups/invitations"
 	grpsRequest "social-network/handlers/groups/joinRequests"
 	grpsPost "social-network/handlers/groups/posts"
-	nots "social-network/handlers/notifications"
 	ws "social-network/handlers/websocket"
 )
-
-var Router http.Handler
 
 // Application routes.
 func Routes() http.Handler {
@@ -80,10 +77,11 @@ func Routes() http.Handler {
 	mux.Handle("/api/groups/event-response", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grpevent.EventResponse))))
 
 	// Followers search:
+	// this is previous function for the search
 	// mux.HandleFunc("/api/followers", flw.GetFollowers)
-	// Following:
+
+	// Followings:
 	mux.HandleFunc("/api/followers/search", flw.SearchFollowersHandler)
-	mux.HandleFunc("/api/followers/info", flw.FollowerInfoHandler)
 	mux.HandleFunc("/api/followers/isfollowed", flw.IsFollwedHandler)
 	mux.HandleFunc("/api/followers/add", flw.AddFollowRequest)
 	mux.HandleFunc("/api/followers/requests", flw.GetFollowingRequestsHandler)
@@ -91,98 +89,11 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)
 	mux.HandleFunc("/api/followings", flw.GetFollowingsHandler)
 
-	// Notifications:
-	mux.HandleFunc("/api/notifications/friendRequest", nots.FriendRequestHandler)
-	mux.HandleFunc("/api/notifications", nots.NotificationsHandler)
-
-	// image server
+	// Profile
+	mux.HandleFunc("/api/profile/info", flw.ProfileInfoHandler)
 
 	// Websocket
 	mux.HandleFunc("/api/ws", ws.GlobalWS)
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }
-
-// package server
-
-// import (
-// 	"net/http"
-// 	"time"
-
-// 	auth "social-network/handlers/authentication"
-// 	flw "social-network/handlers/follows"
-// 	grps "social-network/handlers/groups"
-// 	grpsD "social-network/handlers/groups/dashboard"
-// 	grpsInvite "social-network/handlers/groups/invitations"
-// 	grpsRequest "social-network/handlers/groups/joinRequests"
-// 	grpsPost "social-network/handlers/groups/posts"
-// 	hlp "social-network/handlers/helpers"
-// 	mw "social-network/handlers/middlewares"
-// 	nots "social-network/handlers/notifications"
-// )
-
-// var Router http.Handler
-
-// // Application routes.
-// func Routes() http.Handler {
-// 	mux := http.NewServeMux()
-
-// 	// Allow 1 request per 20(x) microsecond
-// 	rl := mw.NewRateLimiter(20 * time.Microsecond)
-
-// 	// Serving storage
-// 	mux.HandleFunc("/api/storage/", hlp.FilesHandler)
-
-// 	// Authentication:
-// 	mux.HandleFunc("/api/check-session", auth.CheckSession)
-// 	mux.Handle("/api/signup", rl.RateLimitMW(http.HandlerFunc(auth.SignUpHandler)))
-// 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
-// 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
-// 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
-
-// 	// Groups-dashboard:
-// 	mux.HandleFunc("/api/groups/owned", grpsD.GetOwnedGroups)
-// 	mux.HandleFunc("/api/groups/joined", grpsD.GetJoinedGroups)
-// 	mux.HandleFunc("/api/groups/available", grpsD.AvailableGroupsHandler)
-// 	mux.HandleFunc("/api/groups/invitations", grpsD.InvitationsHandler)
-// 	mux.HandleFunc("/api/groups/create", grps.CreateGroupHandler)
-// 	mux.HandleFunc("/api/groups/join-request", grpsRequest.JoinRequestHandler)
-// 	mux.HandleFunc("/api/groups/accept-invitation", grpsInvite.AcceptInvitationHandler)
-// 	mux.HandleFunc("/api/groups/refuse-invitation", grpsInvite.RefuseInvitationHandler)
-
-// 	// Groups:
-// 	mux.HandleFunc("/api/groups/is-member", grps.IsGroupMember)
-// 	mux.HandleFunc("/api/groups/groupInfo", grps.GetGroupInfoHandler)
-// 	mux.HandleFunc("/api/groups/invite", grpsInvite.InviteFollowersHandler)
-// 	mux.HandleFunc("/api/groups/requests", grpsRequest.ListJoinRequestsHandler)
-// 	mux.HandleFunc("/api/groups/accept-request", grpsRequest.AcceptJoinRequestHandler)
-// 	mux.HandleFunc("/api/groups/refuse-request", grpsRequest.RefuseJoinRequestHandler)
-
-// 	// Groups posts:
-// 	mux.HandleFunc("/api/groups/posts", grpsPost.GroupPostsHandler)
-// 	mux.HandleFunc("/api/groups/create-post", grpsPost.CreatePostHandler)
-// 	mux.HandleFunc("/api/groups/chat", grps.ChatPage)
-// 	mux.HandleFunc("/api/groups/comments", grpsPost.GetCommentsHandler)
-// 	mux.HandleFunc("/api/groups/create-comment", grpsPost.CreateCommentHandler)
-// 	mux.HandleFunc("/api/ws", grps.GlobalWS)
-
-// 	// Following:
-// 	mux.HandleFunc("/api/followers/search", flw.GetFollowersHandler)
-// 	mux.HandleFunc("/api/followers/info", flw.FollowerInfoHandler)
-// 	mux.HandleFunc("/api/followers/requests/add", flw.FollowRequestHanlder)
-// 	mux.HandleFunc("/api/followers/isfollowed", flw.IsFollwedHandler)
-// 	mux.HandleFunc("/api/followers/add", flw.FollowingRequestHandler)
-// 	mux.HandleFunc("/api/followers/requests", flw.FollowingRequestsHandler)
-// 	mux.HandleFunc("/api/suggestions", flw.SuggestionsHandler)
-
-// 	mux.HandleFunc("/api/followers", flw.FollowersHandler)
-// 	mux.HandleFunc("/api/followings", flw.FollowingsHandler)
-
-// 	// Notifications:
-// 	mux.HandleFunc("/api/notifications/friendRequest", nots.FriendRequestHandler)
-// 	mux.HandleFunc("/api/notifications", nots.NotificationsHandler)
-
-// 	// image server
-
-// 	return mw.EnableCORS(mw.SecureHeaders(mux))
-// }

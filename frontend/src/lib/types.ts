@@ -53,24 +53,24 @@ export interface NotificationModel {
 
 export interface NotifcationResponse {
   notifications: NotificationModel[];
-  totalCount?: number;
-  totalPages?: number;
+  totalCount: number;
+  totalPages: number;
 }
 
 export interface Followers {
   followers: User[];
-  totalCount?: number;
-  totalPages?: number;
+  totalCount: number;
+  totalPages: number;
 }
 
 export interface Followings {
   followings: User[];
-  totalCount?: number;
-  totalPages?: number;
+  totalCount: number;
+  totalPages: number;
 }
 
 export interface FriendRequest {
   requests: User[];
-  totalCount?: number;
-  totalPages?: number;
+  totalCount: number;
+  totalPages: number;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchUser } from "@/lib/apiUsers";
 import { User } from "@/lib/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -18,23 +19,7 @@ const UserContext = createContext<UserContextValue | undefined>(undefined);
 
 // Fetch user information from the API
 // This function is called when the UserProvider mounts to fetch the user data
-async function fetchUser(): Promise<User | null> {
-  try {
-    const userInfoRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/userInfo`,
-      { credentials: "include", cache: "no-store" }
-    );
-    if (!userInfoRes.ok) return null;
 
-
-
-    return await userInfoRes.json()
-      ;
-  } catch (error) {
-    console.error("Failed to fetch user:", error);
-    return null;
-  }
-}
 
 // Provider component
 export function UserProvider({ children }: { children: React.ReactNode }) {

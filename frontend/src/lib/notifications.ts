@@ -1,19 +1,18 @@
+import Popup from "@/components/Popup";
 import { NotifcationResponse, NotificationModel, User } from "./types";
 
 // getting unread notifications count
 
 async function getNotifications(
   limit?: number,
-  page?: number,
-): Promise<NotifcationResponse  | null> {
-  const url = `${
-    process.env.NEXT_PUBLIC_API_URL
-  }/api/notifications?${
+  page?: number
+): Promise<NotifcationResponse | null> {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?${
     limit ? `&limit=${limit}` : ""
   }${page ? `&page=${page}` : ""}`;
 
   try {
-    const res = await fetch(url,{ credentials: "include"});
+    const res = await fetch(url, { credentials: "include" });
     if (!res.ok) {
       throw new Error(await res.json());
     }
@@ -31,12 +30,10 @@ async function getNotifications(
 async function getUnreadNotificationsCount(
   isRead: string
 ): Promise<number | null> {
-  const url = `${
-    process.env.NEXT_PUBLIC_API_URL
-  }/api/notifications?isread=${isRead}`;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?isread=${isRead}`;
 
   try {
-    const res = await fetch(url,{ credentials: "include" });
+    const res = await fetch(url, { credentials: "include" });
     if (!res.ok) {
       throw new Error(await res.json());
     }
@@ -86,7 +83,7 @@ async function updateReadNotification(
 }
 
 // add notification
-async function addNotification(body: {}, url: String): Promise<String> {
+async function addNotification(body: {}, url: String): Promise<string> {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${url}`,

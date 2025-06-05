@@ -57,7 +57,7 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
 
     const fetchSlice = async (q: string, off: number) => {
         const qs = `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
-        const r = await fetch(`${API_URL}/api/followers?${qs}`, {
+        const r = await fetch(`${API_URL}/api/followers/search?${qs}`, {
             credentials: "include",
         });
         if (r.status === 204) return [];
@@ -99,7 +99,8 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
         return () => el.removeEventListener("scroll", h);
     }, [loadMore]);
 
-    /* ui ------------------------------------------------------- */
+    console.log("00data: ", data);
+    /* ui ----------"--------------------------------------------- */
     return (
         <div className={styles.postAud}>
             <div className={styles.header}>

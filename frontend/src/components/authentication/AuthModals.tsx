@@ -245,9 +245,12 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
 
                             <div className="file-upload-container">
                                 <label htmlFor="signupImage" className="file-upload">
-                                    <span className="upload-icon">
-                                        <Image src="/img/upload.svg" alt="Upload Icon" width={24} height={24} />
-                                    </span>
+                                    <Image
+                                        src="/img/upload.svg"
+                                        alt="Upload Icon"
+                                        width={28}
+                                        height={28}
+                                    />
                                     <span className="upload-text">{fileName}</span>
                                 </label>
                                 <input

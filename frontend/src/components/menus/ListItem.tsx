@@ -1,13 +1,6 @@
 "use client";
 import Image from "next/image";
 import styles from "./menus.module.css";
-import {
-  AcceptIcon,
-  AddFriendIcon,
-  ChatIcon,
-  RejectIcon,
-  UserIcon,
-} from "../icons";
 import { useState } from "react";
 import { User } from "@/lib/types";
 import { addFollower } from "@/lib/followers";
@@ -15,7 +8,6 @@ import Link from "next/link";
 
 function ListItem({
   type,
-  name,
   item,
   loggedUser,
 }: {
@@ -27,7 +19,6 @@ function ListItem({
     | "chat"
     | "group"
     | "event";
-  name?: String;
   item?: User;
   loggedUser?: User | null;
 }) {
@@ -35,12 +26,6 @@ function ListItem({
 
   const handleResponse = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const action = e.currentTarget.value;
-    console.log("bidy: ", {
-      action: action,
-      status: action,
-      followedID: item?.id,
-      followerId: String(loggedUser?.id),
-    });
     setResponed(true);
 
     const res = await addFollower(
@@ -74,7 +59,7 @@ function ListItem({
               height={40}
             />
             <span className={styles.listItemName}>
-              {item ? item?.first_name + " " + item?.last_name : name}
+              {item?.first_name + " " + item?.last_name}
             </span>{" "}
           </div>
           {type !== "chat" &&

@@ -9,13 +9,13 @@ import (
 
 func GetUserId(r *http.Request) (string, error) {
 	cookie, err := r.Cookie("session_token")
+	fmt.Println("tokenerr : ", err)
 	if err != nil {
 		return "", err
 	}
 
 	token := cookie.Value
 
-	fmt.Println("token: ", token)
 
 	GetUserId := `
 SELECT

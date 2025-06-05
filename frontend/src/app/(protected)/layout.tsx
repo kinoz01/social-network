@@ -4,26 +4,26 @@ import "../globals.css";
 import { requireSession } from "@/lib/auth";
 import SideBar from "@/components/SideBar";
 import { UserProvider } from "@/context/UserContext";
-import { WSProvider } from "@/context/wsClient"; // ← NEW
+import { WSProvider } from "@/context/wsClient";
 
 export const metadata: Metadata = {
-    title: "Social Network",
-    description: "Social platform",
+  title: "Social Network",
+  description: "Social platform",
 };
 
 export default async function HomeLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    await requireSession();
+  await requireSession();
 
-    return (
-        <WSProvider>
-            <UserProvider>
-                <SideBar />
-                {children}
-            </UserProvider>
-        </WSProvider>
-    );
+  return (
+    <WSProvider>
+      <UserProvider>
+        <SideBar />
+        {children}
+      </UserProvider>
+    </WSProvider>
+  );
 }

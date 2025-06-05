@@ -1,26 +1,27 @@
 import type { Metadata } from "next";
-
-import "../styles/globals.css";
-import "../styles/theme.css"
+import { Roboto } from "next/font/google";
+// import "../styles/globals.css";
+// import "../styles/theme.css";
 
 export const metadata: Metadata = {
-    title: "Social Network",
-    description: "Social platform",
+  title: "Social Network",
+  description: "Social platform",
 };
 
+const roboto = Roboto({
+  weight: '400',
+  subsets: ['latin'],
+})
 export default function RootLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-
-    return (
-        <html lang="en">
-            <body >
-                <main >
-                    {children}
-                </main>
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en" className={roboto.className}>
+      <body>
+        <main>{children}</main>
+      </body>
+    </html>
+  );
 }

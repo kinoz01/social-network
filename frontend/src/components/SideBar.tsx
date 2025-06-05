@@ -17,6 +17,7 @@ import {
 } from "@/lib/notifications";
 import NavButton from "./NavButton";
 import { useUser } from "@/context/UserContext";
+import { useWS } from "@/context/wsClient";
 
 export default function SideBar() {
   const { user: loggedUser } = useUser();
@@ -27,28 +28,11 @@ export default function SideBar() {
   // logout state management
   const { handleLogout } = useLogout();
 
-  // loading state
-  const [isDataLoading, setIsDataLoading] = useState(false);
-
-  // get unread notificatios count
-  const [unreadNotificationsCount, setUnreadNotificationsCount] =
-    useState<number>(0);
+  const { getCount, unreadNotificationsCount } = useWS();
 
   useEffect(() => {
-    async function fetchNotificationsCount() {
-      if (!loggedUser) return;
-
-      setIsDataLoading(true);
-
-      const notifications = await getUnreadNotificationsCount("false");
-
-      const unreadCount = notifications || 0;
-      setUnreadNotificationsCount(unreadCount);
-      setIsDataLoading(false);
-    }
-
-    fetchNotificationsCount();
-  }, [loggedUser]);
+    getCount(); // only call once on mount
+  }, [getCount, unreadNotificationsCount]);
 
   return (
     <div
@@ -86,7 +70,6 @@ export default function SideBar() {
           link={`notifications/${loggedUser?.id}`}
           icon={<NotificationIcon />}
           count={unreadNotificationsCount}
-          loading={isDataLoading}
         />
 
         <NavButton

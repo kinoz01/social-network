@@ -35,14 +35,12 @@ function Notification({ notification }: { notification: NotificationModel }) {
   // function to handel group event and group invitations
   const handelGroupRequest = async (
     e: React.MouseEvent<HTMLButtonElement>
-  ) => {};
+  ) => { };
 
-  // console.log("image url: ", `${process.env.NEXT_PUBLIC_API_URL}/api/image/${notification.sender.profile_pic}`);
   return (
     <div
-      className={`${styles.notification} ${
-        notification.isRead || isRead ? styles.read : styles.notRead
-      }`}
+      className={`${styles.notification} ${notification.isRead || isRead ? styles.read : styles.notRead
+        }`}
     >
       <div className={styles.info}>
         <Image

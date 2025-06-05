@@ -25,6 +25,7 @@ func Serve(handler http.Handler) {
 	}
 
 	log.Printf("Starting server on http://127.0.0.1:%s", Port)
+
 	if err := httpServer.Serve(listener); err != nil && err != http.ErrServerClosed {
 		log.Printf("Server error: %v", err)
 	}

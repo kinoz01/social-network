@@ -38,11 +38,16 @@ SELECT
 );`
 
 	var exists bool
+
+	if exists {
+		help.JsonError(w, "You've already follwed this user", http.StatusBadRequest, nil)
+		return
+	}
+
 	fmt.Println("follow req: ", followRequest)
 
 	if err := tp.DB.QueryRow(selectFollowRequest, followRequest.FollowerID, followRequest.FollowedID).Scan(&exists); err != nil {
 		fmt.Println("exist err: ", err)
-
 		help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 
 		return
@@ -50,15 +55,25 @@ SELECT
 
 	id := uuid.Must(uuid.NewV4())
 
-	if followRequest.Action == "follow" || followRequest.Action == "accepted" {
-		if exists {
-			help.JsonError(w, "You've already follwed this user", http.StatusBadRequest, nil)
+	if followRequest.Action == "friendRequest" {
+
+		fmt.Println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhher1: ")
+		insertFollower := `
+							INSERT INTO 
+								follow_requests (id, follower_Id, followed_Id, status)
+							VALUES
+								(?, ?, ?, ?)`
+
+		if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, "pending"); err != nil {
+			fmt.Println("err:1 ", err)
+
+			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
 		}
+	} else if followRequest.Status == "accepted" {
+		fmt.Println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhher2: ")
 
-		if followRequest.Status == "accepted" {
-			fmt.Println("heeeeere: 0")
-			deleteFollowRequest := `
+		deleteFollowRequest := `
 							UPDATE
 								follow_requests 
 							SET 
@@ -67,29 +82,30 @@ SELECT
 								follower_id = ? AND followed_id = ? AND status = "pending"
 							`
 
-			if _, err := tp.DB.Exec(deleteFollowRequest, followRequest.FollowerID, followRequest.FollowedID); err != nil {
-				fmt.Println("err delete1: ", err)
+		if _, err := tp.DB.Exec(deleteFollowRequest, followRequest.FollowerID, followRequest.FollowedID); err != nil {
+			fmt.Println("err delete1: ", err)
 
-				help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
-				return
-			}
+			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
+			return
+		}
 
-		} else {
-			insertFollower := `
+	} else if followRequest.Action == "follow" {
+		fmt.Println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhher3: ")
+
+		insertFollower := `
 							INSERT INTO 
 								follow_requests (id, follower_Id, followed_Id, status)
 							VALUES
 								(?, ?, ?, ?)`
 
-			if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, followRequest.Status); err != nil {
-				fmt.Println("err:1 ", err)
+		if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, "accepted"); err != nil {
+			fmt.Println("err:1 ", err)
 
-				help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
-				return
-			}
+			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
+			return
 		}
 
-	} else if followRequest.Action == "rejected" || followRequest.Action == "unfollow" {
+	} else if followRequest.Status == "rejected" || followRequest.Action == "unfollow" {
 		insertFollower := `
 							DELETE 
 							FROM

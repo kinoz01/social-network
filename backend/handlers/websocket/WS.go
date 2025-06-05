@@ -2,12 +2,14 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
 	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
+	"social-network/handlers/notifications"
 	tp "social-network/handlers/types"
 
 	"github.com/gofrs/uuid"
@@ -66,6 +68,11 @@ type inbound struct {
 	Type    string `json:"type"` // subscribeGroup | subscribeChat | chatMessage
 	GroupID string `json:"groupId,omitempty"`
 	Content string `json:"content,omitempty"`
+
+	Page  int `json:"page,omitempty"`
+	Limit int `json:"limit,omitempty"`
+
+	Notification tp.Notification `json:"notification"`
 }
 
 /*────────── Entry point (upgrade) ─────────*/
@@ -73,12 +80,15 @@ type inbound struct {
 func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	u, err := auth.GetUser(r)
 	if err != nil {
+		fmt.Println("ws err1: ", err)
 		help.JsonError(w, "unauth", 401, err)
 		return
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		fmt.Println("ws err2: ", err)
+
 		return
 	}
 	cl := &client{userID: u.ID, conn: conn, subs: make(map[string]bool), chats: make(map[string]bool)}
@@ -114,15 +124,22 @@ func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	chatHubs.mu.Unlock()
 
 	broadcastOnlineStatus()
+	sendUnreadNotificationCount(cl, u.ID)
+
 	conn.Close()
 }
 
 /*────────── Router ─────────*/
 func handleMessage(c *client, raw []byte, u *tp.User) {
 	var msg inbound
+	fmt.Println("raw, msg: ", string(raw), msg)
 	if err := json.Unmarshal(raw, &msg); err != nil {
+		fmt.Println("ws err3: ", err)
+
 		return
 	}
+
+	fmt.Println("ws msg: ", msg)
 
 	switch msg.Type {
 	case "getGroupMembers":
@@ -146,6 +163,15 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		}
 		m := storeAndBuildMessage(msg.GroupID, u, msg.Content)
 		broadcastChat(msg.GroupID, m)
+
+	case "unreadNotificationsCount":
+		sendUnreadNotificationCount(c, u.ID)
+
+	case "getNotifications":
+		sendNotificationList(c, u, msg, "getNotifications")
+
+	case "notification":
+		handleNotifcation(c, msg.Notification)
 	}
 }
 
@@ -244,4 +270,73 @@ func broadcastChat(gid string, m ChatMsg) {
 		_ = cl.conn.WriteJSON(payload)
 		cl.mu.Unlock()
 	}
+}
+
+func sendUnreadNotificationCount(c *client, userId string) {
+	count, err := notifications.GetUnreadNotifications(userId, false)
+	if err != nil {
+		fmt.Println("ws count err: ", err)
+		return
+	}
+
+	payload := map[string]any{
+		"type":  "unreadNotificationsCount",
+		"count": count,
+	}
+
+	c.mu.Lock()
+	_ = c.conn.WriteJSON(payload)
+	c.mu.Unlock()
+}
+
+func handleNotifcation(c *client, notification tp.Notification) {
+	if err:= notifications.AddNotification(notification); err!= nil{
+		fmt.Println("notification err: ",err)
+		return
+	}
+
+
+	payload := map[string]any{
+		"type":         "notification",
+		"notification": notification,
+	}
+
+	c.mu.Lock()
+	_ = c.conn.WriteJSON(payload)
+	c.mu.Unlock()
+
+	clientsMu.RLock()
+	for cl := range clients {
+		if cl.userID == notification.Receiver {
+			sendUnreadNotificationCount(cl, notification.Receiver)
+			sendNotificationList(cl, &tp.User{ID: notification.Receiver}, inbound{
+				Limit: 10,
+				Page:  1,
+			}, "updateNotifications")
+		}
+	}
+	clientsMu.RUnlock()
+}
+
+func sendNotificationList(c *client, u *tp.User, msg inbound, msgType string) {
+	notifs, err := notifications.GetNotifications(u.ID, msg.Limit, msg.Page)
+
+	if err != nil {
+		return
+	}
+
+	if notifs.Notifications == nil {
+		notifs.Notifications = make([]*tp.Notification, 0)
+	}
+
+	payload := map[string]any{
+		"type":          msgType,
+		"notifications": notifs.Notifications,
+		"totalCount":    notifs.TotalCount,
+		"totalPages":    notifs.TotalPages,
+	}
+
+	c.mu.Lock()
+	_ = c.conn.WriteJSON(payload)
+	c.mu.Unlock()
 }

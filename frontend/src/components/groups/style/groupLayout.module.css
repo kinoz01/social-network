@@ -33,7 +33,7 @@
     flex-direction: column;
     gap: 1rem;
     overflow-y: auto;
-    max-height: 90vh;
+    height: 98vh;
 }
 
 @media (max-width: 970px) {

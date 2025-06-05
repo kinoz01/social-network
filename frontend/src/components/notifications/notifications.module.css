@@ -32,6 +32,8 @@
   border-radius: 15px;
   margin-bottom: 1rem;
   background-color: var(--color2);
+    border: 1px solid #e7e7e7;
+
 }
 
 .options {
@@ -45,6 +47,7 @@
 }
 
 .notification.notRead {
+  border: 1px solid var(--color1);
   .info {
     display: flex;
     justify-content: flex-start;

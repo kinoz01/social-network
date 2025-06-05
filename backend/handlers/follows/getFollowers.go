@@ -22,7 +22,7 @@ func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, err := help.GetUserId(r)
+	userId := r.URL.Query().Get("id")
 	limitQuery := r.URL.Query().Get("limit")
 	pageQuery := r.URL.Query().Get("page")
 
