@@ -1,8 +1,8 @@
 import Image from "next/image";
 import styles from "./chat.module.css";
 
-function Message({ type }: { type: "sender" | "receiver" }) {
-
+function Message({ type, message, username, time}: { type: "sender" | "receiver" , message:string, username: string, time:string}) {
+    // console.log("gggg", username)
     return (
         <div className={`${styles.message} ${styles[type]}`}>
             <div className={styles.header}>
@@ -13,13 +13,13 @@ function Message({ type }: { type: "sender" | "receiver" }) {
                     width={40}
                     height={40}
                 />
-                <span className={styles.ListItemName}>Wayne Burton</span>
+                <span className={styles.ListItemName}>{username}</span>
             </div>
             <div className={styles.messageContent}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. At minima saepe sunt neque eius, id dolor voluptate libero, sit nostrum voluptatibus similique in perferendis deserunt fugit! Assumenda porro dolorum sunt?
+                {message}
             </div>
             <div className={styles.messageDate}>
-                01/01/2025
+                {time}
             </div>
 
         </div >

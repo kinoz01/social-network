@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  AddIcon,
+  // AddIcon,
   ChatsIcon,
   GroupsIcon,
   HomeIcon,

@@ -6,6 +6,8 @@ import { AcceptIcon, AddFriendIcon, ChatIcon, RejectIcon } from "../icons";
 function ListItem({
   type,
   name,
+  click,
+  
 }: {
   type:
   | "friendRequests"
@@ -19,7 +21,7 @@ function ListItem({
   name: String;
 }) {
   return (
-    <div className={`${styles.ListItem} ${styles[type]}`}>
+    <div className={`${styles.ListItem} ${styles[type]}`} onClick={click}>
       <div className={styles.ListItemInfo}>
         {type !== "groups" ? (
           <>
@@ -51,7 +53,7 @@ function ListItem({
             {/* UNFOLLOW OCON */}
             <RejectIcon />
           </>
-        ) : type === "chat" || type === "group" || "event" ? null : type ===
+        ) : type === "chat" || type === "group" || type ==="event" ? null : type ===
           "groups" ? (
           <>
             <ChatIcon />

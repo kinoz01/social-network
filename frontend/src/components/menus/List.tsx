@@ -1,11 +1,16 @@
+"use client"
 import Link from "next/link";
 import styles from "./menus.module.css";
 import ListItem from "./ListItem";
-// import GroupCard from "./GroupCard";
+import FetchUsers from "../chat/fetchUsers";
+import {  getUser, User } from "@/lib/user";
+import { useEffect, useState } from "react";
 
 function List({
   type,
   title,
+  selectedUser,
+  // currentUser
 }: {
   type:
   | "friendRequests"
@@ -18,9 +23,22 @@ function List({
   | "event";
   title: String;
 }) {
+  const users = FetchUsers()
+  console.log(users);  
+  const [currentUser, setCurrentUser] = useState<User|null>(null)
+      
+          useEffect(() => {
+              const getCurrentUser = async() => {
+                  const loggedUser = await getUser()
+                  setCurrentUser(loggedUser)
+              }
+              getCurrentUser()
+          },[])
+  const filterdUsers = users?.filter(user => user.id != currentUser?.id)
+  console.log(filterdUsers, currentUser?.id);
+  
   return (
     <div className={`${styles.List} ${styles[type]} `}>
-      {/* TOP  */}
       <div className={styles.header}>
         <span className={styles.title}>{title}</span>
         {type === "friendRequests" ? (
@@ -39,20 +57,18 @@ function List({
       </div>
       <div className={type !== "groups" ? styles.users : styles.groups}>
         {type === "chat" ? (
-          // Fetch all users
           <>
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
+          {filterdUsers?.map((user) => {
+
+            return (
+              <ListItem
+                key={user.id} 
+                type={type}
+                name={user.first_name +" " + user.last_name} 
+                click={() => selectedUser?.(user)}
+                />
+              );
+            })}
           </>
 
         ) : type === "groups" ? (
@@ -83,5 +99,8 @@ function List({
     </div>
   );
 }
+
+
+
 
 export default List;
