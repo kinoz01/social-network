@@ -1,42 +1,30 @@
+"use client";
+
 import styles from "./menus.module.css";
 import ProfileCard from "./ProfileCrad";
 import List from "./List";
-import Link from "next/link";
+import { useUser } from "@/context/UserContext";
 
-const LeftMenu = ({
+function LeftMenu({
   type,
 }: {
   type: "home" | "chat" | "profile" | "group" | "groups";
-}) => {
+}) {
+  const { user: loggedUser } = useUser();
   return (
     <div className={`${styles.leftMenu} ${styles[type]}`}>
       {type == "home" ? (
         <>
-          <ProfileCard />
-            <List type="followers" title="Followers" />
+          {/* <ProfileCard user={loggedUser} /> */} {/* omited for now (cause server panic)*/} 
+          <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
         </>
       ) : type === "chat" ? (
         <>
-            <List type="chat" title="Chat" />
-        </>
-      ) : type === "groups" ? (
-        <>
-          {/* <div className="buttons">
-            <button>
-              <Link href="/groups/1">Posts</Link>
-            </button>
-            <button>
-              <Link href="/groups/1/chat">Chat</Link>
-            </button>
-            <button>
-              <Link href="/groups/1/events">Events</Link>
-            </button>
-          </div> */}
-          <List type="groups" title="Groups" />
+          <List type="chat" title="Chat" loggedUser={loggedUser} />
         </>
       ) : null}
     </div>
   );
-};
+}
 
 export default LeftMenu;

@@ -291,6 +291,25 @@
   margin-top: 30px;
   border-radius: 12px;
   height: fit-content;
+  font-family: 'Zain';
+  font-size: 1.1rem;
+}
+
+.usersSuggestionsChat button {
+  width: 6rem !important;
+  border-radius: 20px !important;
+  font-family: 'Zain';
+  font-size: .9rem;
+}
+
+.usersSuggestionsChat p {
+  margin-left: 15px;
+  font-family: 'Zain';
+  font-size: .9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: #333;
 }
 
 @media (max-width:1100px) {

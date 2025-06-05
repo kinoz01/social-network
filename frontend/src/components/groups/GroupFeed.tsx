@@ -171,9 +171,7 @@ function PostInput({
             setErr("");
 
             // reset height
-            const ta = document.querySelector(
-                `.${styles.input}`
-            ) as HTMLTextAreaElement | null;
+            const ta = document.querySelector(`.${styles.input}`) as HTMLTextAreaElement | null;
             if (ta) ta.style.height = "auto";
         } catch (e: any) {
             setErr(e.message || "Could not post");
@@ -215,7 +213,7 @@ function PostInput({
                         onChange={(e) => setText(e.target.value)}
                         onKeyDown={onKeyDown}
                         onInput={onInput}
-                        placeholder="Share your thoughts…"
+                        placeholder={`What's on your mind, ${user?.first_name?.toUpperCase() ?? ''}?`}
                         className={styles.input}
                         rows={2}
                         maxLength={1500}
@@ -232,7 +230,6 @@ function PostInput({
                 <input
                     ref={fileRef}
                     type="file"
-                    accept="image/*"
                     hidden
                     onChange={onPick}
                 />

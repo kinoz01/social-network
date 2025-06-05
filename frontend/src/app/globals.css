@@ -278,6 +278,17 @@ body {
   } */
 }
 
+.no-data {
+  height: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-direction: column;
+  margin: auto;
+}
+
 @media (max-width: 900px) {
   .buttons button {
     width: 100%;

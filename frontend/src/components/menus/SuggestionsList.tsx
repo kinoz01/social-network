@@ -27,6 +27,7 @@ function SuggestionsList({ className = "" }: Props) {
 
   return (
     <div className={`${styles.users} ${className}`}>
+      {className ? <p>SUGGESTIONS</p>: ""} 
       {suggestions === null || suggestions.length === 0 ? (
         <NoData msg="No Suggestions yet" />
       ) : (

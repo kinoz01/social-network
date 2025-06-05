@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"social-network/service/service_posts"
 )
 
 const fileLimit = 4 << 20 // 4MB
@@ -49,9 +47,6 @@ func HandleFileUpload(r *http.Request, genre string, formFile string) (string, e
 		return "", fmt.Errorf("unsupported image format")
 	}
 	if handler != nil {
-		if err := service_posts.ValidFile(handler); err != nil {
-			return "", fmt.Errorf("invalid file: %w", err)
-		}
 		if p, err := SaveImg(buff, genre); err == nil {
 			return p, nil
 		}

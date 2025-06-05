@@ -21,6 +21,8 @@
     font-size: .9rem;
     font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: .03em;
+    color: #333;
 }
 
 .search {
