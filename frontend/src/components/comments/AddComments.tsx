@@ -2,7 +2,7 @@ import Image from "next/image";
 import styles from "./comments.module.css";
 import Link from "next/link";
 import TimeAgo from "../groups/TimeAgo";
-import { CommentInfo, User } from "../types";
+import { CommentInfo, User } from "../../lib/types";
 import { popup } from "../utils";
 import { useState, useRef } from "react";
 import { API_URL } from "@/lib/api_url";

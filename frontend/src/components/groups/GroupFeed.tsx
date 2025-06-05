@@ -12,7 +12,7 @@ import { useParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import Loading from "@/components/Loading";
 import styles from "./style/groupFeed.module.css";
-import { Post } from "@/components/types";
+import { Post } from "@/lib/types";
 import { PostComponent } from "../posts/Post";
 import { API_URL } from "@/lib/api_url";
 import { throttle } from "../utils";
@@ -171,9 +171,7 @@ function PostInput({
             setErr("");
 
             // reset height
-            const ta = document.querySelector(
-                `.${styles.input}`
-            ) as HTMLTextAreaElement | null;
+            const ta = document.querySelector(`.${styles.input}`) as HTMLTextAreaElement | null;
             if (ta) ta.style.height = "auto";
         } catch (e: any) {
             setErr(e.message || "Could not post");
@@ -208,22 +206,20 @@ function PostInput({
     return (
         <form onSubmit={onSubmit} className={styles.postBox}>
             <div className={styles.inputRow}>
-                <Image src={avatar} alt="" width={40} height={40} className={styles.avatar} />
-                <textarea
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    onKeyDown={onKeyDown}
-                    onInput={onInput}
-                    placeholder="Share your thoughts…"
-                    className={styles.input}
-                    rows={2}
-                    maxLength={1500}
-                />
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className={styles.postButtonIcon}
-                >
+                <div className={styles.textareaWrapper}>
+                    <Image src={avatar} alt="" width={40} height={40} className={styles.avatar} unoptimized/>
+                    <textarea
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={onKeyDown}
+                        onInput={onInput}
+                        placeholder={`What's on your mind, ${user?.first_name?.toUpperCase() ?? ''}?`}
+                        className={styles.input}
+                        rows={2}
+                        maxLength={1500}
+                    />
+                </div>
+                <button type="submit" disabled={loading} className={styles.postButtonIcon}>
                     <Image src="/img/arrow-up.svg" alt="" width={18} height={18} />
                 </button>
             </div>
@@ -234,7 +230,6 @@ function PostInput({
                 <input
                     ref={fileRef}
                     type="file"
-                    accept="image/*"
                     hidden
                     onChange={onPick}
                 />

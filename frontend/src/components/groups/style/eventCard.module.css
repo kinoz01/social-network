@@ -39,6 +39,17 @@
     gap: .5rem;
 }
 
+@media (max-width:520px) {
+    .actionRow {
+        flex-direction: column-reverse;
+    }
+
+    .button {
+        margin: auto;
+        width: 250px;
+    }
+}
+
 .button {
     background: transparent;
     color: #000;

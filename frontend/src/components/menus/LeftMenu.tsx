@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./menus.module.css";
 import ProfileCard from "./ProfileCrad";
 import List from "./List";
@@ -13,8 +15,8 @@ const LeftMenu = ({
     <div className={`${styles.leftMenu} ${styles[type]}`}>
       {type == "home" ? (
         <>
-          <ProfileCard />
-            <List type="followers" title="Followers" />
+          {/* <ProfileCard user={loggedUser} /> */} {/* omited for now (cause server panic)*/} 
+          <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
         </>
       ) : type === "chat" ? (
         <>
@@ -27,6 +29,6 @@ const LeftMenu = ({
       ) : null}
     </div>
   );
-};
+}
 
 export default LeftMenu;

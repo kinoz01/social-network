@@ -1,7 +1,18 @@
+"use client";
 import Image from "next/image";
 import styles from "./menus.module.css";
-import { AcceptIcon, AddFriendIcon, ChatIcon, RejectIcon } from "../icons";
-// import GroupCard from "./GroupCard";
+import {
+  AcceptIcon,
+  AddFriendIcon,
+  ChatIcon,
+  RejectIcon,
+  UserIcon,
+} from "../icons";
+import { useState } from "react";
+import { User } from "@/lib/types";
+import { addFollower } from "@/lib/followers";
+import Link from "next/link";
+import { API_URL } from "@/lib/api_url";
 
 function ListItem({
   type,
@@ -10,16 +21,44 @@ function ListItem({
   
 }: {
   type:
-  | "friendRequests"
-  | "followers"
-  | "followings"
-  | "suggestions"
-  | "chat"
-  | "group"
-  | "groups"
-  | "event";
-  name: String;
+    | "friendRequests"
+    | "followers"
+    | "followings"
+    | "suggestions"
+    | "chat"
+    | "group"
+    | "event";
+  name?: String;
+  item?: User;
+  loggedUser?: User | null;
 }) {
+  const [isResponed, setResponed] = useState(false);
+
+  const handleResponse = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const action = e.currentTarget.value;
+    console.log("bidy: ", {
+      action: action,
+      status: action,
+      followedID: item?.id,
+      followerId: String(loggedUser?.id),
+    });
+    setResponed(true);
+
+    const res = await addFollower(
+      {
+        action: action,
+        status: action,
+        followerID: item?.id,
+        followedId: String(loggedUser?.id),
+      },
+      "/api/followers/add"
+    );
+
+    console.log("follow res: ", res);
+  };
+
+  const profilePic = `${API_URL}/api/storage/avatars/${item?.profile_pic}`;
+
   return (
     <div className={`${styles.ListItem} ${styles[type]}`} onClick={click}>
       <div className={styles.ListItemInfo}>
@@ -27,7 +66,7 @@ function ListItem({
           <>
             <Image
               className={styles.userIcon}
-              src="https://images.unsplash.com/photo-1742626157100-a25483dda2ea?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDM0fGJvOGpRS1RhRTBZfHxlbnwwfHx8fHw%3D"
+              src={profilePic}
               alt=""
               width={40}
               height={40}

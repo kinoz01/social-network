@@ -1,11 +1,17 @@
+"use client";
 import styles from "./menus.module.css";
 import List from "./List";
+import { User } from "@/lib/types";
+import { useUser } from "@/context/UserContext";
 
 function RightMenu() {
+  const { user: loggedUser } = useUser();
+
+  // console.log("logged user: ", loggedUser);
   return (
     <div className={styles.rightMenu}>
-      <List type="friendRequests" title="Friend Requests" />
-      <List type="suggestions" title="Suggestions" />
+      <List type="followings" title="Followings" loggedUser={loggedUser} />
+      <List type="followers" title="Followers" loggedUser={loggedUser} />
     </div>
   );
 }

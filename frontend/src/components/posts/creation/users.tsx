@@ -8,7 +8,7 @@ import Image from "next/image";
 import React, {
     useState, useEffect, useRef
 } from "react";
-import { User } from "@/components/types";
+import { User } from "@/lib/types";
 import { API_URL } from "@/lib/api_url";
 
 const SLICE = 50;

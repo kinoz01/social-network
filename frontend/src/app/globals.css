@@ -1,5 +1,5 @@
 :root {
-  --color1: #161616;
+  --color1: #000000;
   --color2: #fcfaf6;
   --color3: #303030;
   --color4: #ddff8e;
@@ -276,6 +276,17 @@ body {
     font-size: clamp(1rem, 1.2vw, 1.2rem);
     padding: 1.5rem;
   } */
+}
+
+.no-data {
+  height: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-direction: column;
+  margin: auto;
 }
 
 @media (max-width: 900px) {

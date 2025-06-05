@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import styles from "./posts.module.css";
 import { useState, useEffect } from "react";
-// import { Post } from "./Feed";
-import { Post } from "../types";
+import { Post } from "../../lib/types";
 import { CloseFriendIcon, CommentIcon, LikeIcon, PublicIcon, PrivateIcon } from "../icons";
 import Comment from "../comments/Comment";
 import TimeAgo from "../groups/TimeAgo";

@@ -98,6 +98,13 @@
     font-size: 1.3rem;
 }
 
+@media (min-width:1600px) {
+    .feedContainer {
+        margin-left: 30px;
+        margin-right: 30px;
+    }
+}
+
 .status {
     text-align: center;
     color: #555;
@@ -125,13 +132,14 @@
 .postBox {
     border-radius: 12px;
     padding: 0.75rem;
-    background-color: white;
+    background-color: #e5e5e5;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     margin-top: 30px;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 20px -5px #0000003d;
     margin-bottom: 20px;
+    border: 1px solid #b0b0b0;
 }
 
 /* ——— first row ——— */
@@ -141,37 +149,32 @@
     gap: 0.5rem;
 }
 
-.avatar {
-    border-radius: 50%;
-}
-
-/* Auto-grow text input */
+/* Borderless textarea with left padding */
 .input {
-    flex: 1;
-    min-height: 2.2rem;
-    max-height: 9rem;
-    padding: 0.6rem 0.9rem;
-    border: 1px solid var(--color1) !important;
+    width: 100%;
+    padding: 0.6rem 0.9rem 0.6rem 70px;
+    border: none !important;
     border-radius: 20px;
     resize: none;
     overflow-y: hidden;
-    transition: border-color 0.2s;
-    font-size: 0.9rem;
+    font-size: .9rem;
     font-family: 'Inter';
-    overflow-y: scroll;
+    background-color: #fdfdfd;
+    box-shadow: none;
+    outline: none;
+    flex: 1;
+    min-height: 2.2rem;
+    max-height: 9rem;
+    resize: none;
     -ms-overflow-style: none;
     /* IE 10+ */
     scrollbar-width: none;
+    padding-top: 25px;
 }
 
+/* Auto-grow text input */
 .input::-webkit-scrollbar {
     display: none;
-}
-
-.input:focus {
-    border: 2px solid #000 !important;
-    outline: none !important;
-    box-shadow: none !important;
 }
 
 /* Circular Icon-Only Post Button */
@@ -236,4 +239,23 @@
     .input {
         max-height: 16rem;
     }
+}
+
+/* Wrapper for positioning */
+.textareaWrapper {
+    position: relative;
+    flex: 1;
+}
+
+/* Avatar Inside Textarea */
+.avatar {
+    position: absolute;
+    top: 35px;
+    left: 10px;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
 }

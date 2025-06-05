@@ -1,4 +1,4 @@
-import { Post, CommentInfo } from "@/components/types";
+import { Post, CommentInfo } from "@/lib/types";
 import { API_URL } from "@/lib/api_url";
 
 

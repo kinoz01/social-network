@@ -12,16 +12,9 @@ function List({
   selectedUser,
   // currentUser
 }: {
-  type:
-  | "friendRequests"
-  | "followers"
-  | "followings"
-  | "suggestions"
-  | "chat"
-  | "group"
-  | "groups"
-  | "event";
+  type: "friendRequests" | "followers" | "followings" | "suggestions" | "chat";
   title: String;
+  loggedUser: User | null;
 }) {
   const users = FetchUsers()
   console.log(users);  
@@ -43,19 +36,22 @@ function List({
         <span className={styles.title}>{title}</span>
         {type === "friendRequests" ? (
           <>
-            <Link className={styles.link} href="\notifications">
+            <Link
+              className={styles.link}
+              href={`/notifications/${loggedUser?.id}`}
+            >
               See all
             </Link>
           </>
         ) : type === "followers" || type === "followings" ? (
           <>
-            <Link className={styles.link} href="\profile">
+            <Link className={styles.link} href={`/profile/${loggedUser?.id}`}>
               See all
             </Link>
           </>
         ) : null}
       </div>
-      <div className={type !== "groups" ? styles.users : styles.groups}>
+      <div className={styles.users}>
         {type === "chat" ? (
           <>
           {filterdUsers?.map((user) => {
@@ -70,31 +66,15 @@ function List({
               );
             })}
           </>
-
-        ) : type === "groups" ? (
-          <>
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-          </>
-        ) : (
-          // Fetch just a few users
-          <>
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-          </>
-        )}
+        ) : type === "followers" ? (
+          <FollowersList />
+        ) : type === "followings" ? (
+          <FollowingsList />
+        ) : type === "suggestions" ? (
+          <SuggestionsList />
+        ) : type === "friendRequests" ? (
+          <FriendRequestList loggedUser={loggedUser} />
+        ) : null}
       </div>
     </div>
   );

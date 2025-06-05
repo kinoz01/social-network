@@ -9,7 +9,7 @@ import { PostComponent } from "./Post";
 import { NewPOst } from "./AddPost";
 import { fetchOldPosts } from "@/apiService/posts/prevPost";
 import Image from "next/image";
-import { Post } from "../types";
+import { Post } from "../../lib/types";
 import { useUser } from "@/context/UserContext";
 import { API_URL } from "@/lib/api_url";
 

@@ -1,0 +1,84 @@
+.menu {
+    border: 1px solid rgb(214, 214, 214);
+    border-radius: 12px;
+    background: #fff;
+    padding: 1.4rem;
+    max-width: 600px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+    font-family: 'Zain';
+    font-size: 1.2rem;
+    margin-top: 30px;
+    flex-shrink: 0;
+    max-height: 90vh;
+    height: fit-content;
+}
+
+.section {
+    margin: 0;
+    font-size: .9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: #333;
+}
+
+.search {
+    width: 100%;
+    padding: .45rem .6rem;
+    border: 1px solid grey;
+    border-radius: 8px;
+    font-size: .9rem;
+}
+
+.search:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: 5px;
+    border-radius: 25px;
+    text-decoration: none;
+    color: #000;
+    transition: background .15s;
+}
+
+.item:hover {
+    background: #e9e9e9;
+}
+
+.selected {
+    background: #e9e9e9;
+}
+
+.avt {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.badge {
+    margin-left: auto;
+    font-size: 1rem;
+    opacity: .8;
+    margin-top: 5px;
+}
+
+.end {
+    text-align: center;
+    font-size: .85rem;
+    color: #666;
+}

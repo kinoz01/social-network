@@ -2,15 +2,17 @@ package server
 
 import (
 	"net/http"
+	"time"
+
 	"social-network/handlers/posts"
 	"social-network/handlers/users"
-	"time"
 
 	auth "social-network/handlers/authentication"
 	ch "social-network/handlers/chat"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
 
+	"social-network/handlers/chat"
 	cmnts "social-network/handlers/comments"
 	flw "social-network/handlers/follows"
 	grps "social-network/handlers/groups"
@@ -19,6 +21,7 @@ import (
 	grpsInvite "social-network/handlers/groups/invitations"
 	grpsRequest "social-network/handlers/groups/joinRequests"
 	grpsPost "social-network/handlers/groups/posts"
+	"social-network/handlers/profile"
 	ws "social-network/handlers/websocket"
 )
 
@@ -53,7 +56,7 @@ func Routes() http.Handler {
 	// comments
 	mux.Handle("/api/addcomment", rl.RateLimitMW(http.HandlerFunc(cmnts.AddComment)))
 	mux.Handle("/api/comments", rl.RateLimitMW(http.HandlerFunc(cmnts.GetComments)))
-	
+
 	// reactions
 	mux.Handle("/api/comment/like", rl.RateLimitMW(http.HandlerFunc(cmnts.HandleCommentLike)))
 	mux.Handle("/api/react", rl.RateLimitMW(http.HandlerFunc(posts.HandleLike)))
@@ -69,25 +72,35 @@ func Routes() http.Handler {
 	mux.Handle("/api/groups/refuse-invitation", rl.RateLimitMW(http.HandlerFunc(grpsInvite.RefuseInvitation)))
 	// Groups:
 	mux.Handle("/api/groups/is-member", rl.RateLimitMW(http.HandlerFunc(grps.IsGroupMember)))
-	mux.Handle("/api/groups/groupInfo", rl.RateLimitMW(http.HandlerFunc(grps.GetGroupInfo)))
-	mux.Handle("/api/groups/invite", rl.RateLimitMW(http.HandlerFunc( grpsInvite.InviteFollowers)))
+	mux.Handle("/api/groups/groupInfo", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grps.GetGroupInfo))))
+	mux.Handle("/api/groups/invite", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grpsInvite.InviteFollowers))))
 	mux.Handle("/api/groups/requests", rl.RateLimitMW(http.HandlerFunc(grpsRequest.ListJoinRequests)))
 	mux.Handle("/api/groups/accept-request", rl.RateLimitMW(http.HandlerFunc(grpsRequest.AcceptJoinRequest)))
 	mux.Handle("/api/groups/refuse-request", rl.RateLimitMW(http.HandlerFunc(grpsRequest.RefuseJoinRequest)))
 	// Groups posts:
-	mux.Handle("/api/groups/posts", rl.RateLimitMW(http.HandlerFunc(grpsPost.GroupPosts)))
-	mux.Handle("/api/groups/create-post", rl.RateLimitMW(http.HandlerFunc(grpsPost.CreateGroupPost)))
+	mux.Handle("/api/groups/posts", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grpsPost.GroupPosts))))
+	mux.Handle("/api/groups/create-post", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grpsPost.CreateGroupPost))))
 	// Groups Rest Chat:
-	mux.Handle("/api/groups/chat", rl.RateLimitMW(http.HandlerFunc(grps.ChatPage)))
+	mux.Handle("/api/groups/chat", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grps.ChatPage))))
 	// Group Events:
-	mux.Handle("/api/groups/create-event", rl.RateLimitMW(http.HandlerFunc(grpevent.CreateEvent)))
-	mux.Handle("/api/groups/get-events", rl.RateLimitMW(http.HandlerFunc(grpevent.GetEvents)))
-	mux.Handle("/api/groups/event-response", rl.RateLimitMW(http.HandlerFunc(grpevent.EventResponse)))
+	mux.Handle("/api/groups/create-event", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grpevent.CreateEvent))))
+	mux.Handle("/api/groups/get-events", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grpevent.GetEvents))))
+	mux.Handle("/api/groups/event-response", rl.RateLimitMW(mw.Gm(http.HandlerFunc(grpevent.EventResponse))))
 	// Restful members menu:
-	mux.HandleFunc("/api/groups/members", grps.GetMembers)
+	mux.HandleFunc("/api/groups/members", mw.Gm(grps.GetMembers))
 
-
-	// Followers search:
+	// CHAT
+	// Chat menu
+	mux.HandleFunc("/api/chat/list", chat.GetChatList)
+	// Chat Rest DMs
+	mux.HandleFunc("/api/chat/messages", chat.GetPrivateMessages)
+	mux.HandleFunc("/api/users/profile", profile.GetDMProfile)
+	mux.HandleFunc("/api/chat/dm-list", chat.ChatDMList)
+	mux.HandleFunc("/api/chat/mark-read", chat.ChatMarkRead)
+	
+	// Following:
+	mux.HandleFunc("/api/suggestions", flw.SuggestionsHandler)
+	// search
 	mux.HandleFunc("/api/followers", flw.GetFollowers)
 
 	// Websocket

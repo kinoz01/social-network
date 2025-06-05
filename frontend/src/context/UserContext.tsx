@@ -7,7 +7,7 @@ import React, {
     useState,
 } from "react";
 import { API_URL } from "@/lib/api_url";
-import { User } from "@/components/types"
+import { User } from "@/lib/types"
 
 // Context value type
 type UserContextValue = {
