@@ -8,7 +8,7 @@ RUN apk add --no-cache gcc musl-dev
 ENV CGO_ENABLED=1
 
 # Copy backend files
-COPY backend/ ./
+COPY . .
 
 # Download dependencies
 RUN go mod tidy
@@ -23,6 +23,11 @@ WORKDIR /app
 
 # Install SQLite and necessary dependencies
 RUN apk add --no-cache sqlite
+
+# Copy database files //-- Needed for deployement as we already have volume mounting in docker-compose
+COPY ./database /app/database
+# Copy storage directory
+COPY ./storage /app/storage
 
 # Copy built backend
 COPY --from=backend-builder /app/socNet /app/socNet

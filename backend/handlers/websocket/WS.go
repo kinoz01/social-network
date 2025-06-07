@@ -71,8 +71,12 @@ var (
 )
 
 /*────────── Upgrader ─────────*/
-
-var upgrader = websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}
+var upgrader = websocket.Upgrader{
+    CheckOrigin: func(r *http.Request) bool {
+        origin := r.Header.Get("Origin")
+        return origin == "http://localhost:3000" || origin == "https://snet.fly.dev"
+    },
+}
 
 /*────────── Incoming message ─────────*/
 

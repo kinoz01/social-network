@@ -66,6 +66,10 @@
   flex: 1;
 }
 
+.headerText a {
+  width: fit-content;
+}
+
 .headerText .name {
   font-size: 1.2rem;
   font-weight: 600;

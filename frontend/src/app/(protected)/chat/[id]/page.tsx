@@ -1,5 +1,5 @@
 import ChatBox from "@/components/chat/ChatBox";
 
-export default function DMPage({ params }: { params: { id: string } }) {
+export default function DMPage() {
     return <ChatBox />;
 }

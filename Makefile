@@ -2,6 +2,9 @@
 run:  check-npm check-nextjs killPorts run-backend run-frontend
 	@echo "Frontend signal killed"
 
+build: check-npm check-nextjs killPorts run-backend build-frontend
+	@echo "Frontend signal killed"
+
 # Check if npm is installed
 check-npm:
 	@command -v npm >/dev/null 2>&1 || { \
@@ -51,8 +54,13 @@ run-frontend:
 	@echo "Starting Next.js frontend..."
 	cd frontend && npm run dev
 
+# Build frontend
+build-frontend:
+	@echo "Building and running Next.js frontend..."
+	@cd frontend && npm run build && npm run start
+
 #------------------------- Docker -------------------------#
-buildDocker:
+buildDocker: killPorts
 	-docker-compose down --volumes --remove-orphans
 	docker-compose up --build
 

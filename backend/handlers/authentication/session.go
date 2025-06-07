@@ -28,7 +28,7 @@ func CheckSession(w http.ResponseWriter, r *http.Request) {
 	user, err := GetUser(r)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprintf(w, `{"loggedIn": false}`)
+		fmt.Fprintf(w, `{"loggedIn": false, "error": %q}`, err.Error())
 		return
 	}
 	fmt.Fprintf(w, `{"loggedIn": true, "username": %q, "profile_pic": %q}`, user.Username, user.ProfilePic)
@@ -92,15 +92,18 @@ func CreateSession(w http.ResponseWriter, user *tp.User) error {
 	}
 
 	// Set the token in a cookie
-	cookie := &http.Cookie{
+	raw := (&http.Cookie{
 		Name:     "session_token",
 		Value:    token,
-		Expires:  expiresAt,
-		HttpOnly: true,
 		Path:     "/",
-	}
+		Expires:  expiresAt,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}).String()
+	
+	w.Header().Add("Set-Cookie", raw+"; Partitioned")
 
-	http.SetCookie(w, cookie)
 	return nil
 }
 

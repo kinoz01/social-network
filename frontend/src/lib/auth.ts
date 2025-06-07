@@ -7,7 +7,7 @@ export async function requireSession() {
     // Check session cookie (no backend call)
     const cookieStore = await cookies();
     const token = cookieStore.get("session_token")?.value;
-
+    
     if (!token) redirect("/login");
 
     // check session validity (backend call)

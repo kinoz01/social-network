@@ -1,7 +1,3 @@
-:root {
-    --border: #c5c5c5;;
-}
-
 /* container */
 .menu {
     border: 1px solid var(--border);

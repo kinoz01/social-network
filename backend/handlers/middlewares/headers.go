@@ -15,13 +15,20 @@ func SecureHeaders(next http.Handler) http.Handler {
 // CORS Middleware
 func EnableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")            // Allow frontend
+		origin := r.Header.Get("Origin")
+
+		// Allow only specific origins
+		if origin == "http://localhost:3000" || origin == "https://snet.fly.dev" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin") // for caching proxies
+		}
+
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE, PUT") // Allow Http methods
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")     // Allowed headers
-		w.Header().Set("Access-Control-Allow-Credentials", "true")                        // Allow cookies & tokens
+		w.Header().Set("Access-Control-Allow-Credentials", "true")                       // Allow cookies & tokens
 
-		// Allow Preflight Requests (sent before some methods (eg. PUT, POST))
-		if r.Method == "OPTIONS" {
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}

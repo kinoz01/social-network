@@ -19,7 +19,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-// create/open DB and create tables if they aren't already created.
+// create/open DB and run migration
 func InitialiseDB() {
 	var err error
 	db.DB, err = sql.Open("sqlite3", "./database/socNet.db")
