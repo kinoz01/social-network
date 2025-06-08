@@ -15,7 +15,7 @@ import styles from "./style/groupFeed.module.css";
 import { Post } from "@/lib/types";
 import { PostComponent } from "../posts/Post";
 import { API_URL } from "@/lib/api_url";
-import { throttle } from "../utils";
+import { throttle } from "../../lib/utils";
 
 const PAGE_SIZE = 20;
 

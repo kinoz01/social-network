@@ -37,7 +37,7 @@
 
 /******************************************* MESSAGES DM BOX ****************************************************/
 .chatBox {
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -179,6 +179,8 @@
   gap: 0.6rem;
   position: relative;
   background: #fff;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .input {
@@ -241,13 +243,6 @@
   max-height: 93vh;
   scrollbar-width: none;
   min-width: min-content;
-}
-
-.chatBox {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  flex: 1 1 auto;
 }
 
 .mainContent {

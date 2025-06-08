@@ -9,7 +9,7 @@ import Image from "next/image";
 import styles from "./style/chat.module.css";
 import { API_URL } from "@/lib/api_url";
 import Link from "next/link";
-import { throttle } from "../utils";
+import { throttle } from "../../lib/utils";
 
 export const EMOJIS = [
     "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍", "😘", "😗", "😙", "😚", "🙂", "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮", "🤐", "😯", "😪", "😫", "🥱",

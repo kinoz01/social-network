@@ -64,7 +64,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
-
+  flex-direction: column;
 }
 
 .users::-webkit-scrollbar {
@@ -76,7 +76,6 @@
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
-  align-items: center;
   gap: 0.5rem;
   width: 100%;
   padding: 0.6rem;
@@ -115,8 +114,7 @@
 }
 
 .listItem:hover {
-  background-color: var(--color5);
-  transform: translateY(-10px);
+  background-color: #ececec;
 }
 
 .listItem .userIcon {
@@ -126,6 +124,10 @@
   object-fit: cover;
   flex-shrink: 0;
   border-radius: 50%;
+}
+
+.listItemName {
+  overflow-wrap: anywhere;
 }
 
 .listItemInfo {

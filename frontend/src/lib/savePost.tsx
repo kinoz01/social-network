@@ -1,6 +1,6 @@
 import React from "react";
 import { Post, User } from "@/lib/types";
-import { popup } from "@/components/utils";
+import { popup } from "@/lib/utils";
 import { API_URL } from "@/lib/api_url";
 
 

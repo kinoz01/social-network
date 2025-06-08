@@ -1,6 +1,6 @@
 "use client";
 
-import { throttle } from "@/components/utils";
+import { throttle } from "@/lib/utils";
 import styles from "../posts.module.css";
 import { BackIcon } from "@/components/icons";
 import Loading from "@/components/Loading";

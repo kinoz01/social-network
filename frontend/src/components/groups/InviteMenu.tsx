@@ -6,7 +6,7 @@ import Image from "next/image";
 import styles from "./style/inviteMenu.module.css";
 import Loading from "@/components/Loading";
 import { API_URL } from "@/lib/api_url";
-import { throttle } from "../utils";
+import { throttle } from "../../lib/utils";
 
 const SLICE = 50;
 

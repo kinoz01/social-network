@@ -5,7 +5,7 @@ import { User, CommentInfo } from "../../lib/types";
 import { createPortal } from "react-dom";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { COmmentComponent, CommentForm } from "./AddComments";
-import { COmmentsGetter } from "@/apiService/posts/prevPost";
+import { COmmentsGetter } from "@/lib/prevPost";
 
 type Params = {
   userData: User | null

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import styles from "./style/allMembersMenu.module.css";
 import Loading from "@/components/Loading";
-import { throttle } from "@/components/utils";
+import { throttle } from "@/lib/utils";
 import { API_URL } from "@/lib/api_url";
 import { useGroupSync } from "@/context/GroupSyncContext";
 

@@ -6,7 +6,7 @@ import { Post } from "../../lib/types";
 import { CloseFriendIcon, CommentIcon, LikeIcon, PublicIcon, PrivateIcon } from "../icons";
 import Comment from "../comments/Comment";
 import TimeAgo from "../groups/TimeAgo";
-import { popup } from "../utils";
+import { popup } from "../../lib/utils";
 import { useUser } from "@/context/UserContext";
 import Link from "next/link";
 import { API_URL } from "@/lib/api_url";

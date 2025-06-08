@@ -1,20 +1,23 @@
 import Link from "next/link";
 import styles from "./menus.module.css";
-import ListItem from "./ListItem";
-import { User } from "@/lib/types";
 import FollowersList from "./FollowersList";
 import FollowingsList from "./FollowingsList";
 import FriendRequestList from "./FriendRequest";
 import SuggestionsList from "./SuggestionsList";
+import { User } from "@/lib/types";
 
 function List({
   type,
   title,
+  page,
+  profileId,
   loggedUser,
 }: {
   type: "friendRequests" | "followers" | "followings" | "suggestions" | "chat";
-  title: String;
-  loggedUser: User | null;
+  title: string;
+  page?: "home" | "profile";
+  profileId?: string;
+  loggedUser?: User | null;
 }) {
   return (
     <div className={`${styles.list} ${styles[type]} `}>
@@ -39,30 +42,14 @@ function List({
         ) : null}
       </div>
       <div className={styles.users}>
-        {type === "chat" ? (
-          // Fetch all users
-          <>
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-            <ListItem type="chat" name={"Wayne Burton"} />
-          </>
-        ) : type === "followers" ? (
-          <FollowersList />
+        {type === "followers" ? (
+          <FollowersList page={page} profileId={profileId} />
         ) : type === "followings" ? (
-          <FollowingsList />
+          <FollowingsList page={page} profileId={profileId} />
         ) : type === "suggestions" ? (
           <SuggestionsList />
         ) : type === "friendRequests" ? (
-          <FriendRequestList loggedUser={loggedUser} />
+          <FriendRequestList />
         ) : null}
       </div>
     </div>

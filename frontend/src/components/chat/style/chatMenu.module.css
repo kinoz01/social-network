@@ -46,6 +46,10 @@
     scrollbar-width: none;
 }
 
+.name {
+    word-break: break-all;
+}
+
 .item {
     display: flex;
     align-items: center;

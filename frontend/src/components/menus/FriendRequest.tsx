@@ -1,3 +1,5 @@
+"use client";
+
 import { getFollowingRequests } from "@/lib/followers";
 import { FriendRequest, User } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
@@ -5,12 +7,16 @@ import styles from "./menus.module.css";
 import ListItem from "./ListItem";
 import NoData from "../NoData";
 import Loading from "../Loading";
+import { useUser } from "@/context/UserContext";
 
-function FriendRequestList({ loggedUser }: { loggedUser: User | null }) {
+function FriendRequestList({ profileId }: { profileId?: string }) {
   var throttleTimer = false;
   const limit = 5;
+  const { user: loggedUser } = useUser();
+
   const scrollTrigger = useRef<HTMLDivElement>(null);
-  const [page, setPage] = useState<number>(1);
+
+  const [currentPage, setPage] = useState<number>(1);
   const [hasMoreData, setHasMoreData] = useState<Boolean>(true);
   const [friendRequests, setRequests] = useState<FriendRequest>({
     requests: [],
@@ -37,11 +43,14 @@ function FriendRequestList({ loggedUser }: { loggedUser: User | null }) {
 
     setIsDataLoading(true); // Mark loading start
 
-    const data: FriendRequest | null = await getFollowingRequests(limit, page);
+    const data: FriendRequest | null = await getFollowingRequests(
+      limit,
+      currentPage
+    );
     console.log("reqqqqqqquesys: ", data);
 
     if (data && data.requests) {
-      if (data.requests.length === 0 || page === data.totalPages) {
+      if (data.requests.length === 0 || currentPage === data.totalPages) {
         setHasMoreData(false);
       }
 
@@ -71,8 +80,8 @@ function FriendRequestList({ loggedUser }: { loggedUser: User | null }) {
         if (
           scrollTrigger.current &&
           scrollTrigger.current.scrollTop +
-            scrollTrigger.current.clientHeight >=
-            scrollTrigger.current.scrollHeight
+          scrollTrigger.current.clientHeight >=
+          scrollTrigger.current.scrollHeight
         ) {
           // If we've reached the bottom and not loading data, trigger loadMore
           if (!isDataLoading) {
@@ -90,7 +99,7 @@ function FriendRequestList({ loggedUser }: { loggedUser: User | null }) {
     return () => {
       container.removeEventListener("scroll", handleScroll);
     };
-  }, [hasMoreData, page, isDataLoading]); // Watch for changes in `hasMoreData` and `isDataLoading`
+  }, [hasMoreData, currentPage, isDataLoading]); // Watch for changes in `hasMoreData` and `isDataLoading`
 
   useEffect(() => {
     async function initialFetch() {
@@ -102,7 +111,7 @@ function FriendRequestList({ loggedUser }: { loggedUser: User | null }) {
   return (
     <div className={styles.users} ref={scrollTrigger}>
       {friendRequests.requests === null ||
-      friendRequests.requests.length === 0 ? (
+        friendRequests.requests.length === 0 ? (
         <NoData msg="No Freind Requests yet" />
       ) : (
         friendRequests.requests.map((request) => {

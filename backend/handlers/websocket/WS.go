@@ -2,7 +2,6 @@
 package websocket
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"sort"
@@ -43,7 +42,6 @@ type ChatMsg struct {
 }
 
 /*────────── client & hubs ─────────*/
-
 type client struct {
 	userID      string
 	conn        *websocket.Conn
@@ -72,23 +70,21 @@ var (
 
 /*────────── Upgrader ─────────*/
 var upgrader = websocket.Upgrader{
-    CheckOrigin: func(r *http.Request) bool {
-        origin := r.Header.Get("Origin")
-        return origin == "http://localhost:3000" || origin == "https://snet.fly.dev"
-    },
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+		return origin == "http://localhost:3000" || origin == "https://snet.fly.dev"
+	},
 }
 
 /*────────── Incoming message ─────────*/
-
 type inbound struct {
-	Type    string `json:"type"`              // "dmSubscribe" | "dmMessage" | "subscribeChat" | "chatMessage" | "getGroupMembers"
+	Type    string `json:"type"`              // "dmSubscribe" | "dmMessage" | "subscribeChat" | "groupChatMessage" | "getGroupMembers"
 	PeerID  string `json:"peerId,omitempty"`  // for DMs
 	GroupID string `json:"groupId,omitempty"` // for group
 	Content string `json:"content,omitempty"`
 }
 
 /*────────── Entry point (upgrade) ─────────*/
-
 // GlobalWS handles WebSocket upgrades and message routing.
 // Route: GET /api/ws
 func GlobalWS(w http.ResponseWriter, r *http.Request) {
@@ -157,7 +153,6 @@ func GlobalWS(w http.ResponseWriter, r *http.Request) {
 }
 
 /*────────── Router ─────────*/
-
 func handleMessage(c *client, raw []byte, u *tp.User) {
 	var msg inbound
 	if err := json.Unmarshal(raw, &msg); err != nil {
@@ -165,7 +160,6 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 	}
 
 	switch msg.Type {
-
 	// ───── Group: get member snapshot ─────
 	case "getGroupMembers":
 		c.mu.Lock()
@@ -218,7 +212,6 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 }
 
 /*────────── Broadcast online status to everyone ─────────*/
-
 func broadcastOnlineStatus() {
 	clientsMu.RLock()
 	defer clientsMu.RUnlock()
@@ -353,8 +346,7 @@ func broadcastGroupChat(gid string, m ChatMsg) {
 }
 
 /*────────── DM helpers ─────────*/
-
-// dmKey returns a deterministic key for the DM “room” between two user IDs.
+// dmKey returns a deterministic key for the DM "room" between two user IDs.
 func dmKey(a, b string) string {
 	x := []string{a, b}
 	sort.Strings(x)
@@ -368,8 +360,8 @@ func storeAndBuildDM(senderID, receiverID, content string) ChatMsg {
 		`INSERT INTO private_chats(id, sender_id, receiver_id, content) VALUES(?,?,?,?)`,
 		id, senderID, receiverID, content,
 	)
-	// Fetch sender’s name and picture
-	var fn, ln, pic sql.NullString
+	// Fetch sender's name and picture
+	var fn, ln, pic string
 	_ = tp.DB.QueryRow(
 		`SELECT first_name, last_name, profile_pic FROM users WHERE id = ?`, senderID,
 	).Scan(&fn, &ln, &pic)
@@ -380,14 +372,14 @@ func storeAndBuildDM(senderID, receiverID, content string) ChatMsg {
 		ReceiverID: receiverID,
 		Content:    content,
 		CreatedAt:  time.Now(),
-		FirstName:  fn.String,
-		LastName:   ln.String,
-		ProfilePic: pic.String,
+		FirstName:  fn,
+		LastName:   ln,
+		ProfilePic: pic,
 		Type:       "dmMessage",
 	}
 }
 
-// broadcastDM sends a ChatMsg to both participants in the DM “room”.
+// broadcastDM sends a ChatMsg to both participants in the DM "room".
 func broadcastDM(peerID string, m ChatMsg) {
 	key := dmKey(m.SenderID, peerID)
 	privateHubs.mu.RLock()

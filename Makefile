@@ -59,15 +59,16 @@ build-frontend:
 	@echo "Building and running Next.js frontend..."
 	@cd frontend && npm run build && npm run start
 
+##- Without --build: Docker Compose uses existing images (from cache or previous builds)
 #------------------------- Docker -------------------------#
 buildDocker: killPorts
 	-docker-compose down --volumes --remove-orphans
-	docker-compose up --build
+	docker-compose up --build 
 
-# Stop and remove backend and frontend containers
+# Stop and remove backend and frontend containers, images and volumes
 cleanDocker:
-	-docker stop $(docker-compose ps -q backend) $(docker compose ps -q frontend)
-	-docker rm $(docker-compose ps -q backend) $(docker compose ps -q frontend)
+	-docker stop $(docker-compose ps -q backend) $(docker-compose ps -q frontend)
+	-docker rm $(docker-compose ps -q backend) $(docker-compose ps -q frontend)
 	-docker rmi $(docker images -q backend) $(docker images -q frontend)
 	-docker system prune -f --volumes
 

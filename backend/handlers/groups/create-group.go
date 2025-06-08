@@ -129,7 +129,7 @@ func ValidatePayload(groupName string, description string) error {
 	if len(groupName) < 3 {
 		return fmt.Errorf("group name too short")
 	}
-	if len(description) < 8 {
+	if len(description) < 4 {
 		return fmt.Errorf("description too short")
 	}
 	if !validInputRegex.MatchString(groupName) {

@@ -156,7 +156,6 @@
     border: none !important;
     border-radius: 20px;
     resize: none;
-    overflow-y: hidden;
     font-size: .9rem;
     font-family: 'Inter';
     background-color: #fdfdfd;
@@ -166,13 +165,10 @@
     min-height: 2.2rem;
     max-height: 9rem;
     resize: none;
-    -ms-overflow-style: none;
-    /* IE 10+ */
     scrollbar-width: none;
-    padding-top: 25px;
+    padding-top: 27px;
 }
 
-/* Auto-grow text input */
 .input::-webkit-scrollbar {
     display: none;
 }

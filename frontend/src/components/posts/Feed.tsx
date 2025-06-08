@@ -7,7 +7,7 @@ import React from "react";
 import { useRef, useCallback } from "react";
 import { PostComponent } from "./Post";
 import { NewPOst } from "./AddPost";
-import { fetchOldPosts } from "@/apiService/posts/prevPost";
+import { fetchOldPosts } from "@/lib/prevPost";
 import Image from "next/image";
 import { Post } from "../../lib/types";
 import { useUser } from "@/context/UserContext";

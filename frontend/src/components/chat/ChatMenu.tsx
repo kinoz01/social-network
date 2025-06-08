@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Loading from "@/components/Loading";
-import { throttle } from "@/components/utils";
+import { throttle } from "@/lib/utils";
 import { API_URL } from "@/lib/api_url";
 import styles from "./style/chatMenu.module.css";
 

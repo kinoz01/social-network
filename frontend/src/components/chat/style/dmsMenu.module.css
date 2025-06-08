@@ -84,7 +84,6 @@
     font-weight: 500;
     margin: 0;
     color: #222;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }

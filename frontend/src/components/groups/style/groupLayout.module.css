@@ -41,6 +41,7 @@
     .menuLayout:last-of-type {
         display: none;
     }
+
     .menuLayout {
         width: 100%;
         overflow-y: clip;
@@ -60,6 +61,7 @@
         width: 100%;
         padding-left: 1rem;
         padding-right: 1rem;
-        overflow-y: hidden;
+        overflow-y: scroll;
+        scrollbar-width: none;
     }
 }

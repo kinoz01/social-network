@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"syscall"
 
-	// Import the SQLite3 driver
-
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/mattn/go-sqlite3"
 
