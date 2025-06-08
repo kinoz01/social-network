@@ -43,6 +43,7 @@ type PostData struct {
 	FirstName     string   `json:"firstName"`
 	LastName      string   `json:"lastName"`
 	ProfilePic    string   `json:"profile_pic"`
+	
 	HasReact      string   `json:"hasReact"`
 	TotalLIKes    int      `json:"totalLikes"`
 	TotalComments int      `json:"totalComments"`
