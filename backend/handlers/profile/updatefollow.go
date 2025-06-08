@@ -131,12 +131,20 @@ ORDER BY
 			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
-		resction , err := GitReaction(w ,post.PostID, post.UserID)
+		resction, err := GitReaction(w, post.PostID, post.UserID)
 		fmt.Println("react", resction)
-		post.HasReact = resction
+		if err != nil {
+			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+			return
+		}
+		if resction == "ErrNoRows"{
+			post.HasReact = ""
+		}else{
+			post.HasReact = resction
+		}
 		userdata.Posts = append(userdata.Posts, post)
 	}
-	fmt.Println("posr======", userdata.Posts)
+	fmt.Println("posr======", userdata.Posts[0].HasReact)
 	if err = rows.Err(); err != nil {
 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return
@@ -157,6 +165,9 @@ where
     AND like_reaction.post_id = ?
 `, useid, postid).Scan(&react)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return "ErrNoRows", nil
+		}
 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return "", err
 	}

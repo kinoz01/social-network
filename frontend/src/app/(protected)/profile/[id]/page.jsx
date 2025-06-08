@@ -2,7 +2,7 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 export default async function ProfilePAge({params}) {
   console.log("params",await params);
   
-  const { id } = params;
+  const { id } = await params;
 
   return (
     <div className="mainContent profile">

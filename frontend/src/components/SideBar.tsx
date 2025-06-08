@@ -17,6 +17,8 @@ import { useUser } from "@/context/UserContext";
 export default function SideBar() {
   const [hover, setHover] = useState(false);
   const user = useUser();
+  console.log("user======",user);
+  
   const { handleLogout } = useLogout();
 
   return (

@@ -8,9 +8,8 @@ import { Profile } from "../types";
 import { API_URL } from "@/lib/api_url";
 
 import { useUser } from "@/context/UserContext";
+
 //to-do
-//clicksurpofile
-//hasreact
 //accountstatu
 //profilpublic or priv
 

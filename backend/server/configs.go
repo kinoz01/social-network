@@ -36,7 +36,7 @@ func InitialiseDB() {
 	db.DB.SetMaxOpenConns(10)                 // Simultaneously opened connections
 	db.DB.SetMaxIdleConns(5)                  // Reuse some opened connections
 	db.DB.SetConnMaxLifetime(5 * time.Minute) // Remove stale connections
-	
+
 	runMigrations("./database/socNet.db")
 }
 
@@ -47,8 +47,19 @@ func runMigrations(databasePath string) {
 		log.Fatalf("Could not get absolute path: %v", err)
 	}
 
+	info, err := os.Stat(absPath)
+	if err != nil {
+		log.Fatalf("Error accessing migration directory: %v", err)
+	}
+	if !info.IsDir() {
+		log.Fatalf("Migration path is not a directory: %s", absPath)
+	}
+
+	// Try with two slashes, as sometimes Windows wants that
+	uriPath := "file://" + filepath.ToSlash(absPath)
+
 	m, err := migrate.New(
-		"file://"+absPath,
+		uriPath,
 		"sqlite3://"+databasePath,
 	)
 	if err != nil {
