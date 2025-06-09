@@ -83,6 +83,7 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/groups/members", grps.GetMembers)
 
 	mux.HandleFunc("/api/profile/", profile.ProfileData)
+	mux.HandleFunc("/api/handleAccountStatu/", profile.ChangeStatu )
 
 	// Followers search:
 	mux.HandleFunc("/api/followers", flw.GetFollowers)

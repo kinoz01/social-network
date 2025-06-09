@@ -8,37 +8,80 @@ import { Profile } from "../types";
 import { API_URL } from "@/lib/api_url";
 
 import { useUser } from "@/context/UserContext";
+import { createPortal } from "react-dom";
 
 //to-do
 //accountstatu
 //profilpublic or priv
 
+
+
+
 function UserProfile({ userId }: any) {
   const [userData, setData] = useState<Profile | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   // const user = useUser();
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch(`http://localhost:8080/api/profile/${userId}`, {
-          credentials: "include",
-        })
-        const data = await res.json();
-        console.log("hana jiit", data);
-        console.log("posts", data.posts);
-        setData(data)
+  function ChangeStatu() {
+    setIsModalOpen((prev) => !prev);
+  }
 
-        console.log("sssss", userData, typeof userData?.posts);
-      } catch (error) {
-        console.log("error", error);
-      }
+  function getOppositeOfAccountType(): string {
+    return userData?.account_type === "public" ? "private" : "public";
+  }
+  async function handleStatu() {
+    if(isLoading) return;
+
+    console.log("userData?.account_type ", userData?.account_type);
+
+    console.log("getOppositeOfAccountType()", getOppositeOfAccountType());
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/handleAccountStatu/${userId}`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: getOppositeOfAccountType() // "public" or "private"
+        }),
+      })
+      const data = await res.json();
+      await fetchData()
+      ChangeStatu()
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setIsLoading(false);
     }
+  }
+
+  async function fetchData() {
+    try {
+      const res = await fetch(`http://localhost:8080/api/profile/${userId}`, {
+        credentials: "include",
+      })
+      const data = await res.json();
+      console.log("hana jiit", data);
+      console.log("posts", data.posts);
+      setData(data)
+
+      console.log("sssss", userData, typeof userData?.posts);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
+  useEffect(() => {
     fetchData();
   }, [])
 
   if (!userData) return <p>no user found</p>
-  console.log("1", userData.posts);
-  return (
+  console.log("1", userData);
+  return <>
     <div className={styles.profileHeader}>
       <div className={styles.userInfo}>
         <div className={styles.image_btn}>
@@ -79,14 +122,40 @@ function UserProfile({ userId }: any) {
         </div>
       </section>
     </div>
-  );
 
+    {
+      isModalOpen && createPortal(
+        <div className={styles.modalcontainer}>
+          <div className={styles.modal}>
+            <div className={styles.header}>
+              <h3>Change Profile Status</h3>
+              <button onClick={ChangeStatu} className={styles.closebtn}>&times;</button>
+            </div>
 
+            <div className={styles.content}>
+              <p>Do you want to change your profile from <strong>{userData.account_type}</strong> to <strong>{getOppositeOfAccountType()}</strong>?</p>
+
+              <div className={styles.info}>
+                <div className={styles.statusbox}>
+                  <span className={styles.icon}>🔒</span>
+                  <div>
+                    <h4>Private Profile</h4>
+                    <p>Only you can see your posts and information</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.actions}>
+              <button onClick={ChangeStatu} className={styles.cancelbtn}>Cancel</button>
+              <button disabled={isLoading} onClick={handleStatu} className={styles.confirmbtn}>Change to {getOppositeOfAccountType()}</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )
+    }
+  </>
 }
 
 export default UserProfile;
-
-
-function ChangeStatu() {
-
-}

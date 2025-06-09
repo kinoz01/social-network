@@ -1,13 +1,15 @@
 import ProfileHeader from "@/components/profile/ProfileHeader";
+
+
 export default async function ProfilePAge({params}) {
-  console.log("params",await params);
+  const test = await params;
+
+  console.log(test);
   
-  const { id } = await params;
 
   return (
     <div className="mainContent profile">
-
-      <ProfileHeader userId={id} />
+      <ProfileHeader userId={test.id} />
     </div>
   );
 }
