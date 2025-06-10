@@ -82,3 +82,20 @@ type Group struct {
 	Request     string `json:"request"` // pending toggle when rendering all groups
 	Members     int    `json:"members"`
 }
+
+type Notification struct {
+	ID        string `json:"id"`
+	Type      string `json:"type"`        // e.g. "group_invite", "request_accepted"
+	Content   string `json:"content"`     // free-text
+	Receiver  string `json:"receiver"`    // user-ID that should see it
+	Sender    User   `json:"sender"`      // minimal User payload (ID + names/pic)
+
+	/* contextual foreign keys — at most one is non-empty */
+	Group        string `json:"group,omitempty"`        // related_group_id
+	Event        string `json:"event,omitempty"`        // related_event_id
+	InvitationID string `json:"invitationId,omitempty"` // related_invitation_id
+	RequestID    string `json:"requestId,omitempty"`    // related_request_id
+
+	CreatedAt string `json:"createdAt"`
+	IsRead    bool   `json:"isRead"`
+}

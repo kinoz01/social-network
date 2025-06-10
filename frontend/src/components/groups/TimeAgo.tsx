@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-export default function TimeAgo({ dateStr }: { dateStr: string }) {
+export default function TimeAgo({ dateStr, chat }: { dateStr: string, chat?: boolean }) {
     const [label, setLabel] = useState(() => formatTimeAgo(dateStr));
 
     useEffect(() => {
@@ -13,7 +13,9 @@ export default function TimeAgo({ dateStr }: { dateStr: string }) {
         return () => clearInterval(interval); // cleanup on unmount
     }, [dateStr]);
 
-    return <time dateTime={dateStr}>• {label}</time>;
+    if (chat) return <time dateTime={dateStr}>{label}</time>;
+
+    return <time dateTime={dateStr}>• {label} ago</time>;
 }
 
 // Input date in local time (but ends with Z(UTC))
@@ -27,7 +29,7 @@ export function formatTimeAgo(dateStr: string) {
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000); // getTime() references UTC time
 
     if (seconds < 1) return 'just now';
-    if (seconds < 60) return 'seconds ago';
+    if (seconds < 60) return 'seconds';
 
     const units = [
         { label: 'year', seconds: 31536000 },
@@ -40,7 +42,7 @@ export function formatTimeAgo(dateStr: string) {
     for (const unit of units) {
         const value = Math.floor(seconds / unit.seconds);
         if (value >= 1) {
-            return `${value} ${unit.label}${value > 1 ? 's' : ''} ago`;
+            return `${value} ${unit.label}${value > 1 ? 's' : ''}`;
         }
     }
 

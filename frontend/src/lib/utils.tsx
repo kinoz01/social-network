@@ -1,4 +1,7 @@
 export const popup = (mssg: string, close: boolean) => {
+    // If popup already exists, don't create another
+    if (document.querySelector(".popup")) return;
+
     const popup = document.createElement("div");
     popup.classList.add("popup", close ? `succ` : `fail`);
     popup.innerHTML = `

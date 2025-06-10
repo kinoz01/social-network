@@ -17,7 +17,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	uid, _ := auth.GetUserId(r)
-	
+
 	userID := r.URL.Query().Get("id")
 	if userID == "" {
 		userID = uid
@@ -58,8 +58,26 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If the account is private, only return data if the viewer is the user themselves.
-	if out.AccountType == "private" && uid != out.ID {
+	// Check if requester follows profile or profile follows requester
+	var isFollowingOrFollowed bool
+	checkFollow := `
+	SELECT EXISTS (
+		SELECT 1 FROM follow_requests
+		WHERE (
+			(follower_id = ? AND followed_id = ?)
+			OR
+			(follower_id = ? AND followed_id = ?)
+		)
+		AND status = 'accepted'
+	);`
+	err = tp.DB.QueryRow(checkFollow, uid, out.ID, out.ID, uid).Scan(&isFollowingOrFollowed)
+	if err != nil {
+		help.JsonError(w, "follow check failed", http.StatusInternalServerError, err)
+		return
+	}
+
+	// Privacy logic
+	if out.AccountType == "private" && uid != out.ID && !isFollowingOrFollowed {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}

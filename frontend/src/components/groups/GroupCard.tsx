@@ -7,6 +7,7 @@ import styles from "./style/groups.module.css";
 import Loading from "@/components/Loading";
 import CreateGroupModal from "../groups/CreateGroup";
 import { API_URL } from "@/lib/api_url";
+import { popup } from "@/lib/utils";
 
 interface Group {
     id: string;
@@ -75,7 +76,10 @@ export default function GroupCard({
             if (!res.ok) throw new Error();
             refreshInvitations();
             onAccept?.();
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            popup("Somthing went wrong, try reloading", false)
+            console.error(err);
+        }
     };
 
     const handleRefuse = async (id: string) => {
@@ -95,6 +99,7 @@ export default function GroupCard({
             setGroups(prev => prev.filter(g => g.invitation_id !== id));
 
         } catch (err) {
+            popup("Somthing went wrong, try reloading", false)
             console.error(err);
         }
     };
@@ -111,7 +116,10 @@ export default function GroupCard({
             if (!res.ok) throw new Error();
             setGroups(prev =>
                 prev.map(g => g.id === groupId ? { ...g, request: "pending" } : g));
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            popup("Somthing went wrong, try reloading", false)
+            console.error(err);
+        }
     };
 
     /* ---------- card renderer ---------- */

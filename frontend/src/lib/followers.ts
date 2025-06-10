@@ -183,7 +183,9 @@ async function getSuggestions(): Promise<User[] | null> {
     if (!res.ok) {
       throw await res.json();
     }
-
+    if (res.status === 204) {
+      return [];
+    }
     const data: User[] = await res.json();
     return data;
   } catch (error: any) {

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
+	ws "social-network/handlers/websocket"
 
 	"github.com/gofrs/uuid"
 )
@@ -17,12 +19,14 @@ func InviteFollowers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	inviter, _ := auth.GetUser(r)
+
 	var body struct {
 		GroupID    string          `json:"group_id"`
 		InviteeIDs json.RawMessage `json:"invitee_ids"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.GroupID == "" {
-		help.JsonError(w, "bad json", http.StatusBadRequest, nil)
+		help.JsonError(w, "bad json", http.StatusBadRequest, err)
 		return
 	}
 
@@ -32,7 +36,7 @@ func InviteFollowers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(ids) > 0 {
-		if err := Invite(body.GroupID, ids); err != nil {
+		if err := Invite(body.GroupID, *inviter, ids); err != nil {
 			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
 			return
 		}
@@ -41,40 +45,61 @@ func InviteFollowers(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// Invites follwer to join a group if they are not already a member
-func Invite(groupID string, ids []string) error {
-	if len(ids) > 7000 {
+// Invite followers to join a group and notify them
+func Invite(groupID string, inviter tp.User, inviteeIDs []string) error {
+	if len(inviteeIDs) > 7000 {
 		return fmt.Errorf("too many invitees (max 7000)")
 	}
-	// Start transaction
+
 	tx, err := tp.DB.Begin()
 	if err != nil {
 		return err
 	}
 
-	// Prepare insert statement
-	stmt, err := tx.Prepare(`
-		INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
-		SELECT ?, ?, ?
-		WHERE NOT EXISTS (
-			SELECT 1 FROM group_users gu
-			WHERE gu.group_id = ? AND gu.users_id = ?
-		)`)
+	invStmt, err := tx.Prepare(`
+	  INSERT OR IGNORE INTO group_invitations (id, group_id, invitee_id)
+	  SELECT ?, ?, ?
+	  WHERE NOT EXISTS (
+	    SELECT 1 FROM group_users WHERE group_id = ? AND users_id = ?
+	  )`)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	defer stmt.Close()
+	defer invStmt.Close()
 
-	// Loop through follower IDs
-	for _, uid := range ids {
-		_, err := stmt.Exec(uuid.Must(uuid.NewV4()).String(), groupID, uid, groupID, uid)
+	var toBroadcast []tp.Notification
+
+	for _, uid := range inviteeIDs {
+		invID := uuid.Must(uuid.NewV4()).String()
+		res, err := invStmt.Exec(invID, groupID, uid, groupID, uid)
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
+
+		if n, _ := res.RowsAffected(); n == 0 {
+			continue // already a member or invited: skip
+		}
+
+		toBroadcast = append(toBroadcast, tp.Notification{
+			Type:         "group_invite",
+			Content:      "invited you to join a group",
+			Receiver:     uid,
+			Sender:       inviter,
+			Group:        groupID,
+			InvitationID: invID,
+			IsRead:       false,
+		})
 	}
 
-	// Commit transaction
-	return tx.Commit()
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	// insert + broadcast
+	for _, n := range toBroadcast {
+		go ws.BroadcastNotification(n)
+	}
+	return nil
 }

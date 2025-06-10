@@ -10,6 +10,7 @@ import Loading from "@/components/Loading";
 import styles from "./style/dmsMenu.module.css";
 import { API_URL } from "@/lib/api_url";
 import { usePathname } from "next/navigation";
+import TimeAgo from "../groups/TimeAgo";
 
 
 interface DMEntry {
@@ -64,7 +65,7 @@ export default function DMsMenu() {
     }, [fetchDMList]);
 
     // 2) Whenever a new DM arrives on WS (for any peer currently in our list),
-    //    update that peer’s entry: increment unread_count (if I'm the RECEIVER),
+    //    update that peer's entry: increment unread_count (if I'm the RECEIVER),
     //    update last_content/last_time, and move this peer to the top.
     useEffect(() => {
         if (!meId) return;
@@ -73,17 +74,12 @@ export default function DMsMenu() {
         list.forEach((peer) => {
             const peerId = peer.peer_id;
             const unsub = onNewDM(peerId, (incoming: ChatMsg) => {
-                // incoming.type === "dmMessage"
-                const iAmReceiver = incoming.receiver_id === meId;
-                // If the user is already viewing /chat/<peerId>, treat as “read” immediately:
-                const isOpen = pathname === `/chat/${peerId}`;
-
                 setList((prev) => {
                     const filtered = prev.filter((e) => e.peer_id !== peerId);
 
                     // compute new unread count, etc. (as before)…
                     const iAmReceiver = incoming.receiver_id === meId;
-                    const isOpen = pathname === `/chat/${peerId}`;
+                    const isOpen = pathname === `/chat/${peerId}`;  // If the user is already viewing /chat/<peerId>, treat as "read" immediately:
                     const existing = prev.find((e) => e.peer_id === peerId) || {
                         first_name: incoming.first_name,
                         last_name: incoming.last_name,
@@ -142,12 +138,6 @@ export default function DMsMenu() {
         }
     };
 
-    const formatTime = (iso: string) =>
-        new Date(iso.endsWith("Z") ? iso.slice(0, -1) : iso).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-
     // ─── render body ───
     const body = (
         <>
@@ -195,7 +185,7 @@ export default function DMsMenu() {
                                 </div>
                                 <div className={styles.meta}>
                                     <span className={styles.time}>
-                                        {formatTime(e.last_time)}
+                                        <TimeAgo dateStr={e.last_time} chat />
                                     </span>
                                     {e.unread_count > 0 && (
                                         <span className={styles.badge}>{e.unread_count >= 100 ? "99+" : e.unread_count}</span>

@@ -52,7 +52,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(ids) > 0 {
-		if err := grpInvite.Invite(groupID, ids); err != nil {
+		if err := grpInvite.Invite(groupID, *user, ids); err != nil {
 			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
 			return
 		}

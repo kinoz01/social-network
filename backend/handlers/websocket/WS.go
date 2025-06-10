@@ -10,6 +10,7 @@ import (
 
 	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
+	notif "social-network/handlers/notifications"
 	tp "social-network/handlers/types"
 
 	"github.com/gofrs/uuid"
@@ -82,6 +83,11 @@ type inbound struct {
 	PeerID  string `json:"peerId,omitempty"`  // for DMs
 	GroupID string `json:"groupId,omitempty"` // for group
 	Content string `json:"content,omitempty"`
+
+	Page  int `json:"page,omitempty"`
+	Limit int `json:"limit,omitempty"`
+
+	Notification tp.Notification `json:"notification"`
 }
 
 /*────────── Entry point (upgrade) ─────────*/
@@ -409,4 +415,73 @@ func broadcastDM(receiverID string, m ChatMsg) {
 		}
 	}
 	clientsMu.RUnlock()
+}
+
+// BroadcastNotification pushes a new notification to every open socket
+// belonging to notification.Receiver.
+func BroadcastNotification(n tp.Notification) {
+	if err := notif.AddNotification(n); err != nil {
+		return
+	}
+
+	payload := map[string]any{
+		"type":         "notification",
+		"notification": n,
+	}
+
+	clientsMu.RLock()
+	for cl := range clients {
+		if cl.userID == n.Receiver {
+			// push the frame
+			cl.mu.Lock()
+			_ = cl.conn.WriteJSON(payload)
+			cl.mu.Unlock()
+
+			// refresh badge & list for that socket
+			sendUnreadNotificationCount(cl, n.Receiver)
+			sendNotificationList(cl, &tp.User{ID: n.Receiver}, inbound{
+				Limit: 10,
+				Page:  1,
+			}, "updateNotifications")
+		}
+	}
+	clientsMu.RUnlock()
+}
+
+func sendNotificationList(c *client, u *tp.User, msg inbound, msgType string) {
+	notifs, err := notif.GetNotifications(u.ID, msg.Limit, msg.Page)
+	if err != nil {
+		return
+	}
+
+	if notifs.Notifications == nil {
+		notifs.Notifications = make([]*tp.Notification, 0)
+	}
+
+	payload := map[string]any{
+		"type":          msgType,
+		"notifications": notifs.Notifications,
+		"totalCount":    notifs.TotalCount,
+		"totalPages":    notifs.TotalPages,
+	}
+
+	c.mu.Lock()
+	_ = c.conn.WriteJSON(payload)
+	c.mu.Unlock()
+}
+
+func sendUnreadNotificationCount(c *client, userId string) {
+	count, err := notif.GetUnreadNotifications(userId, false)
+	if err != nil {
+		return
+	}
+
+	payload := map[string]any{
+		"type":  "unreadNotificationsCount",
+		"count": count,
+	}
+
+	c.mu.Lock()
+	_ = c.conn.WriteJSON(payload)
+	c.mu.Unlock()
 }

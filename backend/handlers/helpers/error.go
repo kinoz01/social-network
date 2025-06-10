@@ -9,7 +9,7 @@ import (
 // Return error response to JS fetches.
 func JsonError(w http.ResponseWriter, msg string, statusCode int, err error) {
 	// Log the error in case of internal server error.
-	if err != nil && statusCode == 500 {
+	if err != nil && statusCode == 500 || statusCode == http.StatusBadRequest {
 		log.Println(err)
 	}
 	w.Header().Set("Content-Type", "application/json")
