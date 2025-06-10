@@ -25,8 +25,8 @@ function UserProfile({ userId }: any) {
   function ChangeStatu() {
     setIsModalOpen((prev) => !prev);
   }
+  const user = useUser();
   function IsUserLoged() {
-    const user = useUser();
     // console.log("user=====ii=", user.user?.id);
     // console.log("userId", userId);
     if (user.user?.id === userId) {
@@ -69,8 +69,14 @@ function UserProfile({ userId }: any) {
 
   async function fetchData() {
     try {
-      const res = await fetch(`http://localhost:8080/api/profile/${userId}`, {
-        credentials: "include",
+      const res = await fetch(`http://localhost:8080/api/profile/${userId}`,{
+       method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          logeduser_id: user.user?.id, // "public" or "private"
+        }),
       })
       const data = await res.json();
       console.log("hana jiit", data);

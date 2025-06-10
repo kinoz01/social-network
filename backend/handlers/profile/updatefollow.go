@@ -12,15 +12,27 @@ import (
 	Error "social-network/handlers/helpers"
 )
 
+type UserId struct {
+	UserId string `json:"logeduser_id"`
+}
+
 func ProfileData(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		Error.JsonError(w, "Method not allowed", 405, nil)
 		return
 	}
 	var userdata tp.UserData
 	useid := strings.Split(r.URL.Path, "/")[3]
 	fmt.Println("iddd", useid)
-	err := tp.DB.QueryRow(`SELECT 
+	var userid UserId
+	err := json.NewDecoder(r.Body).Decode(&userid)
+	if err != nil {
+		Error.JsonError(w, "Internal Server Error ", http.StatusBadRequest, nil)
+		return
+	}
+	defer r.Body.Close()
+	fmt.Println("uhada", userid.UserId)
+	err = tp.DB.QueryRow(`SELECT 
 	first_name,
 	last_name,
 	birthday,
@@ -49,6 +61,14 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
+
+	isfreand := IsFollower(w, useid, userid.UserId)
+	fmt.Println("isfreand", isfreand)
+
+
+if isfreand {
+
+
 	postsQuery := `SELECT
     posts.group_id,
     posts.body,
@@ -117,9 +137,9 @@ ORDER BY
 			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
-		if resction == "ErrNoRows"{
+		if resction == "ErrNoRows" {
 			post.HasReact = ""
-		}else{
+		} else {
 			post.HasReact = resction
 		}
 		userdata.Posts = append(userdata.Posts, post)
@@ -129,12 +149,18 @@ ORDER BY
 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
+
+
+
+}
+	
 	userdata.PostNbr = len(userdata.Posts)
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata)
 }
 
-func GitReaction(w http.ResponseWriter, postid string, useid string) (string, error) {
+func GitReaction(w http.ResponseWriter, postid string, userid string) (string, error) {
 	var react string
 	err := tp.DB.QueryRow(`SELECT
     react_type
@@ -143,7 +169,7 @@ FROM
 where
     like_reaction.user_id = ?
     AND like_reaction.post_id = ?
-`, useid, postid).Scan(&react)
+`, userid, postid).Scan(&react)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return "ErrNoRows", nil
@@ -152,4 +178,11 @@ where
 		return "", err
 	}
 	return react, nil
+}
+
+func IsFollower(w http.ResponseWriter, userProfil_id string, userLoged_id string) bool {
+fmt.Println("molpofile", userProfil_id)
+fmt.Println("mol cookes", userLoged_id)
+
+	return true
 }
