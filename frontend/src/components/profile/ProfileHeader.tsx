@@ -11,27 +11,35 @@ import { useUser } from "@/context/UserContext";
 import { createPortal } from "react-dom";
 
 //to-do
-//accountstatu
-//profilpublic or priv
-
-
-
+//profilepublic or priv
 
 function UserProfile({ userId }: any) {
+
+
+
   const [userData, setData] = useState<Profile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  // const user = useUser();
+
 
   function ChangeStatu() {
     setIsModalOpen((prev) => !prev);
+  }
+  function IsUserLoged() {
+    const user = useUser();
+    // console.log("user=====ii=", user.user?.id);
+    // console.log("userId", userId);
+    if (user.user?.id === userId) {
+      return true
+    }
+    return false
   }
 
   function getOppositeOfAccountType(): string {
     return userData?.account_type === "public" ? "private" : "public";
   }
   async function handleStatu() {
-    if(isLoading) return;
+    if (isLoading) return;
 
     console.log("userData?.account_type ", userData?.account_type);
 
@@ -80,7 +88,6 @@ function UserProfile({ userId }: any) {
   }, [])
 
   if (!userData) return <p>no user found</p>
-  console.log("1", userData);
   return <>
     <div className={styles.profileHeader}>
       <div className={styles.userInfo}>
@@ -88,16 +95,26 @@ function UserProfile({ userId }: any) {
           <Image
             src={userData.profile_pic ? `${API_URL}/api/storage/avatars/${userData.profile_pic}` : `${API_URL}/api/storage/avatars/avatar.webp`}
             alt={`${userData.profile_pic}`} className={styles.userImageprofil} width={150} height={150} />
-          <button className={`${styles.accountStatus}`} onClick={ChangeStatu} > account staut </button>
+          {
+            IsUserLoged() && (
+              <button className={`${styles.accountStatus}`} onClick={ChangeStatu} > account staut </button>
+            )
+
+
+          }
         </div>
 
         <div className={styles.data}>
           <div >
             <div className={styles.username}>
               <span>{userData.username} </span>
-              {/* <button className={`${styles.followBtn}`}>
+            {
+              ! IsUserLoged() && (
+              <button className={`${styles.followBtn}`}>
                 Follow
-              </button> */}
+              </button>
+              )
+            }
             </div>
             <div className={styles.numbers}>
               <div className={styles.postsNumber}> {userData.post_nbr} Posts</div>

@@ -17,26 +17,8 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Method not allowed", 405, nil)
 		return
 	}
-
-	// cookie, err := r.Cookie("session_token")
-	// if err != nil {
-	// 	Error.JsonError(w, "session not found", http.StatusUnauthorized, err)
-	// 	return
-	// }
-	fmt.Println("r", r.URL.Path)
-
-	// token := cookie.Value
-	// var useid string
 	var userdata tp.UserData
 	useid := strings.Split(r.URL.Path, "/")[3]
-	// if err := tp.DB.QueryRow(`SELECT user_id FROM sessions WHERE token=?`, token).Scan(&useid); err != nil {
-	// 	if err == sql.ErrNoRows {
-	// 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-	// 		return
-	// 	}
-	// 	Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-	// 	return
-	// }
 	fmt.Println("iddd", useid)
 	err := tp.DB.QueryRow(`SELECT 
 	first_name,
@@ -67,8 +49,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
-	// var posts []tp.Post_profil
-	fmt.Println("useid", useid)
 	postsQuery := `SELECT
     posts.group_id,
     posts.body,
