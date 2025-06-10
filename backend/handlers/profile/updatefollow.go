@@ -23,7 +23,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 	}
 	var userdata tp.UserData
 	useid := strings.Split(r.URL.Path, "/")[3]
-	fmt.Println("iddd", useid)
 	var userid UserId
 	err := json.NewDecoder(r.Body).Decode(&userid)
 	if err != nil {
@@ -31,7 +30,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	fmt.Println("uhada", userid.UserId)
 	err = tp.DB.QueryRow(`SELECT 
 	first_name,
 	last_name,
@@ -62,12 +60,18 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isfreand := IsFollower(w, useid, userid.UserId)
-	fmt.Println("isfreand", isfreand)
+	IsFriend, err := IsFollower(w, useid, userid.UserId)
+	if err != nil {
+		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		return
+	}
+	IsPublicAccount, err := IsPublicAccount(w, useid)
+	if err != nil {
+		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		return
+	}
 
-
-if isfreand {
-
+	if IsFriend  ||  useid== userid.UserId  || IsPublicAccount{
 
 	postsQuery := `SELECT
     posts.group_id,
@@ -150,39 +154,10 @@ ORDER BY
 		return
 	}
 
+	}
 
-
-}
-	
 	userdata.PostNbr = len(userdata.Posts)
-
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata)
 }
 
-func GitReaction(w http.ResponseWriter, postid string, userid string) (string, error) {
-	var react string
-	err := tp.DB.QueryRow(`SELECT
-    react_type
-FROM
-    like_reaction
-where
-    like_reaction.user_id = ?
-    AND like_reaction.post_id = ?
-`, userid, postid).Scan(&react)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return "ErrNoRows", nil
-		}
-		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-		return "", err
-	}
-	return react, nil
-}
-
-func IsFollower(w http.ResponseWriter, userProfil_id string, userLoged_id string) bool {
-fmt.Println("molpofile", userProfil_id)
-fmt.Println("mol cookes", userLoged_id)
-
-	return true
-}

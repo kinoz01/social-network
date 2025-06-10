@@ -11,7 +11,7 @@ import { useUser } from "@/context/UserContext";
 import { createPortal } from "react-dom";
 
 //to-do
-//profilepublic or priv
+
 
 function UserProfile({ userId }: any) {
 
