@@ -18,11 +18,9 @@ interface DMEntry {
     last_name: string;
     profile_pic: string | null;
     last_content: string;
-    last_time: string;      // ISO
+    last_time: string;
     unread_count: number;
 }
-
-
 
 const MAX_DMS = 300;
 
@@ -144,6 +142,12 @@ export default function DMsMenu() {
         }
     };
 
+    const formatTime = (iso: string) =>
+        new Date(iso.endsWith("Z") ? iso.slice(0, -1) : iso).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
     // ─── render body ───
     const body = (
         <>
@@ -163,8 +167,7 @@ export default function DMsMenu() {
                                 key={e.peer_id}
                                 href={href}
                                 onClick={() => handlePeerClick(e.peer_id)}
-                                className={`${styles.item} ${isSelected ? styles.selected : ""
-                                    }`}
+                                className={`${styles.item} ${isSelected ? styles.selected : ""}`}
                             >
                                 <div className={styles.avatarWrapper}>
                                     <Image
@@ -192,8 +195,7 @@ export default function DMsMenu() {
                                 </div>
                                 <div className={styles.meta}>
                                     <span className={styles.time}>
-                                        {String(new Date(e.last_time).getUTCHours()).padStart(2, '0')}:
-                                        {String(new Date(e.last_time).getUTCMinutes()).padStart(2, '0')}
+                                        {formatTime(e.last_time)}
                                     </span>
                                     {e.unread_count > 0 && (
                                         <span className={styles.badge}>{e.unread_count >= 100 ? "99+" : e.unread_count}</span>

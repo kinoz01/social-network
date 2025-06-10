@@ -24,7 +24,6 @@ function ProfileHeader() {
           followingAction: followingAction ? "follow" : "unfollow",
         }),
       });
-      console.log("response: ", await res.json());
     } catch (error) {
       console.log("fetch error", error);
     }

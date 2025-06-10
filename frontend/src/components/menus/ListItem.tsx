@@ -36,12 +36,6 @@ function ListItem({
 
   const handleResponse = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const action = e.currentTarget.value;
-    console.log("bidy: ", {
-      action: action,
-      status: action,
-      followedID: item?.id,
-      followerId: String(loggedUser?.id),
-    });
     setResponed(true);
 
     const res = await addFollower(
@@ -53,8 +47,6 @@ function ListItem({
       },
       "/api/followers/add"
     );
-
-    console.log("follow res: ", res);
   };
 
   const profilePic = `${API_URL}/api/storage/avatars/${item?.profile_pic}`;

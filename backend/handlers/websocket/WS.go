@@ -379,16 +379,34 @@ func storeAndBuildDM(senderID, receiverID, content string) ChatMsg {
 	}
 }
 
-// broadcastDM sends a ChatMsg to both participants in the DM "room".
-func broadcastDM(peerID string, m ChatMsg) {
-	key := dmKey(m.SenderID, peerID)
-	privateHubs.mu.RLock()
-	defer privateHubs.mu.RUnlock()
+// broadcastDM delivers the DM to both participants in the room
+// and also pushes it to any socket whose userID == receiver.
+func broadcastDM(receiverID string, m ChatMsg) {
+	key := dmKey(m.SenderID, receiverID)
+	sent := make(map[*client]bool)
 
 	payload := map[string]any{"type": "dmMessage", "message": m}
-	for cl := range privateHubs.m[key] {
-		cl.mu.Lock()
-		_ = cl.conn.WriteJSON(payload)
-		cl.mu.Unlock()
+
+	// room first
+	privateHubs.mu.RLock()
+	if room := privateHubs.m[key]; room != nil {
+		for cl := range room {
+			cl.mu.Lock()
+			_ = cl.conn.WriteJSON(payload)
+			cl.mu.Unlock()
+			sent[cl] = true // mark as delivered
+		}
 	}
+	privateHubs.mu.RUnlock()
+
+	// then global — only if not sent already
+	clientsMu.RLock()
+	for cl := range clients {
+		if cl.userID == receiverID && !sent[cl] {
+			cl.mu.Lock()
+			_ = cl.conn.WriteJSON(payload)
+			cl.mu.Unlock()
+		}
+	}
+	clientsMu.RUnlock()
 }

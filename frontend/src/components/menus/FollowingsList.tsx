@@ -32,7 +32,7 @@ function FollowingsList({
     fetchProfileInfo();
   }, [profileId]);
 
-  const user: User | null = page === "home" ? loggedUser : profileUser;
+  const user: User | null = page === "profile" ? profileUser : loggedUser;
 
   const scrollTrigger = useRef<HTMLDivElement>(null);
   const [currentPage, setPage] = useState<number>(1);
@@ -43,16 +43,14 @@ function FollowingsList({
     totalPages: 0,
   });
 
-
-
   const [isDataLoading, setIsDataLoading] = useState(false);
 
   const loadMore = async () => {
-    if (isDataLoading || !hasMoreData) {
+    if (isDataLoading || !hasMoreData || !user) {
       return;
     }
 
-    setIsDataLoading(true);
+    setIsDataLoading(true);    
 
     const data: Followings | null = await getFollowings(
       user?.id || "",
@@ -120,8 +118,6 @@ function FollowingsList({
     }
     initialFetch();
   }, [user]); // Empty dependency array means this only runs once on mount
-
-  console.log("user follofwings: ", user, followings);
 
   return (
     <div className={styles.users} ref={scrollTrigger}>

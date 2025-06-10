@@ -5,19 +5,29 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 1rem;
-  width: 30%;
   scrollbar-width: none;
   font-size: clamp(1rem, 1.2rem, 1.3rem);
   padding: 0 1rem;
+  padding-bottom: 20px;
+}
+
+.leftMenu {
+  min-width: 280px;
+  overflow-y: scroll;
+  max-width: 320px;
 }
 
 .list {
   overflow: hidden;
-  background-color: var(--color2);
+  background-color: white;
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-
+  width: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  box-shadow: 0 2px 8px #00000040;
+  height: fit-content;
+  margin-top: 30px;
 }
 
 .header {
@@ -35,23 +45,25 @@
 }
 
 .title {
-  color: #000;
+  margin-left: 15px;
+  font-family: 'Zain';
+  font-size: .9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: #333;
 }
 
 .link {
   color: var(--color6);
   transition: all 0.2s ease-in-out;
+  font-family: 'Zain';
 }
 
 .link:hover {
   border-bottom: 1px solid black;
 }
 
-.list {
-  width: 100%;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
 
 .users {
   width: 100%;
@@ -65,6 +77,7 @@
   overflow-x: hidden;
   scrollbar-width: none;
   flex-direction: column;
+  padding-top: 10px;
 }
 
 .users::-webkit-scrollbar {
@@ -84,13 +97,15 @@
 }
 
 .profileBtn button {
-  width: 5rem;
   border: none;
   padding: 0.5rem;
-  border-radius: 10px;
   background-color: var(--color1);
   color: var(--color2);
   cursor: pointer;
+  font-family: Zain;
+  font-size: .9rem;
+  width: 6rem;
+  border-radius: 20px;
 }
 
 .options {
@@ -128,6 +143,7 @@
 
 .listItemName {
   overflow-wrap: anywhere;
+  font-family: 'Zain';
 }
 
 .listItemInfo {
@@ -190,57 +206,6 @@
     overflow-x: hidden;
     border: 1px solid var(--color1);
     border-radius: 15px;
-  }
-}
-
-/* USER SECTION */
-.profileCard {
-  background-color: var(--color2);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-
-  border-radius: 15px;
-  padding: 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  text-align: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.profileCard .profileCardHeader {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.username {
-  width: 100%;
-}
-
-.profileCard .numbers {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  gap: 1rem;
-}
-
-.userImage {
-  border-radius: 50%;
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-    rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-}
-
-@media (max-width: 1200px) {
-  .profileCardDesc {
-    display: none;
   }
 }
 
@@ -348,8 +313,127 @@
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1000px) {
   .leftMenu {
     display: none;
+  }
+}
+
+/*************************** Profile Card Styles ***************************/
+.profileCard {
+  width: 100%;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: center;
+  margin-bottom: 30px;
+  height: max-content;
+  background-color: white;
+}
+
+/* header stack */
+.profileCardHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+/* avatar */
+.userImage {
+  border-radius: 50%;
+  object-fit: cover;
+  height: 96px;
+  width: 96px;
+  border: 3px solid var(--card-accent);
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  margin: auto;
+}
+
+/* full name */
+.username {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: center;
+  line-height: 1.4;
+  width: 100%;
+  font-family: 'Zain';
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.username:hover {
+  color: #727272;
+}
+
+/* description / bio */
+.profileCardDesc {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #333;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.75rem;
+  text-align: center;
+  word-break: break-word;
+}
+
+.profileCard .numbers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 1.4rem;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.handle {
+  word-break: break-word;
+  font-family: 'Zain';
+}
+
+.numbers li {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  line-height: 1.2;
+}
+
+/* icons inherit current text colour & size */
+.numbers svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  flex-shrink: 0;
+}
+
+/* label under each number (Followers, Posts …) */
+.numbers li span {
+  display: block;
+  font-size: .68rem;
+  color: var(--card-muted);
+  margin-left: .15rem;
+}
+
+
+@media (max-width: 1200px) {
+  .profileCardDesc {
+    display: none;
+  }
+}
+
+@media (max-width: 1300px) {
+  .rightMenu {
+    display: none !important;
   }
 }

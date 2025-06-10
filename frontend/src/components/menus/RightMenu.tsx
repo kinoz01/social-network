@@ -6,8 +6,7 @@ import { useUser } from "@/context/UserContext";
 
 function RightMenu() {
   const { user: loggedUser } = useUser();
-
-  // console.log("logged user: ", loggedUser);
+  
   return (
     <div className={styles.rightMenu}>
       <List type="followings" title="Followings" loggedUser={loggedUser} />

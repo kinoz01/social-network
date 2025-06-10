@@ -22,7 +22,7 @@ export const EMOJIS = [
 
 export default function DirectChatBox() {
     const { id: peerId } = useParams() as { id: string };
-    const { meId, online, subscribeDM, sendDM, onNewDM } = useWS();
+    const { meId, online, subscribeDM, sendDM, onNewDM, markChatRead } = useWS();
 
     /* ─── 1. Peer profile ─── */
     const [peerName, setPeerName] = useState<{
@@ -48,7 +48,7 @@ export default function DirectChatBox() {
     const firstLoadRef = useRef(true);
     const newMsgRef = useRef(false);
 
-    /* ─── 5. Jump badge ─── */
+    /* ─── 5. Jump button ─── */
     const [showJump, setJump] = useState(false);
 
     const PAGE = 20;
@@ -58,7 +58,7 @@ export default function DirectChatBox() {
     ──────────────────────────────────────────────────────────── */
     useEffect(() => {
         if (!peerId) return;
-        fetch(`${API_URL}/api/users/profile?user_id=${encodeURIComponent(peerId)}`, {
+        fetch(`${API_URL}/api/users/dmprofiles?user_id=${encodeURIComponent(peerId)}`, {
             credentials: "include",
             cache: "no-store",
         })
@@ -69,6 +69,10 @@ export default function DirectChatBox() {
             .then((d) => setPeerName(d))
             .catch(console.error);
     }, [peerId]);
+
+    useEffect(() => {
+        if (peerId) markChatRead(peerId);   // when we open a chat, clear its badge from side menu
+    }, [peerId, markChatRead]);
 
     /* ────────────────────────────────────────────────────────────
        Helper: fetch one page of history
@@ -143,6 +147,7 @@ export default function DirectChatBox() {
     ──────────────────────────────────────────────────────────── */
     useEffect(() => {
         if (!peerId) return;
+
         const unsubscribe = onNewDM(peerId, (incoming: ChatMsg) => {
             if (idSetRef.current.has(incoming.id)) return;
             idSetRef.current.add(incoming.id);
@@ -152,6 +157,9 @@ export default function DirectChatBox() {
             setOffset(o => o + 1);
 
             if (incoming.receiver_id === meId) {
+                setTimeout(() => {
+                    markChatRead(peerId);
+                }, 0);
                 fetch(`${API_URL}/api/chat/mark-read?peer_id=${peerId}`, {
                     method: "POST",
                     credentials: "include",

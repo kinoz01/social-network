@@ -13,6 +13,11 @@ body {
     background-color: var(--body-bg);
 }
 
+::selection {
+    background-color: #3e444d; 
+    color: #ffffff;        
+}
+  
 /******************* Welcome Popup *******************/
 .welcome-popup,
 .popup {

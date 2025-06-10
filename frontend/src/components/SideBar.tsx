@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  AddIcon,
   ChatsIcon,
   GroupsIcon,
   HomeIcon,
@@ -12,10 +11,16 @@ import {
 } from "./icons";
 import Link from "next/link";
 import { useLogout } from "@/lib/logout";
-export default function SideBar() {
-  const [hover, setHover] = useState(false);
+import { useWS } from "@/context/wsClient";
 
+export default function SideBar() {
+
+  const [hover, setHover] = useState(false);
   const { handleLogout } = useLogout();
+
+  const { totalUnread } = useWS();
+  const badge = totalUnread > 99 ? "99+" : totalUnread.toString();
+  const showBadge = totalUnread > 0;
 
   return (
     <div
@@ -43,13 +48,14 @@ export default function SideBar() {
           <GroupsIcon />
           {hover ? <span>Groups</span> : null}
         </Link>
-        <Link href="/notifications/1" className="navSection">
+        <Link href="/notifications" className="navSection">
           <NotificationIcon />
           {hover ? <span>Notifications</span> : null}
         </Link>
-        <Link href="/chat" className="navSection">
+        <Link href="/chat" className="navSection iconWrap">
           <ChatsIcon />
-          {hover ? <span>Chats</span> : null}
+          {showBadge && <span className="badge">{badge}</span>}
+          {hover && <span>Chats</span>}
         </Link>
 
       </div>

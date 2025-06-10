@@ -57,7 +57,7 @@ export default function InviteMenu({
         const qs =
             `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
         const r = await fetch(
-            `${API_URL}/api/followers?${qs}`,
+            `${API_URL}/api/followers/search?${qs}`,
             { credentials: "include" }
         );
         if (r.status === 204) return [];

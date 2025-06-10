@@ -13,7 +13,7 @@ function List({
   profileId,
   loggedUser,
 }: {
-  type: "friendRequests" | "followers" | "followings" | "suggestions" | "chat";
+  type: "friendRequests" | "followers" | "followings" | "suggestions" ;
   title: string;
   page?: "home" | "profile";
   profileId?: string;

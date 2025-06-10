@@ -1,28 +1,18 @@
 "use client";
 
 import styles from "./menus.module.css";
-import ProfileCard from "./ProfileCrad";
+import ProfileCard from "./ProfileCard";
 import List from "./List";
 import { useUser } from "@/context/UserContext";
 
-function LeftMenu({
-  type,
-}: {
-  type: "home" | "chat" | "profile" | "group" | "groups";
-}) {
+function LeftMenu() {
   const { user: loggedUser } = useUser();
   return (
-    <div className={`${styles.leftMenu} ${styles[type]}`}>
-      {type == "home" ? (
+    <div className={`${styles.leftMenu}`}>
         <>
-          {/* <ProfileCard user={loggedUser} /> */} {/* omited for now (cause server panic)*/} 
+          <ProfileCard /> 
           <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
         </>
-      ) : type === "chat" ? (
-        <>
-          <List type="chat" title="Chat" loggedUser={loggedUser} />
-        </>
-      ) : null}
     </div>
   );
 }

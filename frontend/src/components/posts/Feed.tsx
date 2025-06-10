@@ -13,7 +13,7 @@ import { Post } from "../../lib/types";
 import { useUser } from "@/context/UserContext";
 import { API_URL } from "@/lib/api_url";
 
-export default function Feed({ type }: { type: "home" | "group" }) {
+export default function Feed() {
     const [showFOrm, setShowForm] = useState(false)
     const [postedContent, setPostedContent] = useState<Post[]>([])
     const [currentPage, setPage] = useState(0)
@@ -84,7 +84,7 @@ export default function Feed({ type }: { type: "home" | "group" }) {
 
     return (
         <>
-            <div className={`${styles.feed} ${styles[type]}`}>
+            <div className={`${styles.feed}`}>
                 <div className={styles.toggleFOrm} onClick={toggleFOrm}>
                     {<div className={styles.insideFOrm}>
                         <Image

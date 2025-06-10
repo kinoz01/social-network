@@ -5,7 +5,7 @@ import { API_URL } from   "./api_url";
 
 async function getProfileInfo(id: string, headers?: {}): Promise<User | null> {
   // Get profile user id from the params objects
-  const url = `${API_URL}/api/profile/info?id=${id}`;
+  const url = `${API_URL}/api/users/profilesInfo?id=${id}`;
 
   try {
     const res = await fetch(url, {
@@ -23,7 +23,6 @@ async function getProfileInfo(id: string, headers?: {}): Promise<User | null> {
     }
 
     const data: User = await res.json();
-    console.log("daaaaaata: ", data);
     return data;
   } catch (error: any) {
     console.log("error: ", error);
@@ -34,8 +33,6 @@ async function getProfileInfo(id: string, headers?: {}): Promise<User | null> {
 }
 
 async function addFollower(body: {}, url: string) {
-  console.log("heeeeeeeeeere: ", body);
-
   try {
     const res = await fetch(`${API_URL}${url}`, {
       method: "POST",
@@ -68,7 +65,6 @@ async function handleFollow(
       profileUser.account_type === "public" ||
       (profileUser.account_type === "private" && isFollowed)
     ) {
-      console.log("here1");
       await addFollower(
         {
           action: followingAction ? "unfollow" : "follow",
@@ -78,8 +74,6 @@ async function handleFollow(
         "/api/followers/add"
       );
     } else if (profileUser.account_type === "private") {
-      console.log("here2");
-
       await addFollower(
         {
           action: "friendRequest",
@@ -88,18 +82,6 @@ async function handleFollow(
         },
         "/api/followers/add"
       );
-      // if (!isFollowed) {
-      //   await addNotification(
-      //     {
-      //       type: "friend request",
-      //       content: "New friend request from",
-      //       receiver: profileUser.id,
-      //       sender: { id: loggedUser?.id },
-      //       isRead: false,
-      //     },
-      //     "friendRequest"
-      //   );
-      // }
     }
   }
 }
@@ -136,7 +118,6 @@ async function getFollowingRequests(
     }
 
     const data: FriendRequest = await res.json();
-    console.log("ressssssssss: ", data);
 
     return data;
   } catch (error: any) {
@@ -175,6 +156,7 @@ async function getFollowings(
   limit?: number,
   page?: number
 ): Promise<Followings | null> {
+  
   const url = `${API_URL}/api/followings?id=${userId}&limit=${limit}&page=${page}`;
 
   try {
@@ -184,8 +166,6 @@ async function getFollowings(
     }
 
     const data: Followings = await res.json();
-
-    console.log("data: ", data);
 
     return data;
   } catch (error: any) {
@@ -205,9 +185,6 @@ async function getSuggestions(): Promise<User[] | null> {
     }
 
     const data: User[] = await res.json();
-
-    console.log("data: ", data);
-
     return data;
   } catch (error: any) {
     console.log("fetch error", error);

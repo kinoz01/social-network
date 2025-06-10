@@ -42,7 +42,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
 	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
 	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
-	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))
+	mux.Handle("/api/users/search", rl.RateLimitMW(http.HandlerFunc(users.SearchUsers)))
 
 	// posts
 	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
@@ -85,18 +85,28 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/groups/members", mw.Gm(grps.GetMembers))
 
 	// CHAT
-	// Chat menu
+	// Chat menu:
 	mux.HandleFunc("/api/chat/list", chat.GetChatList)
 	// Chat Rest DMs
 	mux.HandleFunc("/api/chat/messages", chat.GetPrivateMessages)
-	mux.HandleFunc("/api/users/profile", profile.GetDMProfile)
 	mux.HandleFunc("/api/chat/dm-list", chat.ChatDMList)
 	mux.HandleFunc("/api/chat/mark-read", chat.ChatMarkRead)
+	mux.HandleFunc("/api/chat/unread-summary", chat.GetUnreadSummary)
 	
 	// Following:
 	mux.HandleFunc("/api/suggestions", flw.SuggestionsHandler)
+	// mux.HandleFunc("/api/followers/isfollowed", flw.IsFollwedHandler)
+	// mux.HandleFunc("/api/followers/add", flw.AddFollowRequest)
+	// mux.HandleFunc("/api/followers/requests", flw.GetFollowingRequestsHandler)
+	// mux.HandleFunc("/api/suggestions", flw.GetSuggestionsHandler)
+	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)
+	mux.HandleFunc("/api/followings", flw.GetFollowingsHandler)
 	// search
-	mux.HandleFunc("/api/followers", flw.GetFollowers)
+	mux.HandleFunc("/api/followers/search", flw.SearchFollowers)
+
+	// Profiles:
+	mux.HandleFunc("/api/users/dmprofiles", profile.GetDMProfile)
+	mux.HandleFunc("/api/users/profilesInfo", profile.ProfileData)
 
 	// Websocket
 	mux.HandleFunc("/api/ws", ws.GlobalWS)

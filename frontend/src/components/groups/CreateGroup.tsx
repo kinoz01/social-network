@@ -62,7 +62,7 @@ export default function CreateGroupModal({ onClose }: Props) {
     /* ---------------- fetch helpers ---------------- */
     const fetchSlice = async (q: string, off: number) => {
         const qs = `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
-        const r = await fetch(`${API_URL}/api/followers?${qs}`,
+        const r = await fetch(`${API_URL}/api/followers/search?${qs}`,
             { credentials: "include" });
         if (r.status === 204) return [];
         if (!r.ok) throw new Error();
@@ -114,7 +114,7 @@ export default function CreateGroupModal({ onClose }: Props) {
         (async () => {
             try {
                 const r = await fetch(
-                    `${API_URL}/api/followers?status=accepted&limit=1`,
+                    `${API_URL}/api/followers/search?limit=1`,
                     { credentials: "include" });
                 if (!r.ok) throw new Error();
                 const list: Follower[] = await r.json();

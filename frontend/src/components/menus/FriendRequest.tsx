@@ -47,7 +47,6 @@ function FriendRequestList({ profileId }: { profileId?: string }) {
       limit,
       currentPage
     );
-    console.log("reqqqqqqquesys: ", data);
 
     if (data && data.requests) {
       if (data.requests.length === 0 || currentPage === data.totalPages) {
