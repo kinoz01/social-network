@@ -1,0 +1,226 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import styles from "./notifications.module.css";
+import { NotificationModel } from "@/lib/types";
+import { API_URL } from "@/lib/api_url";
+import TimeAgo from "../groups/TimeAgo";
+
+interface Props {
+    n: NotificationModel;
+    onRemove: (id: string) => void;
+}
+
+export default function NotificationItem({ n, onRemove }: Props) {
+    const [busy, setBusy] = useState(false);
+
+    /* ───────── helpers ───────── */
+    const dropFromServer = async () =>
+        fetch(`${API_URL}/api/delete-notification?id=${n.id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+
+    const close = async () => {
+        if (busy) return;
+        setBusy(true);
+        await dropFromServer();
+        onRemove(n.id);
+    };
+
+    /* ========== group invitation ========== */
+    const acceptInvitation = async () => {
+        if (busy) return;
+        setBusy(true);
+        await fetch(`${API_URL}/api/groups/accept-invitation`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ invitation_id: n.invitationId }),
+        });
+        onRemove(n.invitationId || n.id);
+    };
+
+    const rejectInvitation = async () => {
+        if (busy) return;
+        setBusy(true);
+        await fetch(`${API_URL}/api/groups/refuse-invitation`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ invitation_id: n.invitationId }),
+        });
+        onRemove(n.invitationId || n.id);
+    };
+
+    /* ========== friend request ========== */
+    const acceptFriend = async () => {
+        if (busy) return;
+        setBusy(true);
+        await fetch(`/api/followers/add`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "accepted",
+                followerID: n.sender.id,
+                followedId: n.receiver,
+            }),
+        });
+        await close();
+    };
+
+    const rejectFriend = async () => {
+        if (busy) return;
+        setBusy(true);
+        await fetch(`/api/followers/add`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: "rejected",
+                followerID: n.sender.id,
+                followedId: n.receiver,
+            }),
+        });
+        await close();
+    };
+
+    /* ========== join request ========== */
+    const acceptJoinRequest = async () => {
+        if (busy) return;
+        setBusy(true);
+        await fetch(`${API_URL}/api/groups/accept-request`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_id: n.requestId }),
+        });
+        onRemove(n.requestId || n.id);
+    };
+
+    const rejectJoinRequest = async () => {
+        if (busy) return;
+        setBusy(true);
+        await fetch(`${API_URL}/api/groups/refuse-request`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_id: n.requestId }),
+        });
+        onRemove(n.requestId || n.id);
+    };
+    
+
+    /* ========== event response (Going / Not-going) ========== */
+    const respondToEvent = async (choice: "going" | "not_going") => {
+        if (busy) return;
+        setBusy(true);
+        await fetch(`${API_URL}/api/groups/event-response?group_id=${n.groupId}`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ event_id: n.eventId, response: choice }),
+        });
+        onRemove(n.eventId || n.id); // remove the notification from front
+        await close(); // remove from server
+    };
+
+    /* ───────── render ───────── */
+    return (
+        <div className={styles.notification}>
+            <button
+                className={styles.closeBtn}
+                disabled={busy}
+                onClick={close}
+                aria-label="Close"
+            >
+                ×
+            </button>
+
+            <div className={styles.info}>
+                <Image
+                    className={styles.profilePic}
+                    src={
+                        n.sender.profile_pic
+                            ? `${API_URL}/api/storage/avatars/${n.sender.profile_pic}`
+                            : "/img/default-avatar.png"
+                    }
+                    alt=""
+                    width={40}
+                    height={40}
+                    priority
+                />
+
+                <div className={styles.text}>
+                    <Link className={styles.link} href={`/profile/${n.sender.id}`}>
+                        @{`${n.sender.first_name} ${n.sender.last_name}`}
+                    </Link>
+                    <div className={styles.content}>{formatContent(n.content)}</div>
+                </div>
+            </div>
+
+            <div className={styles.date}>
+                <TimeAgo dateStr={n.createdAt} />
+            </div>
+
+            {/* ====== actions by type ====== */}
+            {n.type === "group_invite" && (
+                <div className={styles.options}>
+                    <button onClick={acceptInvitation} disabled={busy}>
+                        Accept
+                    </button>
+                    <button onClick={rejectInvitation} disabled={busy}>
+                        Reject
+                    </button>
+                </div>
+            )}
+
+            {n.type === "friend request" && (
+                <div className={styles.options}>
+                    <button onClick={acceptFriend} disabled={busy}>
+                        Accept
+                    </button>
+                    <button onClick={rejectFriend} disabled={busy}>
+                        Reject
+                    </button>
+                </div>
+            )}
+
+            {n.type === "join_request" && (
+                <div className={styles.options}>
+                    <button onClick={acceptJoinRequest} disabled={busy}>
+                        Accept
+                    </button>
+                    <button onClick={rejectJoinRequest} disabled={busy}>
+                        Reject
+                    </button>
+                </div>
+            )}
+
+            {n.type === "event_created" && (
+                <div className={styles.options}>
+                    <button onClick={() => respondToEvent("going")} disabled={busy}>
+                        Going
+                    </button>
+                    <button onClick={() => respondToEvent("not_going")} disabled={busy}>
+                        Not going
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function formatContent(text: string) {
+    const parts = text.split(/('.*?')/); // keeps quotes in the result
+    return parts.map((part, i) =>
+        part.startsWith("'") && part.endsWith("'") ? (
+            <span key={i} className={styles.highlighted}>{part}</span>
+        ) : (
+            <span key={i}>{part}</span>
+        )
+    );
+}

@@ -39,7 +39,7 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 	    LEFT JOIN event_responses r ON r.event_id = e.id
 	    WHERE e.group_id = ?
 	    GROUP BY e.id
-	    ORDER BY e.start_time ASC, e.id ASC
+	    ORDER BY e.start_time DESC, e.ROWID DESC
 	    LIMIT ? OFFSET ?`, viewerID, gid, limit, offset)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)

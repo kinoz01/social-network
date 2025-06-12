@@ -198,6 +198,7 @@ export default function Events() {
                         <EventCard
                             key={ev.id}
                             ev={ev}
+                            expired={new Date(ev.start_time).getTime() < Date.now()} 
                             onUpdate={(goingCnt, notCnt, myChoice) =>
                                 setEvents(prev =>
                                     prev.map(p => p.id === ev.id ? { ...p, going_count: goingCnt, not_going_count: notCnt, going: myChoice } : p)

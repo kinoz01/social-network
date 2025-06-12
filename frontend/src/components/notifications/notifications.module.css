@@ -1,0 +1,284 @@
+.notificationDashboard {
+  width: 100%;
+  padding: 2rem;
+  border-radius: 15px;
+  background-color: white;
+  box-shadow: 0 2px 8px #00000040;
+  margin: 5px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  max-height: 95vh;
+  margin-top: 35px;
+}
+
+.notification {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: #f2f2f2;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 30px;
+}
+
+.notification:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ============== Close button ============== */
+.closeBtn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: #696969;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.closeBtn:hover:not(:disabled) {
+  color: #333;
+}
+
+.noMore {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #696969;
+  font-family: 'Zain';
+}
+
+/* ============== Main info block ============== */
+.info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+/* Avatar */
+.profilePic {
+  flex-shrink: 0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+/* Text wrapper: stacks name + content vertically so long names never collide */
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  font-family: 'Zain';
+  font-size: 1.3rem;
+  color: #131313;
+}
+
+.link {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #0070f3;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.date {
+  font-size: 1rem;
+  color: #696969;
+  margin-left: 3.25rem;
+  margin-top: -0.5rem;
+  font-family: 'Zain';
+}
+
+/* Buttons */
+.options {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: -1.5rem;
+}
+
+.options button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.1s ease;
+  background-color: #000;
+  color: #fff;
+}
+
+.options button:hover:not(:disabled) {
+  background-color: #272727;
+}
+
+.options button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.highlighted {
+  color: #5c718a;
+  font-weight: 600;
+}
+
+/* ============== Responsive tweaks ============== */
+/* Small tablets & phones */
+@media (max-width: 600px) {
+  .notification {
+    padding: 0.75rem;
+  }
+
+  .link {
+    max-width: 200px;
+  }
+
+  .profilePic {
+    width: 36px;
+    height: 36px;
+  }
+
+  .options {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0;
+  }
+
+  .options button {
+    flex: 1 1 calc(50% - 0.5rem);
+    padding: 0.45rem 0;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .info {
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 850px) {
+  .options {
+    margin-top: 0px;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 900px) {
+  .info {
+    margin-top: 15px;
+  }
+
+  .link {
+    max-width: 150px;
+  }
+}
+
+
+/***************************** CLEAR ALL ************************/
+.controlsRow {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.clearAll {
+  background: none;
+  border: none;
+  color: #383838;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.clearAll:hover {
+  text-decoration: underline;
+}
+
+.clearAll:disabled {
+  opacity: .4;
+  pointer-events: none;
+  text-decoration: none;
+}
+
+/* ——— Modal ——— */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalCard {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 8px;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  text-align: center;
+}
+
+.modalClose {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.modalBtns {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-evenly;
+  gap: 12px;
+}
+
+.yesBtn,
+.noBtn {
+  padding: 6px 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.yesBtn {
+  background: #d9534f;
+  color: #fff;
+}
+
+.yesBtn:hover {
+  background: #c64440;
+}
+
+.noBtn {
+  background: #e0e0e0;
+}
+
+.noBtn:hover {
+  background: #d5d5d5;
+}

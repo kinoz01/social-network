@@ -1,7 +1,7 @@
 package notifications
 
 import (
-	"fmt"
+	"database/sql"
 
 	tp "social-network/handlers/types"
 )
@@ -13,63 +13,98 @@ type Notifcations struct {
 }
 
 func GetNotifications(id string, limitQuery, pageQuery int) (*Notifcations, error) {
+	/* total count (for paging) */
 	var totalCount int
-
-	stmnt := `SELECT COUNT(*) FROM notifications  WHERE receiver_id = ?`
-	row := tp.DB.QueryRow(stmnt, id)
-	if err := row.Scan(&totalCount); err != nil {
+	if err := tp.DB.QueryRow(
+		`SELECT COUNT(*) FROM notifications WHERE receiver_id = ?`,
+		id,
+	).Scan(&totalCount); err != nil {
 		return nil, err
 	}
 
 	offset := (pageQuery - 1) * limitQuery
-
 	totalPages := (totalCount + limitQuery - 1) / limitQuery
 
-	insertNotification := `
-SELECT
-    users.id,
-    users.first_name,
-    users.last_name,
-    users.profile_pic,
-    notifications.id,
-    notifications.receiver_id,
-    notifications.type,
-    notifications.content,
-    notifications.created_at,
-    notifications.is_read
+	/* fetch the rows */
+	const q = `
+		SELECT
+		    /* sender (may be NULL for system notifications) */
+		    u.id          AS sender_id,
+		    u.first_name,
+		    u.last_name,
+		    u.profile_pic,
 
-FROM
-    notifications
-    LEFT JOIN users ON users.id = notifications.sender_id
-WHERE
-    notifications.receiver_id = ?
-ORDER BY
-    notifications.created_at DESC
-LIMIT ? OFFSET ?
-`
-	fmt.Println("queries: ", id, limitQuery, pageQuery)
-	rows, err := tp.DB.Query(insertNotification, id, limitQuery, offset)
+		    /* notification itself */
+		    n.id,
+		    n.receiver_id,
+		    n.type,
+		    n.content,
+		    n.related_group_id,
+		    n.related_event_id,
+		    n.related_invitation_id,
+		    n.related_request_id,
+		    n.created_at,
+		    n.is_read
+		FROM
+		    notifications n
+		    LEFT JOIN users u ON u.id = n.sender_id
+		WHERE
+		    n.receiver_id = ?
+		ORDER BY
+		    n.created_at DESC, n.ROWID DESC
+		LIMIT ? OFFSET ?`
 
-	fmt.Println("notifications err: ", err, rows)
+	rows, err := tp.DB.Query(q, id, limitQuery, offset)
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	var notifications []*tp.Notification
-
 	for rows.Next() {
+		var n tp.Notification
 
-		var notification tp.Notification
+		/* nullable FK columns */
+		var groupID, eventID, invitationID, requestID sql.NullString
 
-		if err := rows.Scan(&notification.Sender.ID, &notification.Sender.FirstName, &notification.Sender.LastName, &notification.Sender.ProfilePic, &notification.ID, &notification.Receiver, &notification.Type, &notification.Content, &notification.CreatedAt, &notification.IsRead); err != nil {
-			fmt.Println("row2 err: ", err, row)
+		if err := rows.Scan(
+			/* sender */
+			&n.Sender.ID,
+			&n.Sender.FirstName,
+			&n.Sender.LastName,
+			&n.Sender.ProfilePic,
+			/* notification core */
+			&n.ID,
+			&n.Receiver,
+			&n.Type,
+			&n.Content,
+			/* contextual FKs */
+			&groupID,
+			&eventID,
+			&invitationID,
+			&requestID,
+			/* meta */
+			&n.CreatedAt,
+			&n.IsRead,
+		); err != nil {
 			return nil, err
 		}
 
-		notifications = append(notifications, &notification)
+		/* copy nullable fields into the struct */
+		if groupID.Valid {
+			n.Group = groupID.String
+		}
+		if eventID.Valid {
+			n.Event = eventID.String
+		}
+		if invitationID.Valid {
+			n.InvitationID = invitationID.String
+		}
+		if requestID.Valid {
+			n.RequestID = requestID.String
+		}
 
+		notifications = append(notifications, &n)
 	}
 
 	return &Notifcations{

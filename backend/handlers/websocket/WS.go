@@ -205,8 +205,7 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		privateHubs.m[key][c] = true
 		privateHubs.mu.Unlock()
 
-		// We rely on REST to fetch history; no immediate push.
-
+	// We rely on REST to fetch history; no immediate push.
 	// ───── DM: send message ─────
 	case "dmMessage":
 		if msg.Content == "" {
@@ -214,6 +213,12 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		}
 		m := storeAndBuildDM(u.ID, msg.PeerID, msg.Content)
 		broadcastDM(msg.PeerID, m)
+		
+	case "unreadNotificationsCount":
+		sendUnreadNotificationCount(c, u.ID)
+
+	case "getNotifications":
+		sendNotificationList(c, u, msg, "getNotifications")
 	}
 }
 
@@ -436,18 +441,12 @@ func BroadcastNotification(n tp.Notification) {
 			cl.mu.Lock()
 			_ = cl.conn.WriteJSON(payload)
 			cl.mu.Unlock()
-
-			// refresh badge & list for that socket
-			sendUnreadNotificationCount(cl, n.Receiver)
-			sendNotificationList(cl, &tp.User{ID: n.Receiver}, inbound{
-				Limit: 10,
-				Page:  1,
-			}, "updateNotifications")
 		}
 	}
 	clientsMu.RUnlock()
 }
 
+// Notifications getter
 func sendNotificationList(c *client, u *tp.User, msg inbound, msgType string) {
 	notifs, err := notif.GetNotifications(u.ID, msg.Limit, msg.Page)
 	if err != nil {
@@ -485,3 +484,4 @@ func sendUnreadNotificationCount(c *client, userId string) {
 	_ = c.conn.WriteJSON(payload)
 	c.mu.Unlock()
 }
+

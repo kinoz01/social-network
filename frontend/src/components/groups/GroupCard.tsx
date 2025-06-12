@@ -8,6 +8,7 @@ import Loading from "@/components/Loading";
 import CreateGroupModal from "../groups/CreateGroup";
 import { API_URL } from "@/lib/api_url";
 import { popup } from "@/lib/utils";
+import { useWS } from "@/context/wsClient"
 
 interface Group {
     id: string;
@@ -22,11 +23,11 @@ interface Group {
 
 export default function GroupCard({
     title,
-    onAccept,
+    onAction,
     refreshKey,
 }: {
     title: string;
-    onAccept?: () => void;
+    onAction?: () => void;
     refreshKey?: number;
 }) {
     const router = useRouter();
@@ -35,6 +36,7 @@ export default function GroupCard({
     const [loading, setLoading] = useState(true);
     const [openModal, setOpen] = useState(false);
     const [activeInfo, setInfo] = useState<string | null>(null);
+    const { deleteNotification } = useWS()
 
     /* ---------- fetch list ---------- */
     const fetchList = async () => {
@@ -75,7 +77,8 @@ export default function GroupCard({
             });
             if (!res.ok) throw new Error();
             refreshInvitations();
-            onAccept?.();
+            onAction?.();
+            deleteNotification(id); // remove notification if exists
         } catch (err) {
             popup("Somthing went wrong, try reloading", false)
             console.error(err);
@@ -97,7 +100,8 @@ export default function GroupCard({
 
             /* --- instant UI update: drop the card locally --- */
             setGroups(prev => prev.filter(g => g.invitation_id !== id));
-
+            onAction?.()
+            deleteNotification(id); // remove notification if exists
         } catch (err) {
             popup("Somthing went wrong, try reloading", false)
             console.error(err);

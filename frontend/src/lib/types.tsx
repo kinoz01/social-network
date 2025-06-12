@@ -43,14 +43,22 @@ export interface Post {
 
 export interface NotificationModel {
     id: string;
-    receiver: User;
-    sender: User;
+
+    /* core info */
+    type: string;            // "group_invite", "friend request", ...
     content: string;
     createdAt: string;
-    group?: string;
-    event?: string;
-    type?: string;
-    isRead?: boolean;
+    isRead: boolean;
+
+    /* actors */
+    receiver: string;      // user-ID who should see it
+    sender: User;          // sender payload
+
+    /* contextual foreign keys */
+    groupId?: string;   // related_group_id
+    eventId?: string;   // related_event_id
+    invitationId?: string;   // related_invitation_id
+    requestId?: string;   // related_request_id
 }
 
 export interface NotifcationResponse {

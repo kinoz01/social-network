@@ -21,6 +21,7 @@ import (
 	grpsRequest "social-network/handlers/groups/joinRequests"
 	grpsPost "social-network/handlers/groups/posts"
 	"social-network/handlers/profile"
+	notif "social-network/handlers/notifications"
 	ws "social-network/handlers/websocket"
 )
 
@@ -92,15 +93,19 @@ func Routes() http.Handler {
 	mux.HandleFunc("/api/chat/dm-list", chat.ChatDMList)
 	mux.HandleFunc("/api/chat/mark-read", chat.ChatMarkRead)
 	mux.HandleFunc("/api/chat/unread-summary", chat.GetUnreadSummary)
-	
+
+	// Notifications:
+	mux.HandleFunc("/api/delete-notification", notif.DeleteNotification)
+	mux.HandleFunc("/api/clear-notifications", notif.ClearAllNotifications)
+
 	// Following:
 	mux.HandleFunc("/api/suggestions", flw.SuggestionsHandler)
 	// mux.HandleFunc("/api/followers/isfollowed", flw.IsFollwedHandler)
-	// mux.HandleFunc("/api/followers/add", flw.AddFollowRequest)
-	// mux.HandleFunc("/api/followers/requests", flw.GetFollowingRequestsHandler)
 	// mux.HandleFunc("/api/suggestions", flw.GetSuggestionsHandler)
+	mux.HandleFunc("/api/followers/requests", flw.GetFollowingRequestsHandler)
 	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)
 	mux.HandleFunc("/api/followings", flw.GetFollowingsHandler)
+	mux.HandleFunc("/api/followers/add", flw.AddFollowRequest)
 	// search
 	mux.HandleFunc("/api/followers/search", flw.SearchFollowers)
 

@@ -14,6 +14,7 @@ export default function TimeAgo({ dateStr, chat }: { dateStr: string, chat?: boo
     }, [dateStr]);
 
     if (chat) return <time dateTime={dateStr}>{label}</time>;
+    if (label === 'just now') return <time dateTime={dateStr}>• just now</time>;
 
     return <time dateTime={dateStr}>• {label} ago</time>;
 }

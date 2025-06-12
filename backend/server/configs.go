@@ -20,7 +20,9 @@ import (
 // create/open DB and run migration
 func InitialiseDB() {
 	var err error
-	db.DB, err = sql.Open("sqlite3", "./database/socNet.db")
+	db.DB, err = sql.Open(
+		"sqlite3",
+		"file:./database/socNet.db?_foreign_keys=1")
 	if err != nil {
 		log.Fatal("Failed to open SQLite database:", err)
 	}

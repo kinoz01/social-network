@@ -8,7 +8,7 @@ import (
 )
 
 func SavePOstLIke(likeDetails pType.React) error {
-	// fmt.Println("details ", likeDetails)
+	
 	query := `INSERT INTO like_reaction (id, user_id, post_id, react_type) VALUES (?, ?, ?, ?)`
 	stat, err := pType.DB.Prepare(query)
 	if err != nil {

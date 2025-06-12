@@ -40,7 +40,7 @@ export default function SideBar() {
           <HomeIcon />
           {hover ? <span>Home</span> : null}
         </Link>
-        <Link href="/profile/1" className="navSection">
+        <Link href="/profile" className="navSection">
           <UserIcon />
           {hover ? <span>Profile</span> : null}
         </Link>

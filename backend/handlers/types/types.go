@@ -68,8 +68,8 @@ type Comment struct {
 	LastName    string `json:"last_name"`
 	Avatar      string `json:"avatar"`
 	CreatedAt   string `json:"createdAt"`
-	LikesCount int    `json:"likesCount"`
-	HasReact   string `json:"hasReact"`
+	LikesCount  int    `json:"likesCount"`
+	HasReact    string `json:"hasReact"`
 }
 
 type Group struct {
@@ -84,18 +84,26 @@ type Group struct {
 }
 
 type Notification struct {
-	ID        string `json:"id"`
-	Type      string `json:"type"`        // e.g. "group_invite", "request_accepted"
-	Content   string `json:"content"`     // free-text
-	Receiver  string `json:"receiver"`    // user-ID that should see it
-	Sender    User   `json:"sender"`      // minimal User payload (ID + names/pic)
+	ID       string `json:"id"`
+	Type     string `json:"type"`     // e.g. "group_invite", "request_accepted"
+	Content  string `json:"content"`  // free-text
+	Receiver string `json:"receiver"` // user-ID that should see it
+	Sender   User   `json:"sender"`   // minimal User payload (ID + names/pic)
 
 	/* contextual foreign keys — at most one is non-empty */
-	Group        string `json:"group,omitempty"`        // related_group_id
-	Event        string `json:"event,omitempty"`        // related_event_id
+	Group        string `json:"groupId,omitempty"`      // related_group_id
+	Event        string `json:"eventId,omitempty"`      // related_event_id
 	InvitationID string `json:"invitationId,omitempty"` // related_invitation_id
 	RequestID    string `json:"requestId,omitempty"`    // related_request_id
 
 	CreatedAt string `json:"createdAt"`
 	IsRead    bool   `json:"isRead"`
+}
+
+type FollowRequest struct {
+	ID         string `json:"id"`
+	Action     string `json:"action"`
+	Status     string `json:"status"`
+	FollowerID string `json:"followerId"`
+	FollowedID string `json:"followedId"`
 }

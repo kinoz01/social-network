@@ -5,14 +5,10 @@ import (
 	"fmt"
 
 	tp "social-network/handlers/types"
-
-	"github.com/gofrs/uuid"
 )
 
 // Insert notification into the database.
 func AddNotification(n tp.Notification) error {
-	id := uuid.Must(uuid.NewV4()).String()
-
 	const q = `
 	  INSERT INTO notifications
 	    (id, type, content, receiver_id, sender_id,
@@ -28,12 +24,12 @@ func AddNotification(n tp.Notification) error {
 	}
 
 	_, err := tp.DB.Exec(q,
-		id,
+		n.ID,
 		n.Type,
 		n.Content,
 		n.Receiver,
 		n.Sender.ID,
-		n.Group, 
+		n.Group,
 		null(n.Event),
 		null(n.InvitationID),
 		null(n.RequestID),

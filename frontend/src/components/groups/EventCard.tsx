@@ -20,9 +20,11 @@ export interface Event {
 
 export default function EventCard({
     ev,
+    expired,
     onUpdate,
 }: {
     ev: Event;
+    expired: boolean;
     onUpdate: (going: number, notGoing: number, myChoice: boolean) => void;
 }) {
 
@@ -35,7 +37,7 @@ export default function EventCard({
 
     const choose = async (resp: "going" | "not_going") => {
         const wantGoing = resp === "going";
-        if (busy) return;
+        if (busy || expired) return;
         if ((wantGoing && myChoice === true) || (!wantGoing && myChoice === false)) return;
 
         setBusy(true);
@@ -77,18 +79,18 @@ export default function EventCard({
                 <button
                     className={`${styles.button} ${myChoice === true ? styles.sel : ""}`}
                     onClick={() => choose("going")}
-                    disabled={busy}
+                    disabled={busy || expired}
                 >
                     Going
                 </button>
                 <button
                     className={`${styles.button} ${myChoice === false ? styles.sel : ""}`}
                     onClick={() => choose("not_going")}
-                    disabled={busy}
+                    disabled={busy || expired}
                 >
                     Not going
                 </button>
-                <p className={styles.date}>{date}</p>
+                <p className={styles.date}> {expired && "expired at"} {date}</p>
             </div>
         </div>
     );

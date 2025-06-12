@@ -3,6 +3,7 @@ import ChatMenu from "@/components/chat/ChatMenu";
 import DMsMenu from "@/components/chat/DMsMenu";
 import style from "@/components/chat/style/chat.module.css";
 import SuggestionsList from "@/components/menus/SuggestionsList";
+import FriendRequests from "@/components/menus/FriendRequest";
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
     return (
@@ -12,7 +13,10 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
                 <ChatMenu />
             </div>
             <div className={style.chatBox}>{children}</div>
-            <SuggestionsList className={style.usersSuggestionsChat} />
+            <div className={`${style.rMenuLayout}`}>
+                <FriendRequests />
+                <SuggestionsList className={style.usersSuggestionsChat} />
+            </div>
         </div>
     );
 }

@@ -4,13 +4,15 @@ import styles from "./menus.module.css";
 import ProfileCard from "./ProfileCard";
 import List from "./List";
 import { useUser } from "@/context/UserContext";
+import FriendRequestList from "./FriendRequest";
 
-function LeftMenu() {
+function LeftMenu({ className = "" }: {className?: string}) {
   const { user: loggedUser } = useUser();
   return (
-    <div className={`${styles.leftMenu}`}>
+    <div className={`${styles.leftMenu} ${className}`}>
         <>
           <ProfileCard /> 
+          <FriendRequestList />
           <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
         </>
     </div>

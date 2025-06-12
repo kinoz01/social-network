@@ -7,6 +7,7 @@ import Image from "next/image";
 import styles from "./style/requestsMenu.module.css";
 import { useGroupSync } from "@/context/GroupSyncContext";
 import { API_URL } from "@/lib/api_url";
+import { useWS } from "@/context/wsClient"
 
 /* ─────────── types ─────────── */
 type Req = {
@@ -22,6 +23,7 @@ function useRequests(groupId: string) {
     const { version, refresh } = useGroupSync();
     const [list, setList] = useState<Req[]>([]);
     const [loading, setLoad] = useState(true);
+    const { deleteNotification } = useWS();
 
     /* 1. fetch from backend */
     const fetchRequests = useCallback(async () => {
@@ -64,6 +66,7 @@ function useRequests(groupId: string) {
             console.warn(`${route} failed — will resync`);
         } finally {
             refresh();     // triggers members refresh + refetch here
+            deleteNotification(id); // remove notification from UI
         }
     };
 
@@ -160,7 +163,7 @@ export function RequestsModal({
     if (loading) return null;
 
     /* sidebar vs modal */
-    if (!modal) return <RequestsMenu />;   // defensive fallback
+    if (!modal) return <RequestsMenu />;   // fallback
 
     return (
         <div className={styles.backdrop} onClick={onClose}>

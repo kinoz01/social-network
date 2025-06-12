@@ -2,19 +2,22 @@
 .rightMenu,
 .leftMenu {
   border-radius: 15px;
-  display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   scrollbar-width: none;
   font-size: clamp(1rem, 1.2rem, 1.3rem);
   padding: 0 1rem;
   padding-bottom: 20px;
+  flex-direction: column;
 }
 
 .leftMenu {
   min-width: 280px;
-  overflow-y: scroll;
+  overflow-y: scroll !important;
   max-width: 320px;
+  justify-content: flex-start;
+  flex-direction: column;
+  max-height: 95vh;
+  margin-top: 30px;
 }
 
 .list {
@@ -436,4 +439,105 @@
   .rightMenu {
     display: none !important;
   }
+}
+
+/****************************** FLOW REQUESTS MENU ******************************/
+.followRequestsMenu {
+  border-radius: 15px;
+  background: #fff;
+  padding: 1rem;
+  max-width: 340px;
+  gap: 0.7rem;
+  max-height: 400px;
+  overflow-y: scroll;
+  margin-top: 30px;
+  box-shadow: 0 2px 8px #00000040;
+  scrollbar-width: none;
+}
+
+/* ───────── heading ───────── */
+.heading {
+  text-transform: uppercase;
+  margin-left: 15px;
+  margin-bottom: 20px;
+  font-family: Zain;
+  font-size: .9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+/* ───────── list wrapper ───────── */
+.liist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+}
+
+/* ───────── individual row ───────── */
+.item {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+  cursor: pointer;
+  /* row is clickable */
+}
+
+.item:hover {
+  background: #f2f2f2;
+  /* light grey hover */
+}
+
+/* ───────── avatar ───────── */
+.avt {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* ───────── name text ───────── */
+.name {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #333;
+  overflow-wrap: anywhere;
+}
+
+/* ───────── horiz. button group ───────── */
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ───────── circular icon buttons ───────── */
+.icnButton {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: transform 0.15s;
+}
+
+.icnButton:hover {
+  transform: scale(1.1);
+}
+
+.rowLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
 }

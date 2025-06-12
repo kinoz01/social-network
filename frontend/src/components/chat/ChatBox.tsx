@@ -250,15 +250,13 @@ export default function DirectChatBox() {
     ──────────────────────────────────────────────────────────── */
     if (!peerName) {
         return (
-            <div className={styles.chatBox}>
-                <div className={styles.emptyBox}>
-                    <Image src="/img/empty.svg" alt="User not found" width={150} height={150} />
-                    <p className={styles.emptyStatus}>
-                        User not found
-                        <br />
-                        Try selecting available users
-                    </p>
-                </div>
+            <div className={styles.emptyBox}>
+                <Image src="/img/empty.svg" alt="User not found" width={150} height={150} />
+                <p className={styles.emptyStatus}>
+                    User not found
+                    <br />
+                    Try selecting available users
+                </p>
             </div>
         );
     }

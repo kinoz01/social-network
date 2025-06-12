@@ -1,5 +1,5 @@
 CREATE TABLE
-     notifications (
+    notifications (
         id TEXT PRIMARY KEY,
         type TEXT NOT NULL,
         content TEXT NOT NULL,

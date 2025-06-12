@@ -162,7 +162,7 @@
 }
 
 /* mobile */
-@media(max-width:970px) {
+@media(max-width:1100px) {
     .menu {
         overflow-x: auto;
         flex-direction: column;
