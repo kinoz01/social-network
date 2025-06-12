@@ -12,7 +12,7 @@ import (
 
 /*
 Route:  GET  /api/chat/messages
-Query:  peer_id  (the other user’s ID)
+Query:  peer_id  (the other user's ID)
 
 	limit    (optional, default 20)
 	offset   (optional, default 0)

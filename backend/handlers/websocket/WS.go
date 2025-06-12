@@ -92,7 +92,6 @@ type inbound struct {
 
 /*────────── Entry point (upgrade) ─────────*/
 // GlobalWS handles WebSocket upgrades and message routing.
-// Route: GET /api/ws
 func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	// 1) Authenticate
 	u, err := auth.GetUser(r)

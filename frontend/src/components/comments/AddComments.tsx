@@ -36,10 +36,6 @@ export const CommentForm = (props: FormParams) => {
       return
     }
 
-    formDAta.append('avatar', props.userData?.profile_pic || '')
-    formDAta.append('userID', props.userData?.id || '')
-    formDAta.append('firstName', props.userData?.first_name || '')
-    formDAta.append('lastName', props.userData?.last_name || '')
     formDAta.append('postID', props.postID)
     try {
       const res = await fetch(`${API_URL}/api/addcomment`,

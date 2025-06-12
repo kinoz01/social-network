@@ -16,11 +16,6 @@ import (
 )
 
 func CreatPosts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		helpers.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	user, err := auth.GetUser(r)
 	if err != nil {
 		helpers.JsonError(w, "unauthorized", http.StatusUnauthorized, err)

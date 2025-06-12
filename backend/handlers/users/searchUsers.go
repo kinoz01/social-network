@@ -12,14 +12,13 @@ import (
 )
 
 func SearchUsers(w http.ResponseWriter, r *http.Request) {
-	// 1) auth
 	me, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 
-	// 2) params
+	// params
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	if limit == 0 {
 		limit = 50

@@ -12,11 +12,7 @@ import (
 
 // Get user profile info (fn, ln and pic) to show in chat box.
 func GetDMProfile(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
+	
 	u, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "user not found", http.StatusUnauthorized, nil)

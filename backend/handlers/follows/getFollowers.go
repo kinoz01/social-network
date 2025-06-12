@@ -16,11 +16,7 @@ type Followers struct {
 }
 
 func GetFollowersHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
-		return
-	}
-
+	
 	userId := r.URL.Query().Get("id")
 	limitQuery := r.URL.Query().Get("limit")
 	pageQuery := r.URL.Query().Get("page")

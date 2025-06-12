@@ -13,10 +13,6 @@ import (
 )
 
 func HandleLike(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
 	_, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

@@ -15,11 +15,7 @@ import (
 )
 
 func AddComment(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		helpers.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-	_, err := auth.GetUser(r)
+	user, err := auth.GetUser(r)
 	if err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
@@ -28,11 +24,11 @@ func AddComment(w http.ResponseWriter, r *http.Request) {
 
 	comment.Content = r.FormValue("content")
 	comment.PostID = r.FormValue("postID")
-	comment.UserID = r.FormValue("userID")
-	comment.FirstName = r.FormValue("firstName")
-	comment.LastName = r.FormValue("lastName")
-	comment.Avatar = r.FormValue("avatar")
-
+	comment.UserID = user.ID
+	comment.FirstName = user.FirstName
+	comment.LastName = user.LastName
+	comment.Avatar = user.ProfilePic
+	
 	filename, err := helpers.HandleFileUpload(r, "posts/", "file")
 	if err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)

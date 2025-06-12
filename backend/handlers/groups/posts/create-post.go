@@ -15,16 +15,7 @@ import (
 )
 
 func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
-	user, err := auth.GetUser(r)
-	if err != nil {
-		help.JsonError(w, "unauth", http.StatusUnauthorized, err)
-		return
-	}
+	userId, _ := auth.GetUserId(r)
 
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		help.JsonError(w, "invalid form", http.StatusBadRequest, err)
@@ -41,7 +32,6 @@ func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 	// collapse ≥3 newlines to 2
 	re := regexp.MustCompile(`(\r\n|\r|\n){3,}`)
 	body = re.ReplaceAllString(body, "\n\n")
-
 
 	/* ─ optional image ─ */
 	var imgPath sql.NullString
@@ -63,7 +53,7 @@ func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 		INSERT INTO posts
 		  (post_id, user_id, group_id, body, img_post, visibility)
 		VALUES (?,?,?,?,?, 'public')`,
-		postID, user.ID, groupID, body, imgPath)
+		postID, userId, groupID, body, imgPath)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
 		return

@@ -21,31 +21,25 @@ Query parameters:
 	offset  (default 0)
 
 Returns 200 + []Person or 204 when no rows.
-A “person” is shown when:
+A "person" is shown when:
   - their account is PUBLIC   OR
   - viewer follows them       OR
   - they follow the viewer
 */
 func GetChatList(w http.ResponseWriter, r *http.Request) {
-	// ── 1) Authenticate viewer ──────────────────────────────────────────────────────
+	// Authenticate viewer 
 	u, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
 		return
 	}
 
-	// ── 2) Parse query params ─────────────────────────────────────────────────────
+	// Parse query params 
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 
-	// ── 3) Build base SQL & args slice ────────────────────────────────────────────
-	//
-	// We always filter out "self" (u.ID) and only show users who are either:
-	//   • public account, OR
-	//   • viewer follows them, OR
-	//   • they follow the viewer
-	//
+	// Build base SQL & args slice
 	base := `
 	  SELECT u.id,
 	         u.first_name,
@@ -81,14 +75,13 @@ func GetChatList(w http.ResponseWriter, r *http.Request) {
 	       )
 	     )
 	`
-	// args for the four “?” above:
-	//   1) check if viewer follows this user
-	//   2) check if this user follows viewer
-	//   3) exclude self
-	//   4) (duplicate of 1) for the second EXISTS
+	// args for the four '?' above:
+	// check if viewer follows this user
+	// check if this user follows viewer
+	// exclude self
 	args := []any{u.ID, u.ID, u.ID, u.ID, u.ID}
 
-	// ── 4) If q != "", append search clause ────────────────────────────────────────
+	// If q != "", append search clause 
 	if q != "" {
 		base += `
 	     AND (
@@ -102,14 +95,14 @@ func GetChatList(w http.ResponseWriter, r *http.Request) {
 		args = append(args, pattern, pattern, pattern, pattern)
 	}
 
-	// ── 5) Append ORDER BY + LIMIT/OFFSET ────────────────────────────────────────
+	// Append ORDER BY + LIMIT/OFFSET 
 	base += `
 	   ORDER BY u.first_name
 	   LIMIT ? OFFSET ?
 	`
 	args = append(args, limit, offset)
 
-	// ── 6) Execute query ───────────────────────────────────────────────────────────
+	// Execute query 
 	rows, err := tp.DB.Query(base, args...)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)

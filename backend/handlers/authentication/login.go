@@ -12,11 +12,6 @@ import (
 
 // Handle Log In functionality
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	var creds struct {
 		Login    string `json:"login"`
 		Password string `json:"password"`

@@ -10,11 +10,6 @@ import (
 )
 
 func SuggestionsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	userId, err := auth.GetUserId(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized.", http.StatusUnauthorized, err)

@@ -12,14 +12,10 @@ import (
 
 // GET /api/groups/chat?group_id=...&limit=20&offset=40
 func ChatPage(w http.ResponseWriter, r *http.Request) {
+	
 	gid := r.URL.Query().Get("group_id")
 	limS := r.URL.Query().Get("limit")
 	offS := r.URL.Query().Get("offset")
-
-	if gid == "" {
-		help.JsonError(w, "group_id required", 400, nil)
-		return
-	}
 
 	limit, _ := strconv.Atoi(limS)
 	offset, _ := strconv.Atoi(offS)

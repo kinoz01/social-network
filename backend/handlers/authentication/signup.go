@@ -26,11 +26,6 @@ const (
 
 // Signing up a new user.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	mr, err := r.MultipartReader()
 	if err != nil {
 		help.JsonError(w, "Invalid form submission", http.StatusBadRequest, err)

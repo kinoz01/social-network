@@ -18,11 +18,6 @@ type CheckUser struct {
 
 // Checks whether the user has a valid session.
 func CheckSession(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		helpers.JsonError(w, "Only GET method is allowed!", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 
 	user, err := GetUser(r)
@@ -109,11 +104,6 @@ func CreateSession(w http.ResponseWriter, user *tp.User) error {
 
 // API for fetching the logged-in user's information
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		helpers.JsonError(w, "Method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	user, err := GetUser(r)
 	if err != nil {
 		helpers.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

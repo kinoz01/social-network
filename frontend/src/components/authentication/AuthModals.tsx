@@ -158,25 +158,6 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                                 maxLength={400}
                                 onChange={handleInputChange}
                             />
-                        </>
-                    )}
-
-                    {isLogin ? (
-                        <>
-                            <label>Email <span>*</span></label>
-                            <input
-                                type="text"
-                                name="email"
-                                className="input-field"
-                                placeholder="Your Email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                maxLength={20}
-                                required
-                            />
-                        </>
-                    ) : (
-                        <>
                             <label>Username (optional)</label>
                             <input
                                 type="text"
@@ -187,19 +168,20 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                                 maxLength={16}
                                 onChange={handleInputChange}
                             />
-
-                            <label>Email <span>*</span></label>
-                            <input
-                                type="email"
-                                name="email"
-                                className="input-field"
-                                placeholder="Your Email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                            />
                         </>
                     )}
+
+                    <label>Email <span>*</span></label>
+                    <input
+                        type="email"
+                        name="email"
+                        className="input-field"
+                        placeholder="Your Email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        maxLength={30}
+                        required
+                    />
 
                     <label>Password <span>*</span></label>
                     <div className="password-container">

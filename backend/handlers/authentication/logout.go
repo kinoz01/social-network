@@ -9,11 +9,6 @@ import (
 
 // Handle log out functionality
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		hlp.JsonError(w, "Method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
 		hlp.JsonError(w, "No session token provided", http.StatusUnauthorized, err)

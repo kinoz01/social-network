@@ -12,10 +12,7 @@ import (
 
 // GET /api/profile?id=<user-uuid>
 func ProfileData(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
+	
 	uid, _ := auth.GetUserId(r)
 
 	userID := r.URL.Query().Get("id")

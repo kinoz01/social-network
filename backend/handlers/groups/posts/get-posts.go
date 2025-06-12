@@ -16,19 +16,11 @@ import (
 func GroupPosts(w http.ResponseWriter, r *http.Request) {
 	/* ---------- params ---------- */
 	groupID := r.URL.Query().Get("group_id")
-	if groupID == "" {
-		help.JsonError(w, "missing group_id", http.StatusBadRequest, nil)
-		return
-	}
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-	
+
 	/* ---------- viewer ---------- */
-	user, err := auth.GetUser(r)
-	if err != nil {
-		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
-		return
-	}
+	userId, _ := auth.GetUserId(r)
 
 	/* ---------- query ---------- */
 	rows, err := tp.DB.Query(`
@@ -56,7 +48,7 @@ func GroupPosts(w http.ResponseWriter, r *http.Request) {
 	      AND p.visibility = 'public'
 	    ORDER BY p.created_at DESC, p.ROWID DESC
 	    LIMIT ? OFFSET ?`,
-		user.ID, groupID, limit, offset)
+		userId, groupID, limit, offset)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
 		return

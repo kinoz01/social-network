@@ -11,11 +11,7 @@ import (
 )
 
 func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
-		return
-	}
-
+	
 	var followRequest tp.FollowRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&followRequest); err != nil {

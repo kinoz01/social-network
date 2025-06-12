@@ -40,13 +40,13 @@ func (rl *RateLimiter) Allow(clientIP string) bool {
 }
 
 // Middleware for rate limiting
-func (rl *RateLimiter) RateLimitMW(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (rl *RateLimiter) RateLimitMW(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		clientIP := r.RemoteAddr
 		if !rl.Allow(clientIP) {
 			helpers.JsonError(w, "Request could not be processed.", http.StatusServiceUnavailable, nil)
 			return
 		}
-		next.ServeHTTP(w, r)
-	})
+		next(w, r) //- next.ServeHTTP(w, r) Also works - this internally just call: next(w, r)
+	}
 }

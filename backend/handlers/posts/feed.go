@@ -12,11 +12,6 @@ import (
 )
 
 func AllPosts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		helpers.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	user, err := auth.GetUser(r)
 	if err != nil {
 		helpers.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

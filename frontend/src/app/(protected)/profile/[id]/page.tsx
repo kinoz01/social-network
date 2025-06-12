@@ -1,4 +1,3 @@
-import ProfileCard from "@/components/menus/ProfileCard";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 
 export default function ProfilePAge() {
