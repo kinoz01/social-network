@@ -13,7 +13,7 @@ function List({
   profileId,
   loggedUser,
 }: {
-  type: "friendRequests" | "followers" | "followings" | "suggestions" ;
+  type: "friendRequests" | "followers" | "followings" | "suggestions" | "chat";
   title: string;
   page?: "home" | "profile";
   profileId?: string;
@@ -42,7 +42,7 @@ function List({
         ) : null}
       </div>
       <div className={styles.users}>
-        {type === "followers" ? (
+        { type === "followers" ? (
           <FollowersList page={page} profileId={profileId} />
         ) : type === "followings" ? (
           <FollowingsList page={page} profileId={profileId} />

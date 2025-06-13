@@ -95,7 +95,7 @@ export default function Comment(props: Params) {
                     className={styles.item}
                     ref={index === postedComments.length - 1 ? lastCOmmentElementRef : null}
                   >
-                    <COmmentComponent comments={c} />
+                    <COmmentComponent comments={c} onClick={props.onClose}/>
                   </div>
                 ))}
 

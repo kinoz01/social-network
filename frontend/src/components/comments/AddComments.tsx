@@ -128,7 +128,7 @@ export const CommentForm = (props: FormParams) => {
   )
 }
 
-export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
+export const COmmentComponent = ({ comments, onClick }: { comments: CommentInfo, onClick: any }) => {
   const [liked, setLiked] = useState(comments.hasReact === "1");
   const [count, setCount] = useState(comments.likesCount ?? 0);
 
@@ -162,7 +162,7 @@ export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
       setLiked(comments.hasReact === "1");
       setCount(comments.likesCount ?? 0);
     }
-  };
+  };  
 
   return (
     <div className={styles.bubble}>
@@ -181,7 +181,7 @@ export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
             className={styles.avt}
           />
         </Link>
-        <Link href={`/profile/${comments.avatar}`} className={styles.nameLink}>
+        <Link href={`/profile/${comments.userID}`} className={styles.nameLink} onClick={onClick}>
           <span className={styles.name}>
             {comments.first_name} {comments.last_name}
           </span>

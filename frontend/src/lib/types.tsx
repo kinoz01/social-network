@@ -39,6 +39,7 @@ export interface Post {
     hasReact?: string;
     totalLikes: number;
     totalComments: number;
+    groupId?: string;
 }
 
 export interface NotificationModel {

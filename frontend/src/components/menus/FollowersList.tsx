@@ -17,6 +17,7 @@ function FollowersList({
   page?: "home" | "profile";
   profileId?: string;
 }) {
+  
   const limit = 5;
   const { user: loggedUser } = useUser();
 
@@ -37,7 +38,7 @@ function FollowersList({
   }, [profileId]);
 
 
-  const user: User | null = page === "profile" ? profileUser : loggedUser;
+  const user: User | null = profileId ? profileUser : loggedUser;
 
   const scrollTrigger = useRef<HTMLDivElement>(null);
   const [currentPage, setPage] = useState<number>(1);
@@ -50,7 +51,7 @@ function FollowersList({
 
 
   const loadMore = async () => {
-    if (isDataLoading || !hasMoreData || !user) {
+    if (isDataLoading || !hasMoreData) {
       return;
     }
 

@@ -11,7 +11,7 @@ import { useUser } from "@/context/UserContext";
 import Link from "next/link";
 import { API_URL } from "@/lib/api_url";
 
-export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({ post, type }) => {
+export const PostComponent: React.FC<{ post: Post; type?: any }> = ({ post, type }) => {
 
   const [showComments, setShowComments] = useState(false)
   const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
@@ -53,10 +53,7 @@ export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({ post, 
       : post.imag_post?? "";
 
   return (
-    <div
-      key={post.id}
-      className={type === "group" ? styles.postGroup : undefined}
-    >
+    <div key={post.id}>
       {/* HEADER */}
       <div className={styles.postHeader}>
         <Link

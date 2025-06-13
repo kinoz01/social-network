@@ -74,8 +74,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/groups/requests", mw.Gm(grpsRequest.ListJoinRequests))
 	mux.Handle("/api/groups/accept-request", rl.RateLimitMW(mw.PostMW(grpsRequest.AcceptJoinRequest)))
 	mux.Handle("/api/groups/refuse-request", rl.RateLimitMW(mw.PostMW(grpsRequest.RefuseJoinRequest)))
-	// Groups posts:
-	mux.Handle("/api/groups/posts", mw.GetMW(mw.Gm(grpsPost.GroupPosts)))
+	// Groups create post:
 	mux.Handle("/api/groups/create-post", rl.RateLimitMW(mw.Gm(mw.PostMW(grpsPost.CreateGroupPost))))
 	// Groups Rest Chat:
 	mux.Handle("/api/groups/chat", mw.GetMW(mw.Gm(grps.ChatPage)))

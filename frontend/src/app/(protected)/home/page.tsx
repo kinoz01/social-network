@@ -18,7 +18,7 @@ export default function Home() {
     return (
         <div className="mainContent home">
             <LeftMenu />
-            <Feed />
+            <Feed type="home" />
             <div className={`${style.menuLayout} ${style.menuLayoutRight}`}>
                 <UserSearchMenu />
                 <RightMenu />

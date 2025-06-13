@@ -1,18 +1,22 @@
 "use client";
+
 import styles from "./menus.module.css";
 import List from "./List";
-import { User } from "@/lib/types";
 import { useUser } from "@/context/UserContext";
+import { useParams } from "next/navigation";
 
-function RightMenu() {
-  const { user: loggedUser } = useUser();
-  
-  return (
-    <div className={styles.rightMenu}>
-      <List type="followings" title="Followings" loggedUser={loggedUser} />
-      <List type="followers" title="Followers" loggedUser={loggedUser} />
-    </div>
-  );
+export default function RightMenu({ page }: { page?: string }) {
+	const { user } = useUser();
+	const { id } = useParams() as { id: string | undefined };
+
+	if (!user) return null;
+
+	const profileId = page === "profile" ? id : user.id;
+
+	return (
+		<div className={styles.rightMenu}>
+			<List key={`followings-${profileId}`} type="followings" title="Followings" profileId={page === "profile" ? id : user.id} />
+			<List key={`followers-${profileId}`} type="followers" title="Followers" profileId={page === "profile" ? id : user.id} />
+		</div>
+	);
 }
-
-export default RightMenu;

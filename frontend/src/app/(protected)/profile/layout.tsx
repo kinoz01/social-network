@@ -4,16 +4,15 @@ import RightMenu from "@/components/menus/RightMenu";
 import UserSearchMenu from "@/components/menus/UsersSearch";
 import style from "@/components/chat/style/chat.module.css";
 
-export default function ProfileLayout({ children }: { children: ReactNode }) {
-
+export default async function ProfileLayout({ children, params }: { children: ReactNode, params: any }) {
     return (
         <div className="mainContent">
             <LeftMenu />
             {children}
             <div className={`${style.menuLayout} ${style.menuLayoutRight}`}>
                 <UserSearchMenu />
-                <RightMenu />
+                <RightMenu page="profile" />
             </div>
-        </div >
+        </div>
     );
 }

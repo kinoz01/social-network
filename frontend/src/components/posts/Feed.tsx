@@ -12,8 +12,9 @@ import Image from "next/image";
 import { Post } from "../../lib/types";
 import { useUser } from "@/context/UserContext";
 import { API_URL } from "@/lib/api_url";
+import PostInput from "./groupPostInput";
 
-export default function Feed() {
+export default function Feed({ type, id }: { type?: string, id?: string }) {
     const [showFOrm, setShowForm] = useState(false)
     const [postedContent, setPostedContent] = useState<Post[]>([])
     const [currentPage, setPage] = useState(0)
@@ -30,7 +31,7 @@ export default function Feed() {
 
         setLoading(true)
         try {
-            const oldPosts = await fetchOldPosts(currentPage)
+            const oldPosts = await fetchOldPosts(currentPage, type, id)
             if (!oldPosts || oldPosts.length === 0) {
                 sethasMore(false)
                 return
@@ -85,19 +86,23 @@ export default function Feed() {
     return (
         <>
             <div className={`${styles.feed}`}>
-                <div className={styles.toggleFOrm} onClick={toggleFOrm}>
-                    {<div className={styles.insideFOrm}>
-                        <Image
-                            src={user?.profile_pic ? `${API_URL}/api/storage/avatars/${user.profile_pic}` : "/img/default-avatar.png"}
-                            alt=""
-                            width={40}
-                            height={40}
-                            className={styles.userIcon}
-                        />
-                        What's on your mind, {user && user.first_name?.toUpperCase()} ??
-                    </div>}
-                </div>
+                {type === "home" && (
+                    <div className={styles.toggleFOrm} onClick={toggleFOrm}>
+                        {<div className={styles.insideFOrm}>
+                            <Image
+                                src={user?.profile_pic ? `${API_URL}/api/storage/avatars/${user.profile_pic}` : "/img/default-avatar.png"}
+                                alt=""
+                                width={40}
+                                height={40}
+                                className={styles.userIcon}
+                            />
+                            What's on your mind, {user && user.first_name?.toUpperCase()} ??
+                        </div>}
+                    </div>
+                )}
                 {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
+
+                {type === "group" && <PostInput groupId={id} onAdd={handleNewPOst} />}
 
                 {currentPage === 0 && postedContent.length === 0 ?
                     <div className={styles.status}>
@@ -108,7 +113,7 @@ export default function Feed() {
                     <>
                         {postedContent.map((post, index) => (
                             <div className={styles.post} key={post.id} ref={index === postedContent.length - 1 ? lastPostElementRef : null}>
-                                <PostComponent post={post} />
+                                <PostComponent post={post} type={type} />
                             </div>
                         )
                         )}
