@@ -98,6 +98,14 @@
   align-items: start;
 }
 
+.empty  {
+  font-family: 'Zain', sans-serif;
+  font-size: 1.5rem;
+  color: #242424;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
 .loading {
   text-align: center;
   padding: 20px;

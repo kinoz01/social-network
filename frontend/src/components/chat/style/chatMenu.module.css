@@ -88,8 +88,6 @@
 }
 
 .rightMenu{
-    border: none !important;
-    box-shadow: 0 2px 8px #00000040;
     margin-top: 0px;
     max-height: 50vh;
     margin-left: 10px;
@@ -101,13 +99,6 @@
 @media (max-width:1300px) {
     .rightMenu {
         display: none !important;
-    } 
- 
-}
-
-@media (min-width:1800px) {
-    .rightMenu {
-        width: 360px !important;
     } 
  
 }

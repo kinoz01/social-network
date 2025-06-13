@@ -37,7 +37,7 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		helpers.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
+		helpers.JsonError(w, err.Error(), http.StatusNotFound, nil)
 		return
 	}
 

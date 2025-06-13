@@ -50,9 +50,7 @@ export const PostComponent: React.FC<{ post: Post; type?: any }> = ({ post, type
   const imgName =
     typeof post.imag_post === "string"
       ? post.imag_post
-      : post.imag_post ?? "";
-      console.log("----------------------", type);
-      
+      : post.imag_post ?? ""; 
 
   return (
     <div key={post.id}>

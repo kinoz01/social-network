@@ -11,7 +11,6 @@ function LeftMenu({ className = "" }: {className?: string}) {
   return (
     <div className={`${styles.leftMenu} ${className}`}>
         <>
-          <ProfileCard /> 
           <FriendRequestList />
           <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
         </>

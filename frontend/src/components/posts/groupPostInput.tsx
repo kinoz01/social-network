@@ -12,7 +12,7 @@ import { API_URL } from "@/lib/api_url";
 
 
 /* ─────────────────────  POST INPUT ───────────────────── */
-export default function PostInput({
+export default function GroupPostInput({
     groupId,
     onAdd,
 }: {

@@ -251,7 +251,7 @@ export default function DirectChatBox() {
     if (!peerName) {
         return (
             <div className={styles.emptyBox}>
-                <Image src="/img/empty.svg" alt="User not found" width={150} height={150} />
+                <Image src="/img/empty.svg" alt="User not found" width={250} height={250} />
                 <p className={styles.emptyStatus}>
                     User not found
                     <br />

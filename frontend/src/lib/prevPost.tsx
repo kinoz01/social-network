@@ -5,9 +5,9 @@ import { API_URL } from "@/lib/api_url";
 export const fetchOldPosts = async (pageNum: number, type?: string, id?: string) => {
     const url =
         type === "profile" ? `${API_URL}/api/allPosts?pageNum=${pageNum}&profileId=${id}`
-        : type === "group" ? `${API_URL}/api/allPosts?pageNum=${pageNum}&groupId=${id}`
-        : `${API_URL}/api/allPosts?pageNum=${pageNum}`;
-        
+            : type === "group" ? `${API_URL}/api/allPosts?pageNum=${pageNum}&groupId=${id}`
+                : `${API_URL}/api/allPosts?pageNum=${pageNum}`;
+
     try {
         const res = await fetch(url,
             {
@@ -16,7 +16,7 @@ export const fetchOldPosts = async (pageNum: number, type?: string, id?: string)
                 credentials: 'include'
             })
         if (!res.ok) {
-            throw new Error((await res.json()).msg || "failed to fetch posts")
+            throw Object.assign(new Error(await res.text()), { status: res.status });
         }
         const posts: Post[] = await res.json()
         return posts

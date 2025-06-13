@@ -189,7 +189,7 @@ export default function Events() {
                 <Loading />
             ) : !events || events.length === 0 ? (
                 <div className={styles.empty}>
-                    <img src="/img/empty.svg" alt="empty" width={160} height={160} />
+                    <img src="/img/empty.svg" alt="empty" width={180} height={180} />
                     <p>No events available</p>
                 </div>
             ) : (

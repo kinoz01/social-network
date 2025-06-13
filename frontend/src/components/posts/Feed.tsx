@@ -12,7 +12,8 @@ import Image from "next/image";
 import { Post } from "../../lib/types";
 import { useUser } from "@/context/UserContext";
 import { API_URL } from "@/lib/api_url";
-import PostInput from "./groupPostInput";
+import GroupPostInput from "./groupPostInput";
+import Loading from "../Loading";
 
 export default function Feed({ type, id }: { type?: string, id?: string }) {
     const [showFOrm, setShowForm] = useState(false)
@@ -20,6 +21,8 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
     const [currentPage, setPage] = useState(0)
     const [isLoading, setLoading] = useState(false)
     const [hasMOre, sethasMore] = useState(true)
+    const [profileNotFound, setProfileNotFound] = useState(false);
+
     const observer = useRef<IntersectionObserver | null>(null)
     const requestedPages = useRef<Set<number>>(new Set())
 
@@ -49,7 +52,13 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
             setPostedContent((prev) => [...prev, ...uniquePosts])
         } catch (err) {
-            console.error("error in loading posts", err)
+            const status = (err as { status?: number }).status;
+            if (status === 404) {
+              setProfileNotFound(true);
+              sethasMore(false);
+            } else {
+                console.error("error in loading posts", err);
+            }
         } finally {
             setLoading(false)
         }
@@ -102,12 +111,12 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 )}
                 {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
 
-                {type === "group" && <PostInput groupId={id} onAdd={handleNewPOst} />}
+                {type === "group" && <GroupPostInput groupId={id} onAdd={handleNewPOst} />}
 
-                {currentPage === 0 && postedContent.length === 0 ?
+                {currentPage === 0 && postedContent.length === 0 && !isLoading ?
                     <div className={styles.status}>
-                        <p>EMPTY FEED.</p>
-                        <Image src="/img/empty.svg" alt="" width={200} height={200} />
+                        <Image src="/img/empty.svg" alt="" width={250} height={250} />
+                        <p className={styles.empty}>{profileNotFound && type == "profile" ? "User Not Found" : "Empty Feed"}</p>
                     </div>
                     :
                     <>
@@ -119,10 +128,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                         )}
 
                         {isLoading && (
-                            <div className={styles.loadingIndicator}>
-                                <div className={styles.loading}></div>
-                                Loading more posts...
-                            </div>
+                            <Loading />
                         )}
 
                         {!hasMOre && !isLoading && (
