@@ -22,7 +22,7 @@ func FilesHandler(w http.ResponseWriter, r *http.Request) {
 	filePath := "./" + strings.TrimLeft(r.URL.Path, "/api")
 
 	info, err := os.Stat(filePath)
-	if info.IsDir() || err != nil {
+	if err != nil || (info != nil && info.IsDir()) {
 		JsonError(w, http.StatusText(http.StatusForbidden), http.StatusForbidden, nil)
 		return
 	}

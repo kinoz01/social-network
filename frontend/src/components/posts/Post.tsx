@@ -50,7 +50,9 @@ export const PostComponent: React.FC<{ post: Post; type?: any }> = ({ post, type
   const imgName =
     typeof post.imag_post === "string"
       ? post.imag_post
-      : post.imag_post?? "";
+      : post.imag_post ?? "";
+      console.log("----------------------", type);
+      
 
   return (
     <div key={post.id}>
@@ -92,7 +94,7 @@ export const PostComponent: React.FC<{ post: Post; type?: any }> = ({ post, type
         {imgName && (
           <img
             className={styles.postImage}
-            src={`${API_URL}/api/storage/${type === "group" ? "groups_posts" : "posts"}/${imgName}`}
+            src={`${API_URL}/api/storage/${type === "group" ? "groups_posts" : post.groupID ? "groups_posts" : "posts"}/${imgName}`}
             alt={`${post.firstName} post`}
             width={450}
             height={450}
