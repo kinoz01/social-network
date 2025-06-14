@@ -12,7 +12,6 @@ import (
 
 // GET /api/profile?id=<user-uuid>
 func ProfileData(w http.ResponseWriter, r *http.Request) {
-	
 	uid, _ := auth.GetUserId(r)
 
 	userID := r.URL.Query().Get("id")
@@ -55,27 +54,41 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if requester follows profile or profile follows requester
-	var isFollowingOrFollowed bool
+	// Check if requester follows profile
+	var isFollowing bool
 	checkFollow := `
 	SELECT EXISTS (
 		SELECT 1 FROM follow_requests
 		WHERE (
-			(follower_id = ? AND followed_id = ?)
-			OR
-			(follower_id = ? AND followed_id = ?)
+			follower_id = ? AND followed_id = ?
 		)
 		AND status = 'accepted'
 	);`
-	err = tp.DB.QueryRow(checkFollow, uid, out.ID, out.ID, uid).Scan(&isFollowingOrFollowed)
+	err = tp.DB.QueryRow(checkFollow, uid, out.ID).Scan(&isFollowing)
 	if err != nil {
 		help.JsonError(w, "follow check failed", http.StatusInternalServerError, err)
 		return
 	}
 
 	// Privacy logic
-	if out.AccountType == "private" && uid != out.ID && !isFollowingOrFollowed {
-		w.WriteHeader(http.StatusNoContent)
+	if out.AccountType == "private" && uid != out.ID && !isFollowing {
+		// send a trimmed-down payload
+		type partial struct {
+			ID         string `json:"id"`
+			FirstName  string `json:"first_name"`
+			LastName   string `json:"last_name"`
+			ProfilePic string `json:"profile_pic"`
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusPartialContent)
+
+		_ = json.NewEncoder(w).Encode(partial{
+			ID:         out.ID,
+			FirstName:  out.FirstName,
+			LastName:   out.LastName,
+			ProfilePic: out.ProfilePic,
+		})
 		return
 	}
 

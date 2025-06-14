@@ -20,7 +20,7 @@ const (
 	maxNameSize     = 16
 	maxPasswordSize = 30
 	maxPicSize      = 2 << 20 // 2 MB for profile pic
-	maxAboutMeSize  = 400
+	maxAboutMeSize  = 120
 	maxDateSize     = 15
 )
 

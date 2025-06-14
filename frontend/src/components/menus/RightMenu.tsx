@@ -14,7 +14,7 @@ export default function RightMenu({ page }: { page?: string }) {
 
 	return (
 		<div className={styles.rightMenu}>
-			<ProfileCard /> 
+			{page !== "profile" && <ProfileCard />}
 			<List type="followings" title="Followings" profileId={page === "profile" ? id : user.id} />
 			<List type="followers" title="Followers" profileId={page === "profile" ? id : user.id} />
 		</div>

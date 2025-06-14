@@ -14,7 +14,9 @@ import { useUser } from "@/context/UserContext";
 import { API_URL } from "@/lib/api_url";
 import GroupPostInput from "./groupPostInput";
 import Loading from "../Loading";
+import ProfileHeader from "../profile/ProfileHeader";
 
+// id is the profile id or group id
 export default function Feed({ type, id }: { type?: string, id?: string }) {
     const [showFOrm, setShowForm] = useState(false)
     const [postedContent, setPostedContent] = useState<Post[]>([])
@@ -96,6 +98,8 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
         setShowForm(!showFOrm)
     }
 
+    const showProfileHeader = type === "profile" && !(isLoading && currentPage === 0) && !profileNotFound;
+
     return (
         <>
             <div className={`${styles.feed}`}>
@@ -115,11 +119,13 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 )}
                 {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
 
+                {showProfileHeader &&  <ProfileHeader profileId={id} />}
+
                 {type === "group" && <GroupPostInput groupId={id} onAdd={handleNewPOst} />}
 
                 {currentPage === 0 && postedContent.length === 0 && !isLoading ?
                     <div className={styles.status}>
-                        <Image src={`/img/${ privateProfile && type === "profile" ? "lock.svg": "empty.svg"}`} alt="" width={200} height={200} />
+                        {type !== "profile" && <Image src={`/img/empty.svg"}`} alt="" width={200} height={200} />}
                         <p className={styles.empty}>{profileNotFound && type === "profile" ? "User Not Found"
                                                         : privateProfile  && type === "profile" ? "This Profile Is Private"
                                                         : "Empty Feed"}</p>

@@ -1,0 +1,212 @@
+/* ---------- wrapper ---------- */
+.header {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  isolation: isolate;
+  margin-bottom: 330px;
+}
+
+/* ---------- cover ----------- */
+.cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 32px 32px 10px 10px;
+  top: 30px;
+}
+
+.coverImg {
+  object-fit: cover;
+  display: block;
+  border: none;
+}
+
+.cover::after {
+  /* gradient overlay */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #ff4e9a90, #ff695e90);
+  mix-blend-mode: overlay;
+}
+
+/* ---------- chat button ------ */
+.msgBtn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem .9rem;
+  font: 400 1.1rem "Zain", sans-serif;
+  color: #0e0e0e;
+  background: rgba(255, 255, 255, .15);
+  border: none;
+  border-radius: 24px;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: background .2s;
+  z-index: 100;
+  font-family: 'Zain';
+
+}
+
+.msgBtn:hover {
+  background: rgba(255, 255, 255, .25);
+}
+
+.msgText {
+  display: none;
+}
+
+@media (min-width:600px) {
+  .msgText {
+    display: inline;
+    margin-top: 5px;
+  }
+}
+
+/* ---------- profile card ----- */
+.card {
+  position: relative;
+  left: 50%;
+  top: 160px;
+  translate: -50% 0;
+  width: min(640px, 90%);
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 100px 2rem 1.7rem;
+  box-shadow: 0 4px 4px 1px rgba(0, 0, 0, .15);
+  text-align: center;
+  border: none;
+}
+
+/* avatar bubble */
+.avatarWrap {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  translate: -50% 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, .2);
+}
+
+.avatar {
+  object-fit: cover;
+  border: none;
+  background-color: #f2f2f2b2;
+}
+
+.name {
+  font: 600 1.5rem "Zain", sans-serif;
+  margin: .5rem 0 0;
+  margin-top: -20px;
+  color: #141414;
+}
+
+.about {
+  color: #6d747c;
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+  margin-bottom: 10px;
+  font-family: 'Zain';
+}
+
+/* ---------- stats row -------- */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+/* clickable items keep exact same look */
+.statLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.statLink:hover strong,
+.statLink:hover span {
+  color: rgb(0, 0, 0);
+}
+
+.stats li {
+  text-align: center;
+}
+
+.stats strong {
+  display: block;
+  font-size: 1.25rem;
+  color: #292929;
+}
+
+.stats span {
+  font-size: .75rem;
+  color: #868e96;
+  text-transform: uppercase;
+}
+
+/* ---------- CTA -------------- */
+.cta {
+  padding: .75rem 2.5rem;
+  background: linear-gradient(135deg, #141414, #202020);
+  border: none;
+  border-radius: 24px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter .2s;
+}
+
+.cta:hover {
+  filter: brightness(1.1);
+}
+
+.username {
+  font-size: 1rem;
+  font-family: 'Zain';
+  color: #141414;
+  margin-bottom: 10px;
+}
+
+.contact {
+  list-style: none;
+  margin: 0 0 1.3rem;
+  padding: 0;
+  font-family: 'Zain';
+}
+
+.contact li {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .9375rem;
+  color: #495057;
+  line-height: 1.4;
+  justify-content: center;
+}
+
+.contactIcon {
+  flex-shrink: 0;
+  color: #868e96;
+}
+
+.empty  {
+  font-family: 'Zain', sans-serif;
+  color: #242424;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.empty p {
+  margin-bottom: 30px;
+}

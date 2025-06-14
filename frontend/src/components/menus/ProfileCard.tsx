@@ -24,7 +24,7 @@ export default function ProfileCard() {
 	const { user } = useUser();
 	const [stats, setStats] = useState<Counters | null>(null);
 
-	// fetch counts when the logged-in user becomes available 
+	// fetch profile when the logged-in user becomes available 
 	useEffect(() => {
 		if (!user) return;
 

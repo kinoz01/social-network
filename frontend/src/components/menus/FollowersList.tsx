@@ -21,7 +21,6 @@ type Props = {
 export default function FollowersList({ profileId, modal = false, onClose }: Props) {
 	const { user: loggedUser } = useUser();
 
-	const [profileUser, setProfileUser] = useState<User | null>(null);
 	const [loadingProfile, setLoadingProfile] = useState(false);
 	const [privateProfile, setPrivateProfile] = useState(false)
 
@@ -31,14 +30,11 @@ export default function FollowersList({ profileId, modal = false, onClose }: Pro
 			if (!profileId) return;
 			setLoadingProfile(true);
 			const info = await getProfileInfo(profileId);
-			if (!cancelled) setProfileUser(info);
 			setLoadingProfile(false);
 		};
 		run();
 		return () => { cancelled = true; };
 	}, [profileId]);
-
-	const viewedUser = profileId ? profileUser : loggedUser;
 
 	/* Paging state */
 	const [list, setList] = useState<User[]>([]);
@@ -51,14 +47,14 @@ export default function FollowersList({ profileId, modal = false, onClose }: Pro
 		setList([]);
 		setPage(1);
 		setMore(true);
-	}, [viewedUser?.id]);
+	}, [profileId]);
 
 	/* Fetch one page */
 	const fetchPage = useCallback(async (p: number) => {
-		if (!viewedUser?.id) return;
+		if (!profileId) return;
 		setLoad(true);
 		try {
-			const res: FollowShip | null = await getFollowShip("follower", viewedUser.id, LIMIT, p);
+			const res: FollowShip | null = await getFollowShip("follower", profileId, LIMIT, p);
 			if (!res || !res.followList) {
 				setMore(false);
 				setLoad(false);
@@ -83,12 +79,12 @@ export default function FollowersList({ profileId, modal = false, onClose }: Pro
 		} finally {
 			setLoad(false);
 		}
-	}, [viewedUser?.id]);
+	}, [profileId]);
 
 	/* Initial page */
 	useEffect(() => {
-		if (viewedUser?.id) fetchPage(1);
-	}, [viewedUser?.id, fetchPage]);
+		if (profileId) fetchPage(1);
+	}, [profileId, fetchPage]);
 
 	/* Infinite scroll */
 	const boxRef = useRef<HTMLDivElement>(null);

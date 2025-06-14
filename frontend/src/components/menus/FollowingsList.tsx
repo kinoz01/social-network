@@ -25,7 +25,6 @@ export default function FollowingsList({
 }: Props) {
 	const { user: loggedUser } = useUser();
 
-	const [profileUser, setProfileUser] = useState<User | null>(null);
 	const [loadingProfile, setLoadingProfile] = useState(false);
 	const [privateProfile, setPrivateProfile] = useState(false);
 
@@ -35,18 +34,12 @@ export default function FollowingsList({
 			if (!profileId) return;
 			setLoadingProfile(true);
 			const info = await getProfileInfo(profileId);
-			if (!cancelled) setProfileUser(info);
 			setLoadingProfile(false);
 		};
 		run();
-		return () => {
-			cancelled = true;
-		};
+		return () => { cancelled = true; };
 	}, [profileId]);
-
-	const viewedUser = profileId ? profileUser : loggedUser;
-
-	/* Paging state */
+	
 	const [list, setList] = useState<User[]>([]);
 	const [page, setPage] = useState(1);
 	const [hasMore, setMore] = useState(true);
@@ -58,15 +51,16 @@ export default function FollowingsList({
 		setPage(1);
 		setMore(true);
 		setPrivateProfile(false);
-	}, [viewedUser?.id]);
+	}, [profileId]);
 
 	/* Fetch one page */
 	const fetchPage = useCallback(
+		
 		async (p: number) => {
-			if (!viewedUser?.id) return;
+			if (!profileId) return;
 			setLoad(true);
 			try {
-				const res: FollowShip | null = await getFollowShip("following", viewedUser.id, LIMIT, p);
+				const res: FollowShip | null = await getFollowShip("following", profileId, LIMIT, p);
 				if (!res || !res.followList) {
 					setMore(false);
 					return;
@@ -80,7 +74,7 @@ export default function FollowingsList({
 				setPage(p + 1);
 			} catch (err) {
 				const { status } = err as { status?: number };
-				if (status === 206) {                 // NEW
+				if (status === 206) {
 					setPrivateProfile(true);
 					setMore(false);
 				} else {
@@ -90,13 +84,13 @@ export default function FollowingsList({
 				setLoad(false);
 			}
 		},
-		[viewedUser?.id],
+		[profileId],
 	);
 
 	/* Initial page */
 	useEffect(() => {
-		if (viewedUser?.id) fetchPage(1);
-	}, [viewedUser?.id, fetchPage]);
+		if (profileId) fetchPage(1);
+	}, [profileId, fetchPage]);
 
 	/* Infinite scroll */
 	const boxRef = useRef<HTMLDivElement>(null);

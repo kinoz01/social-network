@@ -11,13 +11,11 @@ import (
 	tp "social-network/handlers/types"
 )
 
-
 type FollowsResponse struct {
-	FollowList  []tp.User `json:"followList"`
+	FollowList []tp.User `json:"followList"`
 	TotalCount int       `json:"totalCount"`
 	TotalPages int       `json:"totalPages"`
 }
-
 
 func GetFollowsHandler(w http.ResponseWriter, r *http.Request) {
 	viewerId, err := auth.GetUserId(r)
@@ -47,19 +45,22 @@ func GetFollowsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if accountType == "private" && profileId != viewerId {
-		var ok bool
-		_ = tp.DB.QueryRow(
-			`SELECT EXISTS (
-			     SELECT 1
-			       FROM follow_requests
-			      WHERE follower_id = ?
-			        AND followed_id = ?
-			        AND status = 'accepted'
-			 )`, viewerId, profileId).
-			Scan(&ok)
-
-		if !ok {
-			help.JsonError(w, "private profile", http.StatusPartialContent, nil)
+		var isFollowing bool
+		checkFollow := `
+			SELECT EXISTS (
+				SELECT 1 FROM follow_requests
+				WHERE (
+					follower_id = ? AND followed_id = ?
+				)
+				AND status = 'accepted'
+			);`
+		err = tp.DB.QueryRow(checkFollow, viewerId, profileId).Scan(&isFollowing)
+		if err != nil {
+			help.JsonError(w, "follow check failed", http.StatusInternalServerError, err)
+			return
+		}
+		if !isFollowing {
+			help.JsonError(w, "private profile", http.StatusPartialContent, err)
 			return
 		}
 	}
@@ -73,7 +74,6 @@ func GetFollowsHandler(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewEncoder(w).Encode(resp)
 }
-
 
 func getFollows(profileId, kind, limitQ, pageQ string) (*FollowsResponse, error) {
 	/* ── pagination numbers ── */

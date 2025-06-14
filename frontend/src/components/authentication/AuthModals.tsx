@@ -155,7 +155,7 @@ export default function AuthModal({ authSuccess }: AuthModalProps) {
                                 className="input-field about-me"
                                 placeholder="A short bio"
                                 value={formData.aboutMe}
-                                maxLength={400}
+                                maxLength={120}
                                 onChange={handleInputChange}
                             />
                             <label>Username (optional)</label>

@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { redirect, useParams } from "next/navigation";
 import { useWS, ChatMsg } from "@/context/wsClient";
 import Loading from "@/components/Loading";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import styles from "./style/chat.module.css";
 import { API_URL } from "@/lib/api_url";
 import Link from "next/link";
 import { throttle } from "../../lib/utils";
+import { useUser } from "@/context/UserContext";
 
 export const EMOJIS = [
     "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍", "😘", "😗", "😙", "😚", "🙂", "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮", "🤐", "😯", "😪", "😫", "🥱",
@@ -22,6 +23,9 @@ export const EMOJIS = [
 
 export default function DirectChatBox() {
     const { id: peerId } = useParams() as { id: string };
+    const { user } = useUser();
+    if (peerId == user?.id) redirect("/chat");
+    
     const { meId, online, subscribeDM, sendDM, onNewDM, markChatRead } = useWS();
 
     /* ─── 1. Peer profile ─── */
@@ -50,7 +54,7 @@ export default function DirectChatBox() {
 
     /* ─── 5. Jump button ─── */
     const [showJump, setJump] = useState(false);
-
+    
     const PAGE = 20;
 
     /* ────────────────────────────────────────────────────────────
