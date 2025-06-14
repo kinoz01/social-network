@@ -11,7 +11,16 @@ import { useUser } from "@/context/UserContext";
 import { createPortal } from "react-dom";
 
 //to-do
+//good front-end
+//responcive
+//nameforfuncs
+//read react
+//read code and how it work 
+//read about what u use
+//get followers
+//click sur followers / Following
 
+ 
 
 function UserProfile({ userId }: any) {
 
@@ -95,7 +104,7 @@ function UserProfile({ userId }: any) {
 
   if (!userData) return <p>no user found</p>
   return <>
-    <div className={styles.profileHeader}>
+    <div className={styles.container}>
       <div className={styles.userInfo}>
         <div className={styles.image_btn}>
           <Image
@@ -105,8 +114,6 @@ function UserProfile({ userId }: any) {
             IsUserLoged() && (
               <button className={`${styles.accountStatus}`} onClick={ChangeStatu} > account staut </button>
             )
-
-
           }
         </div>
 
@@ -129,7 +136,7 @@ function UserProfile({ userId }: any) {
             </div>
           </div>
           <div className={styles.more_data}>
-            <span></span>
+            {/* <span></span> */}
             <span>{userData.first_name} {userData.last_name}</span>
             <span>{userData.about_me}</span>
             <span>{userData.birthday}</span>

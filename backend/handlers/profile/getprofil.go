@@ -59,7 +59,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
-
 	IsFriend, err := IsFollower(w, useid, userid.UserId)
 	if err != nil {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
@@ -70,9 +69,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
-
-	if IsFriend  ||  useid== userid.UserId  || IsPublicAccount{
-
+	if IsFriend  ||  useid == userid.UserId  || (useid != userid.UserId && IsPublicAccount ){
 	postsQuery := `SELECT
     posts.group_id,
     posts.body,
@@ -107,15 +104,17 @@ WHERE
 ORDER BY
     posts.created_at DESC;
 `
+	
 
-	rows, err := tp.DB.Query(postsQuery, useid)
-	if err != nil {
-		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
-		return
-	}
-	defer rows.Close()
+rows, err := tp.DB.Query(postsQuery, useid)
 
-	for rows.Next() {
+if err != nil {
+	Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+	return
+}
+defer rows.Close()
+
+    for rows.Next() {
 		var post tp.PostData
 		err := rows.Scan(
 			&post.GroupID,
@@ -131,6 +130,7 @@ ORDER BY
 			&post.TotalLIKes,
 			&post.TotalComments,
 		)
+		
 		if err != nil {
 			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
@@ -148,7 +148,7 @@ ORDER BY
 		}
 		userdata.Posts = append(userdata.Posts, post)
 	}
-	fmt.Println("posr======", userdata.Posts[0].HasReact)
+
 	if err = rows.Err(); err != nil {
 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return
@@ -157,7 +157,9 @@ ORDER BY
 	}
 
 	userdata.PostNbr = len(userdata.Posts)
+
+	fmt.Println("userdata===================>",userdata)
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata)
 }
-
