@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	pType "social-network/handlers/types"
+	"github.com/gofrs/uuid"
 )
 
 func CreatePostDB(newPost pType.Post) error {
@@ -35,15 +36,16 @@ func CreatePostDB(newPost pType.Post) error {
 }
 
 func PostPrivacyDB(postID string, userID string) error {
-	query := `INSERT INTO post_privacy (post_id, allowed_users) VALUES
-				(?, ?)`
+	const query = `INSERT INTO post_privacy (id, post_id, allowed_users)
+           VALUES (?, ?, ?)`
+
 	stat, err := pType.DB.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("failed to preparing statement %w", err)
 	}
 	defer stat.Close()
 
-	_, err = stat.Exec(postID, userID)
+	_, err = stat.Exec(uuid.Must(uuid.NewV4()), postID, userID)
 	if err != nil {
 		return fmt.Errorf("failed to insert privacy of post %w", err)
 	}
@@ -130,6 +132,13 @@ func GetGroupPOsts(offset int, userID, groupID string) ([]pType.PostData, error)
 }
 
 func GetProfilePosts(offset int, userID, profileID string) ([]pType.PostData, error) {
+	var exists bool
+	if err := pType.DB.QueryRow(`SELECT EXISTS (SELECT 1 FROM users WHERE id = ?)`, profileID).Scan(&exists); err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, fmt.Errorf("profile not found")
+	}
 	// self-view: everything
 	if userID == profileID {
 		rows, err := pType.DB.Query(`
@@ -145,7 +154,7 @@ func GetProfilePosts(offset int, userID, profileID string) ([]pType.PostData, er
 			JOIN users u ON u.id = p.user_id
 			LEFT JOIN like_reaction lr
 			       ON lr.post_id = p.post_id AND lr.user_id = ?
-			WHERE p.user_id = ?
+			WHERE p.user_id = ? AND p.group_id IS NULL
 			ORDER BY p.created_at DESC, p.ROWID DESC
 			LIMIT 20 OFFSET ?;`, userID, profileID, offset)
 		if err != nil {
@@ -161,34 +170,24 @@ func GetProfilePosts(offset int, userID, profileID string) ([]pType.PostData, er
 		Scan(&accountType); err != nil {
 		return nil, err
 	}
-
-	var related bool
+	var followed bool
 	_ = pType.DB.QueryRow(`
-		SELECT EXISTS(
-		  SELECT 1 FROM follow_requests
-		   WHERE status='accepted'
-		     AND ((follower_id=? AND followed_id=?)
-		       OR (follower_id=? AND followed_id=?))
-		);`, userID, profileID, profileID, userID).Scan(&related)
+    	SELECT EXISTS (
+    	  SELECT 1
+    	    FROM follow_requests
+    	   WHERE status = 'accepted'
+    	     AND follower_id = ? 
+    	     AND followed_id = ? 
+    	);`, userID, profileID).Scan(&followed)
 
-	if !related && accountType == "private" {
-		return nil, fmt.Errorf("no content")
+	if !followed && accountType == "private" {
+		return nil, fmt.Errorf("private profile")
 	}
 
-	// groups shared
-	var shareGroup bool
-	_ = pType.DB.QueryRow(`
-		SELECT EXISTS(
-		  SELECT 1
-		    FROM group_users a
-		    JOIN group_users b ON a.group_id = b.group_id
-		   WHERE a.users_id = ? AND b.users_id = ?
-		);`, userID, profileID).Scan(&shareGroup)
-
 	visCond := "p.visibility='public'"
-	args := []any{userID, userID, profileID}
+	args := []any{userID, profileID}
 
-	if related {
+	if followed {
 		visCond = `
 			(p.visibility IN ('public','almost-private')
   			OR (
@@ -199,23 +198,6 @@ func GetProfilePosts(offset int, userID, profileID string) ([]pType.PostData, er
     		        AND allowed_users = ?)
   			))`
 		args = append(args, userID)
-	}
-
-	groupCond := ""
-	if shareGroup {
-		groupCond = `
-			OR (
-			    p.group_id IS NOT NULL
-			AND EXISTS (
-			    SELECT 1
-			        FROM group_users g1
-			        JOIN group_users g2 ON g1.group_id = g2.group_id
-			    WHERE g1.users_id = ?
-			        AND g2.users_id = ?
-			        AND g1.group_id = p.group_id
-			    )
-			)`
-		args = append(args, userID, profileID)
 	}
 
 	// final query
@@ -232,11 +214,11 @@ func GetProfilePosts(offset int, userID, profileID string) ([]pType.PostData, er
 		JOIN users u ON u.id = p.user_id
 		LEFT JOIN like_reaction lr
 		    ON lr.post_id = p.post_id AND lr.user_id = ?
-		WHERE p.user_id = ?
-		  	AND (%s%s )  
+		WHERE p.user_id = ? AND p.group_id IS NULL 
+		  	AND (%s)  
 		ORDER BY p.created_at DESC, p.ROWID DESC
 		LIMIT 20 OFFSET %d;`,
-		visCond, groupCond, offset)
+		visCond, offset)
 
 	rows, err := pType.DB.Query(query, args...)
 	if err != nil {
@@ -282,6 +264,5 @@ func scanPosts(rows *sql.Rows) ([]pType.PostData, error) {
 
 		posts = append(posts, p)
 	}
-
 	return posts, rows.Err()
 }

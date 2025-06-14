@@ -68,17 +68,12 @@ export interface NotifcationResponse {
     totalPages: number;
 }
 
-export interface Followers {
-    followers: User[];
+export interface FollowShip {
+    followList: User[];
     totalCount: number;
     totalPages: number;
 }
 
-export interface Followings {
-    followings: User[];
-    totalCount: number;
-    totalPages: number;
-}
 
 export interface FriendRequest {
     requests: User[];

@@ -7,7 +7,7 @@ import style from "@/components/chat/style/chat.module.css";
 export default async function ProfileLayout({ children }: { children: ReactNode}) {
     return (
         <div className="mainContent">
-            <div className={`${style.menuLayout} ${style.menuLayoutRight}`}>
+            <div className={`${style.menuLayout} ${style.menuLayoutLeft}`}>
                 <UserSearchMenu />
                 <LeftMenu />
             </div>

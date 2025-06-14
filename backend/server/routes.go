@@ -102,8 +102,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/suggestions", mw.GetMW(flw.SuggestionsHandler))
 	// mux.Handle("/api/followers/isfollowed", flw.IsFollwedHandler)
 	mux.Handle("/api/followers/requests", mw.GetMW(flw.GetFollowingRequestsHandler))
-	mux.Handle("/api/followers", mw.GetMW(flw.GetFollowersHandler))
-	mux.Handle("/api/followings", mw.GetMW(flw.GetFollowingsHandler))
+	mux.Handle("/api/getfollows", mw.GetMW(flw.GetFollowsHandler))
 	mux.Handle("/api/followers/add", rl.RateLimitMW(mw.PostMW(flw.AddFollowRequest)))
 	// search followers
 	mux.Handle("/api/followers/search", mw.GetMW(flw.SearchFollowers))

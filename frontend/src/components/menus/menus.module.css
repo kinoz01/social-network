@@ -5,13 +5,12 @@
   justify-content: space-between;
   scrollbar-width: none;
   font-size: clamp(1rem, 1.2rem, 1.3rem);
-  padding: 0 .6rem;
   padding-bottom: 20px;
   flex-direction: column;
-  max-width: 325px;
+  max-width: 300px;
 }
 
-.rightMenu  {
+.rightMenu {
   overflow-y: scroll;
 }
 
@@ -65,25 +64,26 @@
   color: var(--color6);
   transition: all 0.2s ease-in-out;
   font-family: 'Zain';
+  cursor: pointer;
 }
 
 .link:hover {
   border-bottom: 1px solid black;
 }
 
+.empty  {
+  font-family: 'Zain', sans-serif;
+  color: #242424;
+  text-align: center;
+}
 
 .users {
   width: 100%;
   padding: 1.2rem 0.2rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 1rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
-  flex-direction: column;
   padding-top: 10px;
+  max-height: 300px;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 .users::-webkit-scrollbar {
@@ -444,40 +444,6 @@
   }
 }
 
-/****************************** FLOW REQUESTS MENU ******************************/
-.followRequestsMenu {
-  border-radius: 15px;
-  background: #fff;
-  padding: 1rem;
-  max-width: 340px;
-  gap: 0.7rem;
-  max-height: 400px;
-  overflow-y: scroll;
-  margin-top: 5px;
-  scrollbar-width: none;
-  border: 1px solid #d6d6d6;
-}
-
-/* ───────── heading ───────── */
-.heading {
-  text-transform: uppercase;
-  margin-left: 15px;
-  margin-bottom: 20px;
-  font-family: Zain;
-  font-size: .9rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-}
-
-/* ───────── list wrapper ───────── */
-.liist {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0;
-  margin: 0;
-}
 
 /* ───────── individual row ───────── */
 .item {
@@ -509,9 +475,10 @@
 /* ───────── name text ───────── */
 .name {
   flex: 1;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #333;
   overflow-wrap: anywhere;
+  font-family: 'Zain';
 }
 
 /* ───────── horiz. button group ───────── */
@@ -543,4 +510,47 @@
   flex: 1;
   text-decoration: none;
   color: inherit;
+}
+
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0 0 0 / .6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalPanel {
+  background: white;
+  color: rgb(27, 27, 27);
+  width: min(90vw, 420px);
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 8px;
+  padding: 1rem;
+  position: relative;
+  max-height: 450px;
+  scrollbar-width: none;
+}
+
+.closeBtn {
+  position: absolute;
+  top: .5rem;
+  right: 1rem;
+  border: none;
+  background: transparent;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+.modalTitle {
+  margin: 0 0 .5rem;
+  text-align: center;
+  font-weight: 600;
+  font-family: 'Zain';
+  font-size: 1.3rem;
 }

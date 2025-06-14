@@ -37,7 +37,11 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		helpers.JsonError(w, err.Error(), http.StatusNotFound, nil)
+		if err.Error() == "private profile" {
+			helpers.JsonError(w, "private profile", http.StatusPartialContent, err)
+		} else if err.Error() == "profile not found" {
+			helpers.JsonError(w, "profile not found", http.StatusNotFound, err)
+		}
 		return
 	}
 

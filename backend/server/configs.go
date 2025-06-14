@@ -27,6 +27,12 @@ func InitialiseDB() {
 		log.Fatal("Failed to open SQLite database:", err)
 	}
 
+	// Enable WAL mode (read/write concurrency)
+	_, err = db.DB.Exec("PRAGMA journal_mode=WAL;")
+	if err != nil {
+		log.Fatal("Failed to enable WAL mode:", err)
+	}
+
 	runMigrations("./database/socNet.db")
 }
 

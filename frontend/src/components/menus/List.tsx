@@ -1,59 +1,73 @@
-import Link from "next/link";
-import styles from "./menus.module.css";
+"use client";
+
+import { useState } from "react";
 import FollowersList from "./FollowersList";
 import FollowingsList from "./FollowingsList";
 import FriendRequestList from "./FriendRequest";
 import SuggestionsList from "./SuggestionsList";
 import { User } from "@/lib/types";
+import styles from "./menus.module.css";
 
-function List({
-  type,
-  title,
-  page,
-  profileId,
-  loggedUser,
-}: {
-  type: "friendRequests" | "followers" | "followings" | "suggestions" | "chat";
+type ListProps = {
+  type: "friendRequests" | "followers" | "followings" | "suggestions";
   title: string;
-  page?: "home" | "profile";
   profileId?: string;
   loggedUser?: User | null;
-}) {
-  return (
-    <div className={`${styles.list} ${styles[type]} `}>
-      {/* TOP  */}
-      <div className={styles.header}>
-        <span className={styles.title}>{title}</span>
-        {type === "friendRequests" ? (
-          <>
-            <Link
-              className={styles.link}
-              href={`/notifications/${loggedUser?.id}`}
-            >
-              See all
-            </Link>
-          </>
-        ) : type === "followers" || type === "followings" ? (
-          <>
-            <Link className={styles.link} href={`/profile/${loggedUser?.id}`}>
-              See all
-            </Link>
-          </>
-        ) : null}
+};
+
+export default function List({
+  type,
+  title,
+  profileId,
+  loggedUser,
+}: ListProps) {
+  /* modal flag */
+  const [showModal, setShow] = useState(false);
+  const open = () => setShow(true);
+  const close = () => setShow(false);
+
+  /* header "See all" */
+  const seeAll =
+    type === "followers" ||
+      type === "followings" ||
+      type === "friendRequests" ? (
+      <div className={styles.link} onClick={open}>
+        See all
       </div>
-      <div className={styles.users}>
-        { type === "followers" ? (
-          <FollowersList page={page} profileId={profileId} />
+    ) : null;
+
+  /* ───────── render ───────── */
+  return (
+    <>
+      <div className={`${styles.list} ${styles[type]}`}>
+        {/* header */}
+        <div className={styles.header}>
+          <span className={styles.title}>{title}</span>
+          {seeAll}
+        </div>
+
+        {/* compact list */}
+        {type === "followers" ? (
+          <FollowersList profileId={profileId} />
         ) : type === "followings" ? (
-          <FollowingsList page={page} profileId={profileId} />
-        ) : type === "suggestions" ? (
-          <SuggestionsList />
+          <FollowingsList profileId={profileId} />
         ) : type === "friendRequests" ? (
           <FriendRequestList />
+        ) : type === "suggestions" ? (
+          <SuggestionsList />
         ) : null}
       </div>
-    </div>
+
+      {/* modal overlays */}
+      {showModal && type === "followers" && (
+        <FollowersList modal profileId={profileId} onClose={close} />
+      )}
+      {showModal && type === "followings" && (
+        <FollowingsList modal profileId={profileId} onClose={close} />
+      )}
+      {showModal && type === "friendRequests" && (
+        <FriendRequestList modal onClose={close} />
+      )}
+    </>
   );
 }
-
-export default List;

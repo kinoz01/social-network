@@ -15,13 +15,16 @@ export const fetchOldPosts = async (pageNum: number, type?: string, id?: string)
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
             })
-        if (!res.ok) {
-            throw Object.assign(new Error(await res.text()), { status: res.status });
+        if (res.status === 206) {
+            throw Object.assign(new Error("private profile"), { status: 206 });
+        } else if (res.status === 404) {
+            throw Object.assign(new Error("profile not found"), { status: 404 });
+        } else if (!res.ok) {
+            throw Object.assign(new Error("something went wrong"), { status: res.status });
         }
         const posts: Post[] = await res.json()
         return posts
     } catch (error) {
-        console.error("failed to fetch posts", error)
         throw error
     }
 }

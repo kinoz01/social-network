@@ -19,9 +19,10 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
     const [showFOrm, setShowForm] = useState(false)
     const [postedContent, setPostedContent] = useState<Post[]>([])
     const [currentPage, setPage] = useState(0)
-    const [isLoading, setLoading] = useState(false)
+    const [isLoading, setLoading] = useState(true)
     const [hasMOre, sethasMore] = useState(true)
     const [profileNotFound, setProfileNotFound] = useState(false);
+    const [privateProfile, setPrivateProfile] = useState(false)
 
     const observer = useRef<IntersectionObserver | null>(null)
     const requestedPages = useRef<Set<number>>(new Set())
@@ -29,7 +30,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
     const { user } = useUser();
 
     const loadMOre = useCallback(async () => {
-        if (!hasMOre || isLoading || requestedPages.current.has(currentPage)) return
+        if (!hasMOre || requestedPages.current.has(currentPage)) return
         requestedPages.current.add(currentPage)
 
         setLoading(true)
@@ -52,12 +53,15 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
             setPostedContent((prev) => [...prev, ...uniquePosts])
         } catch (err) {
-            const status = (err as { status?: number }).status;
+            const { status } = err as { status: number };
             if (status === 404) {
-              setProfileNotFound(true);
-              sethasMore(false);
+                setProfileNotFound(true);
+                sethasMore(false);
+            } else if (status === 206) {
+                setPrivateProfile(true);
+                sethasMore(false);
             } else {
-                console.error("error in loading posts", err);
+                console.error("error loading posts", err);
             }
         } finally {
             setLoading(false)
@@ -115,8 +119,10 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
                 {currentPage === 0 && postedContent.length === 0 && !isLoading ?
                     <div className={styles.status}>
-                        <Image src="/img/empty.svg" alt="" width={250} height={250} />
-                        <p className={styles.empty}>{profileNotFound && type == "profile" ? "User Not Found" : "Empty Feed"}</p>
+                        <Image src={`/img/${ privateProfile && type === "profile" ? "lock.svg": "empty.svg"}`} alt="" width={200} height={200} />
+                        <p className={styles.empty}>{profileNotFound && type === "profile" ? "User Not Found"
+                                                        : privateProfile  && type === "profile" ? "This Profile Is Private"
+                                                        : "Empty Feed"}</p>
                     </div>
                     :
                     <>
@@ -126,10 +132,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                             </div>
                         )
                         )}
-
-                        {isLoading && (
-                            <Loading />
-                        )}
+                        {isLoading && ( <Loading />)}
 
                         {!hasMOre && !isLoading && (
                             <div className={styles.noMorePosts}>

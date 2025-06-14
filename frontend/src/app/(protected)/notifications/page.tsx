@@ -8,12 +8,12 @@ export default function NotificationsPage() {
 
     return (
         <div className="mainContent notifications">
-            <LeftMenu className={style.notifLeftMenu}/>
-            <NotificationDashboard />
-            <div className={`${style.menuLayout} ${style.menuLayoutRight}`}>
+            <div className={`${style.menuLayout} ${style.menuLayoutLeft}`}>
                 <UserSearchMenu />
-                <RightMenu />
+                <LeftMenu />
             </div>
+            <NotificationDashboard />
+            <RightMenu />
         </div >
     );
 }

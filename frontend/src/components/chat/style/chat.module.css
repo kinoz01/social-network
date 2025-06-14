@@ -251,19 +251,19 @@
   min-width: min-content;
 }
 
-.menuLayoutRight {
+.menuLayoutLeft {
   max-width: 370px;
   margin-top: 30px;
 }
 
 @media (max-width: 1500px) {
-  .menuLayoutRight {
+  .menuLayoutLeft {
     width: 300px;
   }
 }
 
-@media (max-width: 1300px) {
-  .menuLayoutRight {
+@media (max-width: 1000px) {
+  .menuLayoutLeft {
     display: none;
   }
 }

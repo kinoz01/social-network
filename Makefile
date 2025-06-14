@@ -5,6 +5,9 @@ run:  check-npm check-nextjs killPorts run-backend run-frontend
 build: check-npm check-nextjs killPorts run-backend build-frontend
 	@echo "Frontend signal killed"
 
+fresh:  check-npm check-nextjs killPorts fresh-backend run-frontend
+	@echo "Frontend signal killed"
+
 # Check if npm is installed
 check-npm:
 	@command -v npm >/dev/null 2>&1 || { \
@@ -43,6 +46,12 @@ fresh-backend:
 	}
 	@echo "Starting Go backend with Fresh..."
 	@cd backend && "$$(go env GOPATH)/bin/fresh" &
+
+# remove fresh
+remove-fresh:
+	@echo "Removing Fresh binary..."
+	@rm -f "$$(go env GOPATH)/bin/fresh"
+	@echo "Fresh has been removed."
 
 # Run backend.
 go:

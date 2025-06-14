@@ -1,10 +1,8 @@
-import { notFound } from "next/navigation";
-import { Followers, Followings, FriendRequest, User } from "./types";
+import { FollowShip, FriendRequest, User } from "./types";
 import { popup } from "./utils";
-import { API_URL } from   "./api_url";
+import { API_URL } from "./api_url";
 
 async function getProfileInfo(id: string, headers?: {}): Promise<User | null> {
-  // Get profile user id from the params objects
   const url = `${API_URL}/api/users/profilesInfo?id=${id}`;
 
   try {
@@ -127,52 +125,27 @@ async function getFollowingRequests(
   return null;
 }
 
-async function getFollowers(
+async function getFollowShip(
+  type: string,
   userId: string,
   limit?: number,
   page?: number
-): Promise<Followers | null> {
-  const url = `${API_URL}/api/followers?id=${userId}&limit=${limit}&page=${page}`;
-
+): Promise<FollowShip | null> {
+  const url = `${API_URL}/api/getfollows?kind=${type == "follower" ? "followers": "followings"}&id=${userId}&limit=${limit}&page=${page}`;
   try {
     const res = await fetch(url, { credentials: "include" });
-
-    if (!res.ok) {
+    if (res.status === 206) {
+      throw Object.assign(new Error("private profile"), { status: 206 });
+    } else if (!res.ok) {
       throw await res.json();
     }
 
-    const data: Followers = await res.json();
+    const data: FollowShip = await res.json();
 
     return data;
   } catch (error: any) {
-    console.log("fetch error", error);
-    popup(error.msg, false);
+    throw error
   }
-  return null;
-}
-
-async function getFollowings(
-  userId: string,
-  limit?: number,
-  page?: number
-): Promise<Followings | null> {
-  
-  const url = `${API_URL}/api/followings?id=${userId}&limit=${limit}&page=${page}`;
-
-  try {
-    const res = await fetch(url, { credentials: "include" });
-    if (!res.ok) {
-      throw await res.json();
-    }
-
-    const data: Followings = await res.json();
-
-    return data;
-  } catch (error: any) {
-    console.log("fetch error", error);
-    popup(error.msg, false);
-  }
-  return null;
 }
 
 async function getSuggestions(): Promise<User[] | null> {
@@ -200,8 +173,7 @@ export {
   addFollower,
   handleFollow,
   isUserFollowed,
-  getFollowers,
-  getFollowings,
   getFollowingRequests,
   getSuggestions,
+  getFollowShip
 };

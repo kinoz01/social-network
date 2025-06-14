@@ -59,6 +59,7 @@
     text-decoration: none;
     color: #000;
     transition: background .15s;
+    max-width: 240px;
 }
 
 .item:hover {
@@ -90,15 +91,7 @@
 .rightMenu{
     margin-top: 0px;
     max-height: 50vh;
-    margin-left: 10px;
     margin-top: 5px;
-    margin-right: 10px;
     min-height: 160px;
 }
 
-@media (max-width:1300px) {
-    .rightMenu {
-        display: none !important;
-    } 
- 
-}

@@ -5,15 +5,17 @@ import ProfileCard from "./ProfileCard";
 import List from "./List";
 import { useUser } from "@/context/UserContext";
 import FriendRequestList from "./FriendRequest";
+import UserSearchMenu from "./UsersSearch";
 
-function LeftMenu({ className = "" }: {className?: string}) {
+function LeftMenu({ className = "" }: { className?: string }) {
   const { user: loggedUser } = useUser();
   return (
     <div className={`${styles.leftMenu} ${className}`}>
-        <>
-          <FriendRequestList />
-          <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
-        </>
+      <>
+        <List type="friendRequests" title="Friend Requests" />
+        <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
+        <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
+      </>
     </div>
   );
 }
