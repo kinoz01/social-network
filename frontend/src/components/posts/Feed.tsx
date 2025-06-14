@@ -119,16 +119,22 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 )}
                 {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
 
-                {showProfileHeader &&  <ProfileHeader profileId={id} />}
+                {showProfileHeader && <ProfileHeader profileId={id} />}
 
                 {type === "group" && <GroupPostInput groupId={id} onAdd={handleNewPOst} />}
 
                 {currentPage === 0 && postedContent.length === 0 && !isLoading ?
                     <div className={styles.status}>
-                        {type !== "profile" && <Image src={`/img/empty.svg"}`} alt="" width={200} height={200} />}
+                        {!(privateProfile && type === "profile") && (
+                            <Image src={`/img/${profileNotFound && type === "profile" ? "user-not-found.svg" : "empty.svg"}`}
+                                alt=""
+                                width={200}
+                                height={200}
+                            />
+                        )}
                         <p className={styles.empty}>{profileNotFound && type === "profile" ? "User Not Found"
-                                                        : privateProfile  && type === "profile" ? "This Profile Is Private"
-                                                        : "Empty Feed"}</p>
+                            : privateProfile && type === "profile" ? "This Profile Is Private"
+                                : "Empty Feed"}</p>
                     </div>
                     :
                     <>
@@ -138,7 +144,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                             </div>
                         )
                         )}
-                        {isLoading && ( <Loading />)}
+                        {isLoading && <Loading />}
 
                         {!hasMOre && !isLoading && (
                             <div className={styles.noMorePosts}>

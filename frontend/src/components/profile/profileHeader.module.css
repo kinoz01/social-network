@@ -1,29 +1,24 @@
-/* ---------- wrapper ---------- */
-.header {
+/* ---------- LAYOUT WRAPPER ---------- */
+.wrapper {
   position: relative;
   width: 100%;
-  height: 320px;
-  isolation: isolate;
-  margin-bottom: 330px;
+  margin-top: 30px;
 }
 
-/* ---------- cover ----------- */
+/* ---------- COVER ---------- */
 .cover {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
+  height: 320px;
   border-radius: 32px 32px 10px 10px;
-  top: 30px;
+  overflow: hidden;
+  position: relative;
+  min-width: 360px;
 }
 
 .coverImg {
   object-fit: cover;
-  display: block;
-  border: none;
 }
 
 .cover::after {
-  /* gradient overlay */
   content: "";
   position: absolute;
   inset: 0;
@@ -31,7 +26,19 @@
   mix-blend-mode: overlay;
 }
 
-/* ---------- chat button ------ */
+/* ---------- CARD ---------- */
+.card {
+  position: relative;
+  width: min(640px, 90%);
+  margin: -160px auto 2.5rem;
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 100px 2rem 1.7rem;
+  box-shadow: 0 4px 4px 1px rgba(0 0 0 / .15);
+  text-align: center;
+}
+
+/* ---------- MESSAGE BUTTON ---------- */
 .msgBtn {
   position: absolute;
   top: 16px;
@@ -42,82 +49,89 @@
   padding: .45rem .9rem;
   font: 400 1.1rem "Zain", sans-serif;
   color: #0e0e0e;
-  background: rgba(255, 255, 255, .15);
-  border: none;
+  background: rgba(255 255 255 / .15);
+  border: 0;
   border-radius: 24px;
   backdrop-filter: blur(6px);
   cursor: pointer;
   transition: background .2s;
-  z-index: 100;
-  font-family: 'Zain';
-
 }
 
 .msgBtn:hover {
-  background: rgba(255, 255, 255, .25);
+  background: rgba(255 255 255 / .25);
 }
 
 .msgText {
   display: none;
 }
 
-@media (min-width:600px) {
+@media(min-width:600px) {
   .msgText {
     display: inline;
     margin-top: 5px;
   }
 }
 
-/* ---------- profile card ----- */
-.card {
-  position: relative;
-  left: 50%;
-  top: 160px;
-  translate: -50% 0;
-  width: min(640px, 90%);
-  background: #f5f5f5;
-  border-radius: 16px;
-  padding: 100px 2rem 1.7rem;
-  box-shadow: 0 4px 4px 1px rgba(0, 0, 0, .15);
-  text-align: center;
-  border: none;
-}
-
-/* avatar bubble */
+/* ---------- AVATAR ---------- */
 .avatarWrap {
   position: absolute;
   top: -60px;
   left: 50%;
-  translate: -50% 0;
+  transform: translateX(-50%);
   width: 120px;
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, .2);
+  box-shadow: 0 2px 2px rgba(0 0 0 / .2);
 }
 
 .avatar {
   object-fit: cover;
-  border: none;
-  background-color: #f2f2f2b2;
+  background: #f2f2f2b2;
 }
 
+/* ---------- TEXT ---------- */
 .name {
-  font: 600 1.5rem "Zain", sans-serif;
-  margin: .5rem 0 0;
-  margin-top: -20px;
+  font: 600 1.5rem "Zain";
   color: #141414;
+  margin-top: -20px;
+}
+
+.username {
+  font: 1rem "Zain";
+  color: #141414;
+  margin-bottom: 10px;
 }
 
 .about {
   color: #6d747c;
-  font-size: 1.1rem;
-  overflow-wrap: anywhere;
+  font: 1.1rem "Zain";
   margin-bottom: 10px;
-  font-family: 'Zain';
+  overflow-wrap: anywhere;
 }
 
-/* ---------- stats row -------- */
+/* ---------- CONTACT LIST ---------- */
+.contact {
+  list-style: none;
+  margin: 0 0 1.3rem;
+  padding: 0;
+}
+
+.contact li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  font: .9375rem "Zain";
+  color: #495057;
+}
+
+.contactIcon {
+  color: #868e96;
+  flex-shrink: 0;
+}
+
+/* ---------- STATS ---------- */
 .stats {
   display: flex;
   justify-content: center;
@@ -127,20 +141,14 @@
   padding: 0;
 }
 
-/* clickable items keep exact same look */
 .statLink {
-  display: block;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
 }
 
-.statLink:hover strong,
-.statLink:hover span {
-  color: rgb(0, 0, 0);
-}
-
-.stats li {
-  text-align: center;
+.statLink:hover * {
+  color: #000;
 }
 
 .stats strong {
@@ -155,11 +163,11 @@
   text-transform: uppercase;
 }
 
-/* ---------- CTA -------------- */
+/* ---------- CTA ---------- */
 .cta {
   padding: .75rem 2.5rem;
   background: linear-gradient(135deg, #141414, #202020);
-  border: none;
+  border: 0;
   border-radius: 24px;
   color: #fff;
   font-weight: 600;
@@ -171,42 +179,151 @@
   filter: brightness(1.1);
 }
 
-.username {
-  font-size: 1rem;
-  font-family: 'Zain';
-  color: #141414;
-  margin-bottom: 10px;
-}
-
-.contact {
-  list-style: none;
-  margin: 0 0 1.3rem;
-  padding: 0;
-  font-family: 'Zain';
-}
-
-.contact li {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .9375rem;
-  color: #495057;
-  line-height: 1.4;
-  justify-content: center;
-}
-
-.contactIcon {
-  flex-shrink: 0;
-  color: #868e96;
-}
-
-.empty  {
-  font-family: 'Zain', sans-serif;
-  color: #242424;
+/* ---------- PRIVATE NOTICE ---------- */
+.empty {
   text-align: center;
+  font: 1rem "Zain";
+  color: #242424;
   margin-top: 10px;
 }
 
 .empty p {
   margin-bottom: 30px;
+}
+
+/************************************* Privacy Toggle *************************************/
+.privacyToggle {
+  position: absolute;
+  top: 30px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* labels */
+.labelLeft,
+.labelRight {
+  font-size: 11px;
+  font-weight: 600;
+  user-select: none;
+  line-height: 1;
+  font-family: 'Zain';
+}
+
+.switchTrack {
+  position: relative;
+  width: 35px;
+  height: 20px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: background 0.25s;
+}
+
+.switchThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.25s;
+}
+
+/* PUBLIC (black track) */
+.pub .switchTrack {
+  background: #000;
+}
+
+.pub .switchThumb {
+  left: 18px;
+}
+
+.pub .labelRight,
+.pub .labelLeft {
+  color: #111111;
+}
+
+
+.priv .switchTrack {
+  background: #aaa;
+}
+
+.priv .labelLeft {
+  color: #000;
+}
+
+.priv .labelRight {
+  color: #777;
+}
+
+/* ─────────── CONFIRM DIALOG ─────────── */
+.confirmBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+
+.confirmBox {
+  background: #fff;
+  padding: 1.4rem 1.8rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.confirmBtns {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.confirmBtns button {
+  padding: 0.4rem 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.confirmBtns button:first-child {
+  background: #eee;
+}
+
+.confirmBtns button:last-child {
+  background: #000;
+  color: #fff;
+}
+
+.confirmBtns button[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.confirmBox p {
+  margin-bottom: 40px;
+}
+
+.confirmClose {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #0e0e0e;
 }

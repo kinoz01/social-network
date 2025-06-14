@@ -110,6 +110,7 @@ func Routes() http.Handler {
 	// Profiles:
 	mux.Handle("/api/users/dmprofiles", mw.GetMW(profile.GetDMProfile))
 	mux.Handle("/api/users/profilesInfo", mw.GetMW(profile.ProfileData))
+	mux.Handle("/api/handleAccountStatu", rl.RateLimitMW(mw.PostMW(profile.ChangeStatu)))
 
 	// Websocket
 	mux.Handle("/api/ws", mw.GetMW(ws.GlobalWS))

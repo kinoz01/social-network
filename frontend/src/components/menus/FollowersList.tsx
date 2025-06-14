@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getFollowShip, getProfileInfo } from "@/lib/followers";
+import { getFollowShip } from "@/lib/followers";
 import { FollowShip, User } from "@/lib/types";
 import { useUser } from "@/context/UserContext";
 import ListItem from "./ListItem";
@@ -21,20 +21,8 @@ type Props = {
 export default function FollowersList({ profileId, modal = false, onClose }: Props) {
 	const { user: loggedUser } = useUser();
 
-	const [loadingProfile, setLoadingProfile] = useState(false);
 	const [privateProfile, setPrivateProfile] = useState(false)
 
-	useEffect(() => {
-		let cancelled = false;
-		const run = async () => {
-			if (!profileId) return;
-			setLoadingProfile(true);
-			const info = await getProfileInfo(profileId);
-			setLoadingProfile(false);
-		};
-		run();
-		return () => { cancelled = true; };
-	}, [profileId]);
 
 	/* Paging state */
 	const [list, setList] = useState<User[]>([]);
@@ -116,7 +104,7 @@ export default function FollowersList({ profileId, modal = false, onClose }: Pro
 		return (
 			<div className={styles.users} ref={boxRef}>
 				{content}
-				{(loading || loadingProfile) && <Loading />}
+				{loading && <Loading />}
 			</div>
 		);
 	}

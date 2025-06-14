@@ -12,6 +12,7 @@
 
 .rightMenu {
   overflow-y: scroll;
+  min-width: 300px;
 }
 
 .leftMenu {
@@ -81,7 +82,7 @@
   width: 100%;
   padding: 1.2rem 0.2rem;
   padding-top: 10px;
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: scroll;
   scrollbar-width: none;
 }
@@ -405,6 +406,7 @@
 .handle {
   word-break: break-word;
   font-family: 'Zain';
+  margin: auto;
 }
 
 .numbers li {

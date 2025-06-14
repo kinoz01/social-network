@@ -21,6 +21,13 @@
     padding: 1rem 1.25rem 1rem;
 }
 
+@media (max-width: 350px) {
+    .card {
+        overflow-x: scroll;
+        width: 95vw;
+    }
+}
+
 /* top bar */
 .title {
     margin: 0;

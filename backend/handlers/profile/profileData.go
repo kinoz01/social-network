@@ -34,16 +34,19 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 
 	var out struct {
 		tp.User
-		TotalPosts  int `json:"total_posts"`
-		TotalGroups int `json:"total_groups"`
-		Followers   int `json:"followers"`
-		Following   int `json:"following"`
+		TotalPosts  int  `json:"total_posts"`
+		TotalGroups int  `json:"total_groups"`
+		Followers   int  `json:"followers"`
+		Followings   int  `json:"followings"`
+		IsFollowing bool `json:"is_followings"`
+		IsFollowed  bool `json:"is_followed"`
+		IsOwn       bool `json:"is_own"`
 	}
 
 	err := tp.DB.QueryRow(q, userID).Scan(
 		&out.ID, &out.Email, &out.Username, &out.FirstName, &out.LastName,
 		&out.Bday, &out.ProfilePic, &out.AboutMe, &out.AccountType,
-		&out.TotalPosts, &out.TotalGroups, &out.Followers, &out.Following,
+		&out.TotalPosts, &out.TotalGroups, &out.Followers, &out.Followings,
 	)
 	switch {
 	case err == sql.ErrNoRows:
@@ -56,7 +59,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 
 	// Check if requester follows profile
 	var isFollowing bool
-	checkFollow := `
+	checkFollowing := `
 	SELECT EXISTS (
 		SELECT 1 FROM follow_requests
 		WHERE (
@@ -64,30 +67,54 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		)
 		AND status = 'accepted'
 	);`
-	err = tp.DB.QueryRow(checkFollow, uid, out.ID).Scan(&isFollowing)
+	err = tp.DB.QueryRow(checkFollowing, uid, out.ID).Scan(&isFollowing)
 	if err != nil {
 		help.JsonError(w, "follow check failed", http.StatusInternalServerError, err)
 		return
 	}
+	out.IsFollowing = isFollowing
+	out.IsOwn = (uid == out.ID)
+
+	// Check if requester is followed by profile
+	var isFollowed bool
+	checkFollowed := `
+	SELECT EXISTS (
+		SELECT 1 FROM follow_requests
+		WHERE (
+			follower_id = ? AND followed_id = ?
+		)
+		AND status = 'accepted'
+	);`
+	err = tp.DB.QueryRow(checkFollowed, out.ID, uid).Scan(&isFollowed)
+	if err != nil {
+		help.JsonError(w, "follow check failed", http.StatusInternalServerError, err)
+		return
+	}
+	out.IsFollowed = isFollowed
 
 	// Privacy logic
 	if out.AccountType == "private" && uid != out.ID && !isFollowing {
-		// send a trimmed-down payload
 		type partial struct {
-			ID         string `json:"id"`
-			FirstName  string `json:"first_name"`
-			LastName   string `json:"last_name"`
-			ProfilePic string `json:"profile_pic"`
+			ID          string `json:"id"`
+			FirstName   string `json:"first_name"`
+			LastName    string `json:"last_name"`
+			ProfilePic  string `json:"profile_pic"`
+			IsFollowing bool   `json:"is_following"`
+			IsFollowed  bool   `json:"is_followed"`
+			IsOwn       bool   `json:"is_own"`
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusPartialContent)
 
 		_ = json.NewEncoder(w).Encode(partial{
-			ID:         out.ID,
-			FirstName:  out.FirstName,
-			LastName:   out.LastName,
-			ProfilePic: out.ProfilePic,
+			ID:          out.ID,
+			FirstName:   out.FirstName,
+			LastName:    out.LastName,
+			ProfilePic:  out.ProfilePic,
+			IsFollowing: isFollowing,
+			IsFollowed:  isFollowed,
+			IsOwn:       out.IsOwn,
 		})
 		return
 	}
