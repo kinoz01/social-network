@@ -2,6 +2,7 @@
 package follows
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -40,6 +41,10 @@ func GetFollowsHandler(w http.ResponseWriter, r *http.Request) {
 	var accountType string
 	if err := tp.DB.QueryRow(`SELECT account_type FROM users WHERE id = ?`, profileId).
 		Scan(&accountType); err != nil {
+		if err == sql.ErrNoRows {
+			help.JsonError(w, "user not found", http.StatusNotFound, nil)
+			return
+		}
 		help.JsonError(w, "Unexpected error", http.StatusInternalServerError, err)
 		return
 	}

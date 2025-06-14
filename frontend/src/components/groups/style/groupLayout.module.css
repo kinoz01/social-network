@@ -65,3 +65,10 @@
         scrollbar-width: none;
     }
 }
+
+@media (max-width: 800px) {
+    .contentLayout {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}

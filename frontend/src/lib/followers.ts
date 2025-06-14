@@ -2,33 +2,6 @@ import { FollowShip, FriendRequest, User } from "./types";
 import { popup } from "./utils";
 import { API_URL } from "./api_url";
 
-async function getProfileInfo(id: string, headers?: {}): Promise<User | null> {
-  const url = `${API_URL}/api/users/profilesInfo?id=${id}`;
-
-  try {
-    const res = await fetch(url, {
-      headers,
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      // console.log("url : ", res.status);
-
-      // if (res.status === 404) {
-      //   notFound(); 
-      // }
-      return null;
-    }
-
-    const data: User = await res.json();
-    return data;
-  } catch (error: any) {
-    console.log("error: ", error);
-    // popup(error.msg, false);
-  }
-
-  return null;
-}
 
 async function addFollower(body: {}, url: string) {
   try {
@@ -139,7 +112,6 @@ async function getFollowShip(
     } else if (!res.ok) {
       throw await res.json();
     }
-
     const data: FollowShip = await res.json();
 
     return data;
@@ -169,7 +141,6 @@ async function getSuggestions(): Promise<User[] | null> {
 }
 
 export {
-  getProfileInfo,
   addFollower,
   handleFollow,
   isUserFollowed,

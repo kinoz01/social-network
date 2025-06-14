@@ -38,7 +38,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		TotalGroups int  `json:"total_groups"`
 		Followers   int  `json:"followers"`
 		Followings   int  `json:"followings"`
-		IsFollowing bool `json:"is_followings"`
+		IsFollowing bool `json:"is_following"`
 		IsFollowed  bool `json:"is_followed"`
 		IsOwn       bool `json:"is_own"`
 	}

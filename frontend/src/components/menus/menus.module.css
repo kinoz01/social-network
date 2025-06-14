@@ -385,11 +385,13 @@
 .profileCardDesc {
   font-size: 0.9rem;
   line-height: 1.4;
-  color: #333;
+  color: #3f4652;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 0.75rem;
   text-align: center;
   word-break: break-word;
+  font-family: 'Zain';
+  font-size: 1.1rem;
 }
 
 .profileCard .numbers {

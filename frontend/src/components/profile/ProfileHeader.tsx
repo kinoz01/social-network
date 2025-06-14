@@ -52,7 +52,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 
 				if (res.status === 206) {
 					const data = await res.json();
-					const { is_following, is_followed, is_own, ...userFields } = data;
+					const { is_following, is_followed, is_own, ...userFields } = data;					
 					setProfile(userFields as User);
 					setStats({ is_following, is_followed, is_own });
 					setPrivateProfile(true);
@@ -72,7 +72,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 					is_own,
 					...userFields
 				} = data;
-
+				
 				setProfile(userFields as User);
 				setStats({
 					total_posts: total_posts ?? 0,
@@ -123,13 +123,13 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 	const closeRequests = () => setShowRequests(false);
 
 	const isOwn = stats?.is_own;
-
+	
 	return (
 		<>
 			<section className={styles.wrapper}>
 				<div className={styles.cover}>
 					<Image
-						src="https://plus.unsplash.com/premium_photo-1730051168732-8b53f9fb4c26"
+						src="https://plus.unsplash.com/premium_photo-1669923868851-e37a4f49fcde"
 						alt=""
 						fill
 						priority

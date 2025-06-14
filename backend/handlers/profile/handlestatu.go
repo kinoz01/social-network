@@ -2,7 +2,6 @@ package profile
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	auth "social-network/handlers/authentication"
@@ -15,7 +14,6 @@ type Resp struct {
 }
 
 func ChangeStatu(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("------------------------------------------")
 	userID, err := auth.GetUserId(r)
 	if err != nil {
 		Error.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)

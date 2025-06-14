@@ -63,8 +63,6 @@ export default function FollowingsList({
 				if (status === 206) {
 					setPrivateProfile(true);
 					setMore(false);
-				} else {
-					console.log("fetch error", err);
 				}
 			} finally {
 				setLoad(false);

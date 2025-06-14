@@ -59,7 +59,7 @@
     text-decoration: none;
     color: #000;
     transition: background .15s;
-    max-width: 240px;
+    max-width: 260px;
 }
 
 .item:hover {

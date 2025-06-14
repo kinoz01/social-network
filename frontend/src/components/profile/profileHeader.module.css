@@ -18,13 +18,13 @@
   object-fit: cover;
 }
 
-.cover::after {
+/* .cover::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, #ff4e9a90, #ff695e90);
   mix-blend-mode: overlay;
-}
+} */
 
 /* ---------- CARD ---------- */
 .card {
