@@ -18,8 +18,6 @@ async function addFollower(body: {}, url: string) {
     if (!res.ok) {
       throw await res.json();
     }
-
-    popup(await res.json(), true);
   } catch (error: any) {
     popup(error.msg, false);
   }

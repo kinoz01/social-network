@@ -19,7 +19,6 @@ import (
 	grpevent "social-network/handlers/groups/events"
 	grpsInvite "social-network/handlers/groups/invitations"
 	grpsRequest "social-network/handlers/groups/joinRequests"
-	grpsPost "social-network/handlers/groups/posts"
 	"social-network/handlers/profile"
 	notif "social-network/handlers/notifications"
 	ws "social-network/handlers/websocket"
@@ -75,7 +74,7 @@ func Routes() http.Handler {
 	mux.Handle("/api/groups/accept-request", rl.RateLimitMW(mw.PostMW(grpsRequest.AcceptJoinRequest)))
 	mux.Handle("/api/groups/refuse-request", rl.RateLimitMW(mw.PostMW(grpsRequest.RefuseJoinRequest)))
 	// Groups create post:
-	mux.Handle("/api/groups/create-post", rl.RateLimitMW(mw.Gm(mw.PostMW(grpsPost.CreateGroupPost))))
+	mux.Handle("/api/groups/create-post", rl.RateLimitMW(mw.Gm(mw.PostMW(grps.CreateGroupPost))))
 	// Groups Rest Chat:
 	mux.Handle("/api/groups/chat", mw.GetMW(mw.Gm(grps.ChatPage)))
 	// Group Events:
@@ -100,7 +99,7 @@ func Routes() http.Handler {
 
 	// Following:
 	mux.Handle("/api/suggestions", mw.GetMW(flw.SuggestionsHandler))
-	// mux.Handle("/api/followers/isfollowed", flw.IsFollwedHandler)
+	mux.HandleFunc("/api/followers/isfollowed", mw.GetMW(flw.IsFollwedHandler))
 	mux.Handle("/api/followers/requests", mw.GetMW(flw.GetFollowingRequestsHandler))
 	mux.Handle("/api/getfollows", mw.GetMW(flw.GetFollowsHandler))
 	mux.Handle("/api/followers/add", rl.RateLimitMW(mw.PostMW(flw.AddFollowRequest)))

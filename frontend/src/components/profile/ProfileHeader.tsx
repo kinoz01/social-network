@@ -10,6 +10,7 @@ import FollowingsList from "@/components/menus/FollowingsList";
 import FriendRequestList from "@/components/menus/FriendRequest";
 import Loading from "../Loading";
 import { User } from "@/lib/types";
+import FollowButton from "./FollowButton";
 
 /* -------------------------------- Types -------------------------------- */
 
@@ -123,6 +124,9 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 	const closeRequests = () => setShowRequests(false);
 
 	const isOwn = stats?.is_own;
+
+	console.log(isOwn, stats?.is_followed || stats?.is_following);
+	
 	
 	return (
 		<>
@@ -154,7 +158,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 						</button>
 					)}
 
-					{!isOwn && (stats?.is_followed || stats?.is_following) && (
+					{!isOwn && (profile.account_type === "public" || stats?.is_followed || stats?.is_following) && (
 						<Link href={`/chat/${profileId}`}>
 							<button className={styles.msgBtn}>
 								<Image src="/img/chat.svg" alt="dm user" width={22} height={22} />
@@ -244,7 +248,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 					)}
 
 					{!isOwn && (
-						<button className={styles.cta}>Follow</button>
+						<FollowButton profileUser={profile} />
 					)}
 				</article>
 			</section>

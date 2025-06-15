@@ -3,6 +3,7 @@ package posts
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -42,7 +43,10 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
 	}
-	newPost.Content = content
+	
+	// collapse >3 newlines to 2
+	re := regexp.MustCompile(`(\r\n|\r|\n){3,}`)
+	newPost.Content = re.ReplaceAllString(content, "\n\n")
 
 	filename, err := helpers.HandleFileUpload(r, "posts/", "file")
 	if err != nil {

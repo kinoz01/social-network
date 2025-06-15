@@ -33,7 +33,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/components/authentication/AuthModals.tsx"
   ],
   "exclude": [
     "node_modules"

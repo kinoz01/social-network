@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	pType "social-network/handlers/types"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -28,6 +29,7 @@ func CreatePostDB(newPost pType.Post) error {
 		return fmt.Errorf("failed to preparing statement %w", err)
 	}
 	defer stat.Close()
+
 	_, err = stat.Exec(newPost.ID, newPost.UserID, newPost.Content, imgPost, newPost.Visibility)
 	if err != nil {
 		return fmt.Errorf("failed to insert new post in database %w", err)
