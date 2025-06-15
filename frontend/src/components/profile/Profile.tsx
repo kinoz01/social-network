@@ -10,14 +10,7 @@ import { API_URL } from "@/lib/api_url";
 import { useUser } from "@/context/UserContext";
 import { createPortal } from "react-dom";
 
-//to-do
-//click sur followers / following 
-//click sur FOLLOW(<a></>)
-//test
-//read react
-//read code and how it work 
-//read about what u use
-//import ProfileCard from "@/components/menus/ProfileCrad"; @ ???
+
 
 
 
