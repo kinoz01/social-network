@@ -10,6 +10,14 @@ import { API_URL } from "@/lib/api_url";
 import { useUser } from "@/context/UserContext";
 import { createPortal } from "react-dom";
 
+//to-do
+//click sur followers / following 
+//click sur FOLLOW(<a></>)
+//test
+//read react
+//read code and how it work 
+//read about what u use
+//import ProfileCard from "@/components/menus/ProfileCrad"; @ ???
 
 
 
@@ -18,17 +26,16 @@ import { createPortal } from "react-dom";
 function UserProfile({ userId }: any) {
   console.log("dkhhhhaaalt");
 
-
-
   const [userData, setData] = useState<Profile | null>(null);
   const [userPosts, setPosts] = useState<Profile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
 
-  function ChangeStatu() {
+  function ChangeStatus() {
     setIsModalOpen((prev) => !prev);
   }
+
   const user = useUser();
 
   function IsUserLoged() {
@@ -42,12 +49,8 @@ function UserProfile({ userId }: any) {
   function getOppositeOfAccountType(): string {
     return userData?.account_type === "public" ? "private" : "public";
   }
-  async function handleStatu() {
+  async function handleStatus() {
     if (isLoading) return;
-
-    console.log("userData?.account_type ", userData?.account_type);
-
-    console.log("getOppositeOfAccountType()", getOppositeOfAccountType());
 
     setIsLoading(true);
 
@@ -63,7 +66,7 @@ function UserProfile({ userId }: any) {
       })
       const data = await res.json();
       await fetchData()
-      ChangeStatu()
+      ChangeStatus()
     } catch (error) {
       console.log("error", error);
     } finally {
@@ -73,34 +76,40 @@ function UserProfile({ userId }: any) {
 
 
 
+function displqyfollowers() {
 
+}
 
 
   async function fetchData() {
+      if (isLoading) return;
+
+    setIsLoading(true);
     try {
       const res = await fetch(`http://localhost:8080/api/profileData/${userId}`)
       const data = await res.json();
-      console.log("data: hana jiiit", data);
       setData(data)
-
-      console.log("dataaaaaaaaaaaa", userData?.about_me);
     } catch (error) {
       console.log("error", error);
+    }finally {
+      setIsLoading(false);
     }
   }
 
   async function fetchPost() {
+       if (isLoading) return;
+
+    setIsLoading(true);
     try {
       const res = await fetch(`http://localhost:8080/api/profilePosts/${userId}`, {
         credentials: "include",
       })
       const posts = await res.json();
-      console.log("posts", posts);
       setPosts(posts)
-
-      console.log("userPosts", userPosts?.posts);
     } catch (error) {
       console.log("error", error);
+    }finally {
+      setIsLoading(false);
     }
   }
 
@@ -119,7 +128,7 @@ function UserProfile({ userId }: any) {
             alt={`${userData.profile_pic}`} className={styles.userImageprofil} width={150} height={150} />
           {
             IsUserLoged() && (
-              <button className={`${styles.accountStatus}`} onClick={ChangeStatu} > account staut </button>
+              <button className={`${styles.accountStatus}`} onClick={ChangeStatus} > account staut </button>
             )
           }
         </div>
@@ -138,7 +147,7 @@ function UserProfile({ userId }: any) {
             </div>
             <div className={styles.numbers}>
               <div className={styles.postsNumber}> {userPosts?.post_nbr} Posts</div>
-              <a className={styles.followersNumber}>{userData.total_followers} Followers </a>
+              <div onClick={displqyfollowers} className={styles.followersNumber}>{userData.total_followers} Followers </div>
               <div className={styles.followingNumber}>{userData.total_followings} Following</div>
             </div>
           </div>
@@ -167,7 +176,7 @@ function UserProfile({ userId }: any) {
           <div className={styles.modal}>
             <div className={styles.header}>
               <h3>Change Profile Status</h3>
-              <button onClick={ChangeStatu} className={styles.closebtn}>&times;</button>
+              <button onClick={ChangeStatus} className={styles.closebtn}>&times;</button>
             </div>
 
             <div className={styles.content}>
@@ -185,8 +194,8 @@ function UserProfile({ userId }: any) {
             </div>
 
             <div className={styles.actions}>
-              <button onClick={ChangeStatu} className={styles.cancelbtn}>Cancel</button>
-              <button disabled={isLoading} onClick={handleStatu} className={styles.confirmbtn}>Change to {getOppositeOfAccountType()}</button>
+              <button onClick={ChangeStatus} className={styles.cancelbtn}>Cancel</button>
+              <button disabled={isLoading} onClick={handleStatus} className={styles.confirmbtn}>Change to {getOppositeOfAccountType()}</button>
             </div>
           </div>
         </div>,
