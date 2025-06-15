@@ -1,4 +1,4 @@
-import ProfileHeader from "@/components/profile/ProfileHeader";
+import Profile from "@/components/profile/Profile";
 
 
 export default async function ProfilePAge({params}) {
@@ -9,7 +9,7 @@ export default async function ProfilePAge({params}) {
 
   return (
     <div className="mainContent profile">
-      <ProfileHeader userId={test.id} />
+      <Profile userId={test.id} />
     </div>
   );
 }

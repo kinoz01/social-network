@@ -17,20 +17,15 @@ type UserId struct {
 }
 
 func ProfileData(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+	if r.Method != http.MethodGet {
 		Error.JsonError(w, "Method not allowed", 405, nil)
 		return
 	}
+
 	var userdata tp.UserData
 	useid := strings.Split(r.URL.Path, "/")[3]
-	var userid UserId
-	err := json.NewDecoder(r.Body).Decode(&userid)
-	if err != nil {
-		Error.JsonError(w, "Internal Server Error ", http.StatusBadRequest, nil)
-		return
-	}
 	defer r.Body.Close()
-	err = tp.DB.QueryRow(`SELECT 
+	err := tp.DB.QueryRow(`SELECT 
 	first_name,
 	last_name,
 	birthday,
@@ -38,11 +33,26 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 	profile_pic,
 	account_type,
 	email,
-	username
+	username,
+    (
+        SELECT 
+      COUNT(*) 
+      from follow_requests 
+      WHERE 
+      follow_requests.followed_id =  ?
+    ) as total_follower,
+    (
+        SELECT 
+      COUNT(*) 
+      from follow_requests 
+      WHERE 
+      follow_requests.follower_id = ?
+    ) as total_follower
 	from 
 	users 
+    
 	where 
-	id = ?`, useid).Scan(&userdata.Firstname,
+	id = ?`, useid, useid, useid).Scan(&userdata.Firstname,
 		&userdata.Lastname,
 		&userdata.Birthday,
 		&userdata.About_me,
@@ -50,6 +60,8 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		&userdata.AccountType,
 		&userdata.Email,
 		&userdata.Username,
+		&userdata.TotalFollowers,
+		&userdata.TotalFollowings,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -59,106 +71,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
-	IsFriend, err := IsFollower(w, useid, userid.UserId)
-	if err != nil {
-		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
-		return
-	}
-	IsPublicAccount, err := IsPublicAccount(w, useid)
-	if err != nil {
-		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
-		return
-	}
-	if IsFriend  ||  useid == userid.UserId  || (useid != userid.UserId && IsPublicAccount ){
-	postsQuery := `SELECT
-    posts.group_id,
-    posts.body,
-    posts.img_post,
-    posts.visibility,
-    posts.created_at,
-    posts.post_id,
-    users.first_name,
-    users.last_name,
-    users.profile_pic,
-	users.id,
-    (
-        select
-            count(*)
-        FROM
-            like_reaction l
-        WHERE
-            l.post_id = posts.post_id
-    ) AS cte_likes,
-    (
-        SELECT
-            COUNT(*)
-        FROM
-            comments c
-        WHERE
-            c.post_id = posts.post_id
-    ) AS comment_count
-FROM posts 
-LEFT JOIN users ON users.id = posts.user_id
-WHERE
-    user_id = ?
-ORDER BY
-    posts.created_at DESC;
-`
-	
-
-rows, err := tp.DB.Query(postsQuery, useid)
-
-if err != nil {
-	Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
-	return
-}
-defer rows.Close()
-
-    for rows.Next() {
-		var post tp.PostData
-		err := rows.Scan(
-			&post.GroupID,
-			&post.Content,
-			&post.Imag_post,
-			&post.Visibility,
-			&post.CreatedAt,
-			&post.PostID,
-			&post.FirstName,
-			&post.LastName,
-			&post.ProfilePic,
-			&post.UserID,
-			&post.TotalLIKes,
-			&post.TotalComments,
-		)
-		
-		if err != nil {
-			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-			return
-		}
-		resction, err := GitReaction(w, post.PostID, post.UserID)
-		fmt.Println("react", resction)
-		if err != nil {
-			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-			return
-		}
-		if resction == "ErrNoRows" {
-			post.HasReact = ""
-		} else {
-			post.HasReact = resction
-		}
-		userdata.Posts = append(userdata.Posts, post)
-	}
-
-	if err = rows.Err(); err != nil {
-		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-		return
-	}
-
-	}
-
-	userdata.PostNbr = len(userdata.Posts)
-
-	fmt.Println("userdata===================>",userdata)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata)

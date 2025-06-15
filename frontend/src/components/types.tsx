@@ -12,16 +12,18 @@ export interface CommentInfo {
     likesCount: number;
 }
 export interface Profile {
-  email: string;
-  username: string;
-  profile_pic: string;
-  first_name: string;
-  last_name: string;
-  birthday: string;
-  about_me: string;
-  account_type: string;
-  posts: Post[];
-  post_nbr: number;
+    email: string;
+    username: string;
+    profile_pic: string;
+    first_name: string;
+    last_name: string;
+    birthday: string;
+    about_me: string;
+    account_type: string;
+    posts: Post[];
+    post_nbr: number;
+    total_followers: number;
+    total_followings: number;
 }
 export interface User {
     id: string;

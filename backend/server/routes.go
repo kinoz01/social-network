@@ -82,7 +82,8 @@ func Routes() http.Handler {
 	// Restful members menu:
 	mux.HandleFunc("/api/groups/members", grps.GetMembers)
 
-	mux.HandleFunc("/api/profile/", profile.ProfileData)
+	mux.HandleFunc("/api/profileData/", profile.ProfileData)
+	mux.HandleFunc("/api/profilePosts/", profile.GetPosts)
 	mux.HandleFunc("/api/handleAccountStatu/", profile.ChangeStatu )
 
 	// Followers search:

@@ -1,10 +1,10 @@
 import ProfileCard from "@/components/menus/ProfileCrad";
-import ProfileHeader from "@/components/profile/ProfileHeader";
+import Profile from "@/components/profile/Profile";
 
 export default function ProfilePAge() {
   return (
     <div className="mainContent profile">
-      <ProfileHeader />
+      <Profile />
     </div>
   );
 }

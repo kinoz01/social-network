@@ -34,21 +34,21 @@ type Post struct {
 }
 
 type PostData struct {
-	PostID        string   `json:"id"`
-	UserID        string   `json:"userID"`
-	Content       string   `json:"content"`
-	Imag_post     any      `json:"imag_post,omitempty"`
-	Visibility    string   `json:"visibility"`
-	VipUsers      []string `json:"vipUsers"`
-	FirstName     string   `json:"firstName"`
-	LastName      string   `json:"lastName"`
-	ProfilePic    string   `json:"profile_pic"`
-	
-	HasReact      string   `json:"hasReact"`
-	TotalLIKes    int      `json:"totalLikes"`
-	TotalComments int      `json:"totalComments"`
-	CreatedAt     string   `json:"createdAt"`
-	GroupID       any      `json:"groupID,omitempty"`
+	PostID     string   `json:"id"`
+	UserID     string   `json:"userID"`
+	Content    string   `json:"content"`
+	Imag_post  any      `json:"imag_post,omitempty"`
+	Visibility string   `json:"visibility"`
+	VipUsers   []string `json:"vipUsers"`
+	FirstName  string   `json:"firstName"`
+	LastName   string   `json:"lastName"`
+	ProfilePic string   `json:"profile_pic"`
+
+	HasReact      string `json:"hasReact"`
+	TotalLIKes    int    `json:"totalLikes"`
+	TotalComments int    `json:"totalComments"`
+	CreatedAt     string `json:"createdAt"`
+	GroupID       any    `json:"groupID,omitempty"`
 }
 
 type React struct {
@@ -85,14 +85,16 @@ type Group struct {
 }
 
 type UserData struct {
-	Email       string     `json:"email"`
-	Firstname   string     `json:"first_name"`
-	Lastname    string     `json:"last_name"`
-	Profile_pic string     `json:"profile_pic,omitempty"`
-	Username    string     `json:"username"`
-	Birthday    string     `json:"birthday"`
-	About_me    string     `json:"about_me,omitempty"`
-	AccountType string     `json:"account_type"`
-	Posts       []PostData `json:"posts"`
-	PostNbr     int        `json:"post_nbr"`
+	Email           string     `json:"email"`
+	Firstname       string     `json:"first_name"`
+	Lastname        string     `json:"last_name"`
+	Profile_pic     string     `json:"profile_pic,omitempty"`
+	Username        string     `json:"username"`
+	Birthday        string     `json:"birthday"`
+	About_me        string     `json:"about_me,omitempty"`
+	AccountType     string     `json:"account_type"`
+	Posts           []PostData `json:"posts"`
+	PostNbr         int        `json:"post_nbr"`
+	TotalFollowers  int        `json:"total_followers"`
+	TotalFollowings int        `json:"total_followings"`
 }
