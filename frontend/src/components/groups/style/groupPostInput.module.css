@@ -37,7 +37,9 @@
     max-height: 9rem;
     resize: none;
     scrollbar-width: none;
-    padding-top: 27px;
+    padding: 23px .9rem .6rem 70px;
+  font-family: 'Zain';
+  font-size: 1.4rem;
 }
 
 .input::-webkit-scrollbar {

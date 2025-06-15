@@ -3,15 +3,22 @@ package follows
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
+	auth "social-network/handlers/authentication"
 	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
+	ws "social-network/handlers/websocket"
 
 	"github.com/gofrs/uuid"
 )
 
 func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
-	
+	user, err := auth.GetUser(r)
+	if err != nil {
+		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
+		return
+	}
 	var followRequest tp.FollowRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&followRequest); err != nil {
@@ -45,10 +52,10 @@ func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := uuid.Must(uuid.NewV4())
+	id := uuid.Must(uuid.NewV4()).String()
+	var notif tp.Notification
 
 	if followRequest.Action == "friendRequest" {
-
 		insertFollower := `
 							INSERT INTO 
 								follow_requests (id, follower_Id, followed_Id, status)
@@ -60,8 +67,18 @@ func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
 		}
+		notif = tp.Notification{
+			ID:        uuid.Must(uuid.NewV4()).String(),
+			Type:      "follow_request",
+			Content:   "sent you a new follow request",
+			Receiver:  followRequest.FollowedID,
+			Sender:    *user,
+			FollowID:  id,
+			IsRead:    false,
+			CreatedAt: time.Now().Local().Format("2006-01-02 15:04:05"),
+		}
+		ws.BroadcastNotification(notif)
 	} else if followRequest.Status == "accepted" {
-
 		deleteFollowRequest := `
 							UPDATE
 								follow_requests 
@@ -78,19 +95,17 @@ func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else if followRequest.Action == "follow" {
-
 		insertFollower := `
-							INSERT INTO 
-								follow_requests (id, follower_Id, followed_Id, status)
-							VALUES
-								(?, ?, ?, ?)`
+			INSERT INTO 
+				follow_requests (id, follower_Id, followed_Id, status)
+			VALUES
+				(?, ?, ?, ?)`
 
 		if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, "accepted"); err != nil {
 
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
 		}
-
 	} else if followRequest.Status == "rejected" || followRequest.Action == "unfollow" {
 		insertFollower := `
 							DELETE 

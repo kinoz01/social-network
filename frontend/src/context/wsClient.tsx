@@ -155,8 +155,8 @@ export function WSProvider({ children }: { children: ReactNode }) {
                     setNotifications(prev => [...prev, ...fresh]);
                     break;
 
-                case "notification": // single live push
-                    setNotifications((prev) => [msg.notification, ...prev]);
+                case "notification": // upcoming notifications
+                    setNotifications((prev) => [msg.notification, ...prev]);                    
                     setUnreadNotificationsCount((c) => c + 1);
                     break;
             }
@@ -206,8 +206,9 @@ export function WSProvider({ children }: { children: ReactNode }) {
         send({ type: "getNotifications", page, limit });
     };
 
+    // exposed deleting context
     const deleteNotification = (key: string) =>
-        setNotifications(prev => key === "ALL" ? [] : prev.filter(n => n.id !== key && n.invitationId !== key &&  n.requestId !== key && n.eventId !== key));
+        setNotifications(prev => key === "ALL" ? [] : prev.filter(n => n.id !== key && n.invitationId !== key &&  n.requestId !== key && n.eventId !== key && n.followId !== key));
 
     return (
         <WSContext.Provider

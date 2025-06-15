@@ -7,6 +7,7 @@ import styles from "./notifications.module.css";
 import { NotificationModel } from "@/lib/types";
 import { API_URL } from "@/lib/api_url";
 import TimeAgo from "../groups/TimeAgo";
+import { addFollower } from "@/lib/followers";
 
 interface Props {
     n: NotificationModel;
@@ -55,39 +56,6 @@ export default function NotificationItem({ n, onRemove }: Props) {
         onRemove(n.invitationId || n.id);
     };
 
-    /* ========== friend request ========== */
-    const acceptFriend = async () => {
-        if (busy) return;
-        setBusy(true);
-        await fetch(`/api/followers/add`, {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "accepted",
-                followerID: n.sender.id,
-                followedId: n.receiver,
-            }),
-        });
-        await close();
-    };
-
-    const rejectFriend = async () => {
-        if (busy) return;
-        setBusy(true);
-        await fetch(`/api/followers/add`, {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                action: "rejected",
-                followerID: n.sender.id,
-                followedId: n.receiver,
-            }),
-        });
-        await close();
-    };
-
     /* ========== join request ========== */
     const acceptJoinRequest = async () => {
         if (busy) return;
@@ -112,7 +80,7 @@ export default function NotificationItem({ n, onRemove }: Props) {
         });
         onRemove(n.requestId || n.id);
     };
-    
+
 
     /* ========== event response (Going / Not-going) ========== */
     const respondToEvent = async (choice: "going" | "not_going") => {
@@ -125,7 +93,22 @@ export default function NotificationItem({ n, onRemove }: Props) {
             body: JSON.stringify({ event_id: n.eventId, response: choice }),
         });
         onRemove(n.eventId || n.id); // remove the notification from front
-        await close(); // remove from server
+        await close(); //- remove from server, unlike other we don't do DELETE in the query here so we need to manually delete it.
+    };
+
+    const handleAction = async (
+        action: "accepted" | "rejected",
+    ) => {
+        await addFollower(
+            {
+                action,
+                status: action,
+                followerID: n.sender.id,
+                followedId: n.receiver,
+            },
+            "/api/followers/add"
+        );
+        onRemove(n.followId || n.id);
     };
 
     /* ───────── render ───────── */
@@ -178,17 +161,6 @@ export default function NotificationItem({ n, onRemove }: Props) {
                 </div>
             )}
 
-            {n.type === "friend request" && (
-                <div className={styles.options}>
-                    <button onClick={acceptFriend} disabled={busy}>
-                        Accept
-                    </button>
-                    <button onClick={rejectFriend} disabled={busy}>
-                        Reject
-                    </button>
-                </div>
-            )}
-
             {n.type === "join_request" && (
                 <div className={styles.options}>
                     <button onClick={acceptJoinRequest} disabled={busy}>
@@ -207,6 +179,16 @@ export default function NotificationItem({ n, onRemove }: Props) {
                     </button>
                     <button onClick={() => respondToEvent("not_going")} disabled={busy}>
                         Not going
+                    </button>
+                </div>
+            )}
+            {n.type === "follow_request" && (
+                <div className={styles.options}>
+                    <button onClick={() => handleAction("accepted")} disabled={busy}>
+                        Accept
+                    </button>
+                    <button onClick={() => handleAction("rejected")} disabled={busy}>
+                        Reject
                     </button>
                 </div>
             )}

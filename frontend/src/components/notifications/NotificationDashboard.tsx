@@ -68,7 +68,8 @@ export default function NotificationDashboard() {
             n.id !== key &&
             n.invitationId !== key &&
             n.requestId !== key &&
-            n.eventId !== key,
+            n.eventId !== key &&
+            n.followId !== key,
         ));
         deleteNotification(key);
     };

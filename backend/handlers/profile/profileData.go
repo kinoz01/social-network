@@ -37,7 +37,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		TotalPosts  int  `json:"total_posts"`
 		TotalGroups int  `json:"total_groups"`
 		Followers   int  `json:"followers"`
-		Followings   int  `json:"followings"`
+		Followings  int  `json:"followings"`
 		IsFollowing bool `json:"is_following"`
 		IsFollowed  bool `json:"is_followed"`
 		IsOwn       bool `json:"is_own"`
@@ -99,6 +99,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 			FirstName   string `json:"first_name"`
 			LastName    string `json:"last_name"`
 			ProfilePic  string `json:"profile_pic"`
+			AccountType string `json:"account_type"`
 			IsFollowing bool   `json:"is_following"`
 			IsFollowed  bool   `json:"is_followed"`
 			IsOwn       bool   `json:"is_own"`
@@ -112,6 +113,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 			FirstName:   out.FirstName,
 			LastName:    out.LastName,
 			ProfilePic:  out.ProfilePic,
+			AccountType: out.AccountType,
 			IsFollowing: isFollowing,
 			IsFollowed:  isFollowed,
 			IsOwn:       out.IsOwn,

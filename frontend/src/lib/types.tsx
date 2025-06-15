@@ -60,6 +60,7 @@ export interface NotificationModel {
     eventId?: string;   // related_event_id
     invitationId?: string;   // related_invitation_id
     requestId?: string;   // related_request_id
+    followId?: string;   // related_follow_id
 }
 
 export interface NotifcationResponse {
@@ -79,4 +80,5 @@ export interface FriendRequest {
     requests: User[];
     totalCount: number;
     totalPages: number;
+    followid: string;
 }

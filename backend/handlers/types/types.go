@@ -85,7 +85,7 @@ type Group struct {
 
 type Notification struct {
 	ID       string `json:"id"`
-	Type     string `json:"type"`     // e.g. "group_invite", "request_accepted"
+	Type     string `json:"type"`
 	Content  string `json:"content"`  // free-text
 	Receiver string `json:"receiver"` // user-ID that should see it
 	Sender   User   `json:"sender"`   // minimal User payload (ID + names/pic)
@@ -95,6 +95,7 @@ type Notification struct {
 	Event        string `json:"eventId,omitempty"`      // related_event_id
 	InvitationID string `json:"invitationId,omitempty"` // related_invitation_id
 	RequestID    string `json:"requestId,omitempty"`    // related_request_id
+	FollowID     string `json:"followId,omitempty"`     // related_follow_request_id
 
 	CreatedAt string `json:"createdAt"`
 	IsRead    bool   `json:"isRead"`

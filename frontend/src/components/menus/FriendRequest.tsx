@@ -65,6 +65,8 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 
 	/* optimistic remove */
 	const dropRow = (id: string) => {
+		console.log(id,"+++++++++++++++++++++++++++");
+		
 		setList(prev => prev.filter(u => u.id !== id));
 		deleteNotification(id);
 	};
@@ -74,7 +76,6 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 		action: "accepted" | "rejected",
 		userId: string
 	) => {
-		dropRow(userId);
 		await addFollower(
 			{
 				action,
@@ -84,6 +85,7 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 			},
 			"/api/followers/add"
 		);
+		dropRow(userId);
 	};
 
 	/* infinite scroll */

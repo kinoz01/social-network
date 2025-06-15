@@ -14,7 +14,6 @@ function LeftMenu({ className = "" }: { className?: string }) {
       <>
         <List type="friendRequests" title="Friend Requests" />
         <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
-        <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
       </>
     </div>
   );

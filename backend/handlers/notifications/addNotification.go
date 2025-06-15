@@ -13,8 +13,8 @@ func AddNotification(n tp.Notification) error {
 	  INSERT INTO notifications
 	    (id, type, content, receiver_id, sender_id,
 	     related_group_id, related_event_id,
-	     related_invitation_id, related_request_id, is_read)
-	  VALUES (?,?,?,?,?,?,?,?,?,?);`
+	     related_invitation_id, related_request_id, related_follow_id, is_read)
+	  VALUES (?,?,?,?,?,?,?,?,?,?,?);`
 
 	null := func(s string) sql.NullString {
 		if s == "" {
@@ -29,10 +29,11 @@ func AddNotification(n tp.Notification) error {
 		n.Content,
 		n.Receiver,
 		n.Sender.ID,
-		n.Group,
+		null(n.Group),
 		null(n.Event),
 		null(n.InvitationID),
 		null(n.RequestID),
+		null(n.FollowID),
 		n.IsRead,
 	)
 	if err != nil {

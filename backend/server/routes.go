@@ -87,6 +87,7 @@ func Routes() http.Handler {
 	// CHAT
 	// Chat menu:
 	mux.Handle("/api/chat/list", mw.GetMW(chat.GetChatList))
+	mux.Handle("/api/users/dmprofiles", mw.GetMW(chat.GetDMProfile))
 	// Chat Rest DMs
 	mux.Handle("/api/chat/messages", mw.GetMW(chat.GetPrivateMessages))
 	mux.Handle("/api/chat/dm-list", mw.GetMW(chat.ChatDMList))
@@ -107,7 +108,6 @@ func Routes() http.Handler {
 	mux.Handle("/api/followers/search", mw.GetMW(flw.SearchFollowers))
 
 	// Profiles:
-	mux.Handle("/api/users/dmprofiles", mw.GetMW(profile.GetDMProfile))
 	mux.Handle("/api/users/profilesInfo", mw.GetMW(profile.ProfileData))
 	mux.Handle("/api/handleAccountStatu", rl.RateLimitMW(mw.PostMW(profile.ChangeStatu)))
 

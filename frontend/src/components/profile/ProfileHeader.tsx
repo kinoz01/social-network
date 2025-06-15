@@ -123,10 +123,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 	const closeFollowings = () => setShowFollowings(false);
 	const closeRequests = () => setShowRequests(false);
 
-	const isOwn = stats?.is_own;
-
-	console.log(isOwn, stats?.is_followed || stats?.is_following);
-	
+	const isOwn = stats?.is_own;	
 	
 	return (
 		<>
