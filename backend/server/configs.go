@@ -38,26 +38,26 @@ func InitialiseDB() {
 
 // Applies database migrations using golang-migrate.
 func runMigrations(databasePath string) {
-	absPath, err := filepath.Abs("./database/migrations/sqlite")
-	if err != nil {
-		log.Fatalf("Could not get absolute path: %v", err)
-	}
+    absPath, err := filepath.Abs("./database/migrations/sqlite")
+    if err != nil {
+        log.Fatalf("Could not get absolute path: %v", err)
+    }
 
-	m, err := migrate.New(
-		"file://"+absPath,
-		"sqlite3://"+databasePath,
-	)
-	if err != nil {
-		log.Fatalf("Error loading migrations: %v", err)
-	}
+    m, err := migrate.New(
+        "file://"+absPath,
+        "sqlite3://"+databasePath,
+    )
+    if err != nil {
+        log.Fatalf("Error loading migrations: %v", err)
+    }
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatalf("Migration failed: %v", err)
-	} else if err == migrate.ErrNoChange {
-		log.Println("No new migrations to apply")
-	} else {
-		log.Println("Migrations applied successfully")
-	}
+    if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+        log.Fatalf("Migration failed: %v", err)
+    } else if err == migrate.ErrNoChange {
+        log.Println("No new migrations to apply")
+    } else {
+        log.Println("Migrations applied successfully")
+    }
 }
 
 // Listens for termination signals and ensures the DB is closed before exiting.

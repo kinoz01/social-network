@@ -78,7 +78,7 @@ export const PostComponent: React.FC<{ post: Post; type?: any }> = ({ post, type
           </Link>
           <div className={styles.postCreationDate}>
             <div className={styles.timeAgo}>
-              <TimeAgo dateStr={post.createdAt} />
+              <TimeAgo dateStr={post.createdAt}/>
             </div>
             {post.visibility === "private" ? <CloseFriendIcon /> : post.visibility === "almost-private" ? <PrivateIcon /> : <PublicIcon />}
           </div>
