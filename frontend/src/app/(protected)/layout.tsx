@@ -8,16 +8,16 @@ import { WSProvider } from "@/context/wsClient";
 import { FollowSyncProvider } from "@/context/FollowSyncContext";
 
 export const metadata: Metadata = {
-  title: "Social Network",
-  description: "Social platform",
+    title: "Social Network",
+    description: "Social platform",
 };
 
 export default async function HomeLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
-  await requireSession();
+    await requireSession();
 
     return (
         <UserProvider>

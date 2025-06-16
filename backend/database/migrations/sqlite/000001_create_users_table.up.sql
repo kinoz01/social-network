@@ -8,9 +8,12 @@ CREATE TABLE
         last_name TEXT NOT NULL,
         birthday TEXT NOT NULL,
         about_me TEXT,
-        profile_pic TEXT NOT NULL DEFAULT 'avatar.webp' CHECK(profile_pic LIKE '%.jpg' OR profile_pic LIKE '%.png' OR profile_pic LIKE '%.jpeg' OR profile_pic LIKE '%.webp'),
+        profile_pic TEXT NOT NULL DEFAULT 'avatar.webp' CHECK (
+            profile_pic LIKE '%.jpg'
+            OR profile_pic LIKE '%.png'
+            OR profile_pic LIKE '%.jpeg'
+            OR profile_pic LIKE '%.webp'
+        ),
         account_type TEXT NOT NULL DEFAULT 'public' CHECK (account_type IN ('public', 'private')),
         created_at TIMESTAMP DEFAULT (DATETIME ('now', 'localtime'))
     );
-
-CREATE INDEX IF NOT EXISTS idx_users_name ON users (first_name, last_name, username);

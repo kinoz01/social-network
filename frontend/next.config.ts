@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 
-const isFly = process.env.FLY_APP_NAME !== undefined; // Detect if running on Fly.io
 
 const nextConfig: NextConfig = {
   reactStrictMode: false,
@@ -22,12 +21,12 @@ const nextConfig: NextConfig = {
         hostname: "images.pexels.com",
       },
       {
-        protocol: "https",
-        hostname: "myflywebsite.com",
+        protocol: "http",
+        hostname: "localhost",
       },
       {
         protocol: "http",
-        hostname: "localhost",
+        hostname: "backend",
       },
     ],
   },

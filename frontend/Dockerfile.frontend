@@ -10,8 +10,9 @@ RUN npm install
 # Copy rest of the code (using .dockerignore)
 COPY . . 
 
-# Before the build
+# DECLARE the build-time variable (for deployement)
 ARG NEXT_PUBLIC_FLY_APP_NAME
+# COPY ARG into the image's runtime ENV 
 ENV NEXT_PUBLIC_FLY_APP_NAME=$NEXT_PUBLIC_FLY_APP_NAME
 
 # Build the Next.js app

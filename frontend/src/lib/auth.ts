@@ -67,5 +67,3 @@ export async function checkMembership(groupId: string) {
 
     return true;
 }
-
-

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import {
   ChatsIcon,
   GroupsIcon,
@@ -17,7 +16,6 @@ import { useWS } from "@/context/wsClient";
 export default function SideBar() {
 
   const [hover, setHover] = useState(false);
-  const user = useUser();
   const { handleLogout } = useLogout();
 
   const { totalUnread, notifsCount } = useWS();
@@ -65,39 +63,12 @@ export default function SideBar() {
           {hover && <span>Chats</span>}
         </Link>
 
-        <NavButton
-          state={hover}
-          title="Profile"
-          link={`profile/${loggedUser?.id}`}
-          icon={<UserIcon />}
-        />
-
-        <NavButton
-          state={hover}
-          title="Groups"
-          link="groups"
-          icon={<GroupsIcon />}
-        />
-
-        <NavButton
-          state={hover}
-          title="Notifications"
-          link={`notifications/${loggedUser?.id}`}
-          icon={<NotificationIcon />}
-          count={unreadNotificationsCount}
-        />
-
-        <NavButton
-          state={hover}
-          title="Chats"
-          link={`chat/${loggedUser?.id}`}
-          icon={<ChatsIcon />}
-        />
       </div>
-
       <button className="navSection" onClick={handleLogout}>
         <LogoutIcon />
-        {hover ? <span>Logout</span> : null}
+        {hover ? (
+          <span>Logout</span>
+        ) : null}
       </button>
     </div>
   );

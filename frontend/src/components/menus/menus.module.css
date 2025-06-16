@@ -38,14 +38,17 @@
 }
 
 .header {
-  padding: 25px;
+  padding: 15px 15px 0px 15px;
+  position: sticky;
+  top: 0;
+  left: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: auto;
-  /* background-color: var(--color2); */
+  height: 3rem;
+  background-color: var(--color2);
 }
 
 .title {
@@ -91,7 +94,7 @@
 .listItem {
   font-size: clamp(0.8rem, 1rem, 1.4rem);
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: space-between;
   gap: 0.5rem;
   width: 100%;
@@ -160,22 +163,7 @@
   gap: 8px;
 }
 
-/* posts */
-/* input[type="checkbox"] {
-  color: beige;
-  cursor: pointer;
-} */
-
-
-
-/* 
-label {
-  font-size: 0.8rem;
-  color: #343434;
-  margin-left: 0.5rem;
-  cursor: pointer;
-} */
-
+/* GROUP LIST */
 .leftMenu.chat {
   height: 100%;
 }
@@ -234,8 +222,7 @@ label {
     right: 20px;
   }
 
-  .rightMenu:not(.profile) {
-    background-color: aqua;
+  .rightMenu {
     display: none;
   }
 
@@ -248,7 +235,6 @@ label {
   }
 
   /* PRIVATE CHAT MENU */
-
   .leftMenu.chat {
     flex-direction: row;
     height: 10%;

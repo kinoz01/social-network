@@ -1,3 +1,4 @@
+import React from "react";
 const HomeIcon = () => {
   return (
     <svg
@@ -191,54 +192,14 @@ const AddFriendIcon = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle
-        cx="20"
-        cy="20"
-        r="15"
-        stroke="#130F26"
-        strokeWidth="1"
-        fill="none"
-      />
+      <circle cx="20" cy="20" r="15" stroke="#130F26" strokeWidth="1" fill="none" />
       <g id="SVGRepo_iconCarrier">
         <g id="Iconly/Curved/Add User">
           <g id="Add User">
-            <path
-              id="Stroke 1"
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M19.92234 28.8083C16.10834 28.8083 12.85034 28.2313 12.85034 25.9213C12.85034 23.6113 16.08734 21.5103 19.92234 21.5103C23.7363 21.5103 26.9943 23.5913 26.9943 25.9003C26.9943 28.2093 23.7573 28.8083 19.92234 28.8083Z"
-              stroke="#130F26"
-              strokeWidth="0.696"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-            <path
-              id="Stroke 3"
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M19.92231 18.2159C22.4253 18.2159 24.4553 16.1859 24.4553 13.6829C24.4553 11.1789 22.4253 9.1499 19.92231 9.1499C17.41931 9.1499 15.38931 11.1789 15.38931 13.6829C15.38031 16.1769 17.39631 18.2069 19.89031 18.2159H19.92231Z"
-              stroke="#130F26"
-              strokeWidth="0.696"
-              strokeLinecap="round" /* background-color: rgba(245, 245, 245, 0.699); */
-              /* border-radius: 10px; */
-              strokeLinejoin="round"
-            ></path>
-            <path
-              id="Stroke 5"
-              d="M28.1313 16.12891V20.1389"
-              stroke="#130F26"
-              strokeWidth="0.696"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
-            <path
-              id="Stroke 7"
-              d="M30.1776 18.1338H26.0876"
-              stroke="#130F26"
-              strokeWidth="0.696"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></path>
+            <path id="Stroke 1" fillRule="evenodd" clipRule="evenodd" d="M19.92234 28.8083C16.10834 28.8083 12.85034 28.2313 12.85034 25.9213C12.85034 23.6113 16.08734 21.5103 19.92234 21.5103C23.7363 21.5103 26.9943 23.5913 26.9943 25.9003C26.9943 28.2093 23.7573 28.8083 19.92234 28.8083Z" stroke="#130F26" strokeWidth="0.696" strokeLinecap="round" strokeLinejoin="round"></path>
+            <path id="Stroke 3" fillRule="evenodd" clipRule="evenodd" d="M19.92231 18.2159C22.4253 18.2159 24.4553 16.1859 24.4553 13.6829C24.4553 11.1789 22.4253 9.1499 19.92231 9.1499C17.41931 9.1499 15.38931 11.1789 15.38931 13.6829C15.38031 16.1769 17.39631 18.2069 19.89031 18.2159H19.92231Z" stroke="#130F26" strokeWidth="0.696" strokeLinecap="round" strokeLinejoin="round"></path>
+            <path id="Stroke 5" d="M28.1313 16.12891V20.1389" stroke="#130F26" strokeWidth="0.696" strokeLinecap="round" strokeLinejoin="round"></path>
+            <path id="Stroke 7" d="M30.1776 18.1338H26.0876" stroke="#130F26" strokeWidth="0.696" strokeLinecap="round" strokeLinejoin="round"></path>
           </g>
         </g>
       </g>
@@ -249,7 +210,7 @@ const AddFriendIcon = () => {
 const CreateIcon = () => {
   return (
     <svg
-      viewBox="0 0 1500 1500"
+      viewBox="0 0 1024 1024"
       fill="#000000"
       className="icon"
       version="1.1"
@@ -270,6 +231,7 @@ const CreateIcon = () => {
     </svg>
   );
 };
+
 
 const ChatIcon = () => {
   return (
@@ -336,7 +298,7 @@ const UserIcon = () => {
       fill="#000000"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      stroke="#0000"
+      stroke="#000000"
       strokeWidth="0.00024000000000000003"
     >
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -372,6 +334,7 @@ const SendIcon = () => {
         strokeLinejoin="round"
       ></g>
       <g id="SVGRepo_iconCarrier">
+
         <path
           d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z"
           strokeWidth="0.792"
@@ -399,7 +362,7 @@ const BackIcon = () => (
       strokeLinejoin="round"
     />
   </svg>
-);
+)
 const CommentIcon = () => (
   <svg
     width="24"
@@ -407,12 +370,12 @@ const CommentIcon = () => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1"
+    strokeWidth="2"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
   </svg>
-);
+)
 const LikeIcon: React.FC<{ fill: string }> = ({ fill }) => (
   <svg
     width="24"
@@ -420,53 +383,31 @@ const LikeIcon: React.FC<{ fill: string }> = ({ fill }) => (
     viewBox="0 0 24 24"
     fill={fill}
     stroke="currentColor"
-    strokeWidth="1"
+    strokeWidth={fill !== "none" ? "1" : "2"}
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
   </svg>
-);
+)
 
 const CloseFriendIcon = () => (
-  <svg
-    width="15"
-    height="15"
-    viewBox="0 0 100 100"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <circle cx="50" cy="50" r="50" fill="#464849" />
+  <svg width="15" height="15" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="50" fill="#34C759" />
     <path
       d="M50 15 L61.8 38.2 H85.4 L66.9 53.8 L78.7 77 L50 62.6 L21.3 77 L33.1 53.8 L14.6 38.2 H38.2 Z"
       fill="white"
     />
   </svg>
-);
-
+)
 const PublicIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#464849"
-    strokeWidth="1.5"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#464849" strokeWidth="1.5">
     <circle cx="12" cy="12" r="10"></circle>
     <line x1="2" y1="12" x2="22" y2="12"></line>
     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
   </svg>
-);
+)
 const PrivateIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="#464849"
-    strokeWidth="2"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#464849" strokeWidth="2">
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
@@ -524,6 +465,12 @@ export const GroupsIconSmall = () => (
 );
 
 export {
+  PrivateIcon,
+  PublicIcon,
+  CloseFriendIcon,
+  CommentIcon,
+  LikeIcon,
+  BackIcon,
   HomeIcon,
   NotificationIcon,
   GroupsIcon,

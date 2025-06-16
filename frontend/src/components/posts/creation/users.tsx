@@ -10,7 +10,6 @@ import React, {
 } from "react";
 import { User } from "@/lib/types";
 import { API_URL } from "@/lib/api_url";
-import { User } from "@/lib/types";
 
 const SLICE = 50;
 
@@ -96,8 +95,7 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
         return () => el.removeEventListener("scroll", h);
     }, [loadMore]);
 
-    console.log("00data: ", data);
-    /* ui ----------"--------------------------------------------- */
+    /* ui ------------------------------------------------------- */
     return (
         <div className={styles.postAud}>
             <div className={styles.header}>

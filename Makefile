@@ -1,6 +1,6 @@
 # Run everything
-run: check-npm check-nextjs kill-ports run-backend run-frontend
-	@echo "Live and running!"
+run:  check-npm check-nextjs killPorts run-backend run-frontend
+	@echo "Frontend signal killed"
 
 build: check-npm check-nextjs killPorts run-backend build-frontend
 	@echo "Frontend signal killed"
@@ -33,7 +33,7 @@ kill-3000:
 killPorts: kill-3000 kill-8080
 
 # Run backend on background
-run-backend:
+run-backend: 
 	@echo "Starting Go backend..."
 	@cd backend && go run main.go &
 
@@ -111,7 +111,6 @@ migrate-sqlite:
 		migrate create -seq -ext sql -dir "./backend/database/migrations/sqlite" "create_$${t}_table"; \
 	done; \
 	echo "Created $$(echo $$tables | wc -w) table migrations"
-
 
 users:
 	@echo "Generating users_insert.sql with static IDs (uuid-1 to uuid-x)..."

@@ -6,9 +6,9 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./backend/database/socNet.db:/app/database/socNet.db
-      - ./backend/database/schema.sql:/app/database/schema.sql 
-
+      - ./backend/database:/app/database
+      - ./backend/storage:/app/storage
+      
   frontend:
     build:
       context: ./frontend
@@ -17,3 +17,6 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      - BACKEND_URL=http://backend:8080
+      - BACKEND_WS=ws://backend:8080

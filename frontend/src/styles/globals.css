@@ -6,7 +6,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -20,7 +19,8 @@ body {
 }
   
 /******************* Welcome Popup *******************/
-.welcome-popup {
+.welcome-popup,
+.popup {
     position: fixed;
     top: 1%;
     left: 50%;
@@ -71,7 +71,8 @@ body {
         font-weight: bold;
     }
 
-    .welcome-popup {
+    .welcome-popup,
+    .popup {
         padding: 1.5rem 2rem;
         font-size: 1.2rem;
         font-weight: normal;
@@ -81,14 +82,4 @@ body {
     .close-popup {
         font-size: 1.3rem;
     }
-}
-
-::selection {
-    background-color: #697077;
-    color: white;
-}
-
-::-moz-selection {
-    background-color: #697077;
-    color: white;
 }

@@ -2,8 +2,6 @@ package server
 
 import (
 	"net/http"
-	"social-network/handlers/posts"
-	"social-network/handlers/users"
 	"time"
 
 	"social-network/handlers/posts"
@@ -25,6 +23,8 @@ import (
 	notif "social-network/handlers/notifications"
 	ws "social-network/handlers/websocket"
 )
+
+var Router http.Handler
 
 // Application routes.
 func Routes() http.Handler {
@@ -97,11 +97,11 @@ func Routes() http.Handler {
 	// Notifications:
 	mux.HandleFunc("/api/delete-notification", notif.DeleteNotification)
 	mux.HandleFunc("/api/clear-notifications", notif.ClearAllNotifications)
-	mux.HandleFunc("/api/notifications/totalcount", notif.NotificationsCount)
+	mux.Handle("/api/notifications/totalcount", mw.GetMW(notif.NotificationsCount))
 
 	// Following:
 	mux.Handle("/api/suggestions", mw.GetMW(flw.SuggestionsHandler))
-	mux.HandleFunc("/api/followers/isfollowed", mw.GetMW(flw.IsFollwedHandler))
+	mux.Handle("/api/followers/isfollowed", mw.GetMW(flw.IsFollwedHandler))
 	mux.Handle("/api/followers/requests", mw.GetMW(flw.GetFollowingRequestsHandler))
 	mux.Handle("/api/getfollows", mw.GetMW(flw.GetFollowsHandler))
 	mux.Handle("/api/followers/add", rl.RateLimitMW(mw.PostMW(flw.AddFollowRequest)))
