@@ -1,25 +1,34 @@
 package notifications
 
 import (
+	"encoding/json"
+	"net/http"
+
+	help "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
+	auth "social-network/handlers/authentication"
 )
 
-func GetUnreadNotifications(id string, isRead bool) (int, error) {
-	var count int
-	getCount := `
-		SELECT
-		    COUNT(*)
-		FROM
-		    notifications
-		WHERE
-		    is_read = ? 
-		AND
-			receiver_id = ?
-		`
-	row := tp.DB.QueryRow(getCount, isRead, id)
-	if err := row.Scan(&count); err != nil {
-		return 0, err
+func NotificationsCount(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth.GetUserId(r)
+	if err != nil {
+		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
+		return
 	}
 
-	return count, nil
+	const q = `
+		SELECT COUNT(*)
+		FROM   notifications
+		WHERE  receiver_id = ?
+		  AND  is_read = 0;`
+	var n int
+	if err := tp.DB.QueryRow(q, userID).Scan(&n); err != nil {
+		help.JsonError(w, "db error", http.StatusInternalServerError, err)
+		return 
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(struct {
+		Count int `json:"count"`
+	}{Count: n})
 }

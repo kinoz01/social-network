@@ -26,6 +26,7 @@ const MainDiv = (props: MainParams) => {
                 name="content"
                 className={styles.postContentInput}
                 placeholder={`What's on your mind, ${props.userName}??`}
+                maxLength={3000}
             />
             <div className={styles.toolbar}>
                 <button

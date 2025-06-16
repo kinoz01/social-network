@@ -72,7 +72,7 @@
   border-bottom: 1px solid black;
 }
 
-.empty  {
+.empty {
   font-family: 'Zain', sans-serif;
   color: #242424;
   text-align: center;
@@ -557,4 +557,17 @@
   font-weight: 600;
   font-family: 'Zain';
   font-size: 1.3rem;
+}
+
+.search {
+  width: 100%;
+  padding: .45rem .6rem;
+  border: 1px solid grey;
+  border-radius: 8px;
+  font-size: .9rem;
+}
+
+.search:focus {
+  outline: none;
+  border-color: #000;
 }

@@ -24,8 +24,8 @@ func ValidInput(inputs string) error {
 		return fmt.Errorf("post content cannot be empty")
 	}
 
-	if len(trimSpace) > 5000 {
-		return fmt.Errorf("post content exceeds 5000 characters limit")
+	if len(trimSpace) > 3000 {
+		return fmt.Errorf("post content exceeds 3000 characters limit")
 	}
 	return nil
 }

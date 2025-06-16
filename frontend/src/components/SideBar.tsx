@@ -18,10 +18,14 @@ export default function SideBar() {
   const [hover, setHover] = useState(false);
   const { handleLogout } = useLogout();
 
-  const { totalUnread } = useWS();
+  const { totalUnread, notifsCount } = useWS();
   const badge = totalUnread > 99 ? "99+" : totalUnread.toString();
   const showBadge = totalUnread > 0;
 
+  // Show notification badge with how many notifications
+  const notifbadge = notifsCount > 99 ? "99+" : notifsCount.toString();
+  const showNotifBadge = notifsCount > 0;
+  
   return (
     <div
       className="sideBar"
@@ -48,7 +52,8 @@ export default function SideBar() {
           <GroupsIcon />
           {hover ? <span>Groups</span> : null}
         </Link>
-        <Link href="/notifications" className="navSection">
+        <Link href="/notifications" className="navSection iconWrap">
+          {showNotifBadge && <span className="badge">{notifbadge}</span>}
           <NotificationIcon />
           {hover ? <span>Notifications</span> : null}
         </Link>

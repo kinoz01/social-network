@@ -212,9 +212,7 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		}
 		m := storeAndBuildDM(u.ID, msg.PeerID, msg.Content)
 		broadcastDM(msg.PeerID, m)
-	case "unreadNotificationsCount":
-		sendUnreadNotificationCount(c, u.ID)
-
+		
 	case "getNotifications":
 		sendNotificationList(c, u, msg, "getNotifications")
 	}
@@ -467,18 +465,3 @@ func sendNotificationList(c *client, u *tp.User, msg inbound, msgType string) {
 	c.mu.Unlock()
 }
 
-func sendUnreadNotificationCount(c *client, userId string) {
-	count, err := notif.GetUnreadNotifications(userId, false)
-	if err != nil {
-		return
-	}
-
-	payload := map[string]any{
-		"type":  "unreadNotificationsCount",
-		"count": count,
-	}
-
-	c.mu.Lock()
-	_ = c.conn.WriteJSON(payload)
-	c.mu.Unlock()
-}

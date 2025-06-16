@@ -12,6 +12,7 @@ import React, {
 import { useUser } from "@/context/UserContext";
 import { API_URL_WS, API_URL } from "@/lib/api_url";
 import { NotificationModel } from "@/lib/types";
+import { useFollowSync } from "./FollowSyncContext";
 
 /* ───────── Types ───────── */
 export interface Member {
@@ -54,7 +55,7 @@ interface WSContextShape {
     markChatRead: (peer: string) => void;
 
     /* notifications */
-    unreadNotificationsCount: number;
+    notifsCount: number;
     notifications: NotificationModel[];
     getNotifications: (page: number, limit: number) => void;
     deleteNotification: (id: string) => void;
@@ -67,6 +68,7 @@ export const useWS = () => useContext(WSContext)!;
 export function WSProvider({ children }: { children: ReactNode }) {
     const { user } = useUser();
     const meId = user?.id ?? null;
+    const { version } = useFollowSync()
 
     const socketRef = useRef<WebSocket | null>(null);
 
@@ -76,7 +78,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
     const [groupMembers, setGroupMembers] = useState<Map<string, Member[]>>(new Map());
     const [unreadCount, setUnreadCount] = useState<Map<string, number>>(new Map());
 
-    const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
+    const [notifsCount, setNotifsCount] = useState(0);
     const [notifications, setNotifications] = useState<NotificationModel[]>([]);
 
     /* listeners per peer */
@@ -96,6 +98,14 @@ export function WSProvider({ children }: { children: ReactNode }) {
             })
             .catch(() => setUnreadCount(new Map()));
     }, [meId]);
+
+    useEffect(() => {
+        if (!meId) return;
+        fetch(`${API_URL}/api/notifications/totalcount`, { credentials: "include" })
+            .then(r => (r.ok ? r.json() : { count: 0 }))
+            .then(({ count }) => setNotifsCount(count))
+            .catch(() => setNotifsCount(0));
+    }, [meId, version]);
 
     /* open socket */
     useEffect(() => {
@@ -143,10 +153,6 @@ export function WSProvider({ children }: { children: ReactNode }) {
                     break;
                 }
 
-                case "unreadNotificationsCount":
-                    setUnreadNotificationsCount(msg.count);
-                    break;
-
                 case "getNotifications": // paged response
                     const fresh = msg.notifications.filter(
                         (n: NotificationModel) => !seenNotifIds.current.has(n.id)
@@ -156,8 +162,8 @@ export function WSProvider({ children }: { children: ReactNode }) {
                     break;
 
                 case "notification": // upcoming notifications
-                    setNotifications((prev) => [msg.notification, ...prev]);                    
-                    setUnreadNotificationsCount((c) => c + 1);
+                    setNotifications((prev) => [msg.notification, ...prev]);
+                    setNotifsCount((c) => c + 1);
                     break;
             }
         };
@@ -165,7 +171,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
         return () => ws.close();
     }, [meId]);
 
-    /* helper: always use current socket */
+    /* SENDING helper */
     const send = (obj: object) => {
         const ws = socketRef.current;
         if (!ws) return;
@@ -198,7 +204,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
         });
     }, []);
 
-    /* computed */
+    /* total unread messages for sidebar */
     const totalUnread = [...unreadCount.values()].reduce((a, b) => a + b, 0);
     const hasUnread = totalUnread > 0;
 
@@ -208,8 +214,9 @@ export function WSProvider({ children }: { children: ReactNode }) {
 
     // exposed deleting context
     const deleteNotification = (key: string) => {
-        setNotifications(prev => key === "ALL" ? [] : 
+        setNotifications(prev => key === "ALL" ? [] :
             prev.filter(n => n.id !== key && n.invitationId !== key && n.requestId !== key && n.eventId !== key && n.followId !== key));
+        setNotifsCount((c) => c === 0 ? c : c - 1);
     }
     return (
         <WSContext.Provider
@@ -227,7 +234,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
                 totalUnread,
                 hasUnread,
                 markChatRead,
-                unreadNotificationsCount,
+                notifsCount,
                 notifications,
                 getNotifications,
                 deleteNotification

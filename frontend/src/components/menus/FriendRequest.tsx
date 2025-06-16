@@ -33,7 +33,7 @@ type Props = {
 export default function FriendRequests({ modal = false, onClose }: Props) {
 	const { deleteNotification } = useWS();
 	const { user: loggedUser } = useUser();
-	const { refresh } = useFollowSync()
+	const { refresh, version } = useFollowSync()
 
 	const [list, setList] = useState<ReqUser[]>([]);
 	const [page, setPage] = useState(1);
@@ -57,8 +57,11 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 
 	/* initial page */
 	useEffect(() => {
-		fetchPage(1);
-	}, [fetchPage]);
+		setList([]);
+		setPage(1);
+		setMore(true);
+		fetchPage(1); 
+	}, [version]);
 
 	/* optimistic remove */
 	const dropRow = (followId: string) => {
@@ -83,7 +86,7 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 		);
 		dropRow(followId);
 		refresh()
-	};	
+	};
 
 	/* infinite scroll */
 	const boxRef = useRef<HTMLDivElement>(null);

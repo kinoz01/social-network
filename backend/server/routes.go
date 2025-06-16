@@ -97,6 +97,7 @@ func Routes() http.Handler {
 	// Notifications:
 	mux.HandleFunc("/api/delete-notification", notif.DeleteNotification)
 	mux.HandleFunc("/api/clear-notifications", notif.ClearAllNotifications)
+	mux.HandleFunc("/api/notifications/totalcount", notif.NotificationsCount)
 
 	// Following:
 	mux.Handle("/api/suggestions", mw.GetMW(flw.SuggestionsHandler))

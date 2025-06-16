@@ -38,7 +38,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 	const [showFollowers, setShowFollowers] = useState(false);
 	const [showFollowings, setShowFollowings] = useState(false);
 	const [showRequests, setShowRequests] = useState(false);
-	const { version } = useFollowSync();
+	const { version, refresh } = useFollowSync();
 
 	/* ---------------------- fetch on mount / id change --------------------- */
 	useEffect(() => {
@@ -112,6 +112,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 		} finally {
 			setToggleLoading(false);
 			setConfirmOpen(false);
+			refresh()
 		}
 	};
 

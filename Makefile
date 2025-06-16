@@ -126,7 +126,7 @@ followers:
 	@echo "INSERT INTO follow_requests (id, follower_id, followed_id, status, created_at) VALUES" > follow_requests.sql
 	@for i in $$(seq 1 7001); do \
 		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
-		echo "('foll-$$i','uuid-$$i','b724fe7e-b44e-4918-864e-5c42c763b3ee','pending',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
+		echo "('foll-$$i','uuid-$$i','d9f67f93-a778-4041-9ff8-3b4da298796c','pending',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
 	done
 	@echo "✅ follow_requests.sql generated with x accepted follow requests."
 

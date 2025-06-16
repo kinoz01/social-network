@@ -42,8 +42,8 @@ export default function InviteMenu({
 
     /* misc ui */
     const [submitting, setSubmitting] = useState(false);
-    const [msg, setMsg] = useState("");          // flash message
-    const [cls, setCls] = useState<"" | "ok" | "err">("");
+    const [msg, setMsg] = useState("");          // flash message (success / error)
+    const [cls, setCls] = useState<"" | "ok" | "err">(""); // set corresponding class
 
     const listRef = useRef<HTMLUListElement>(null);
 

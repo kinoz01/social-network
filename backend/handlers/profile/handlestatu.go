@@ -28,8 +28,34 @@ func ChangeStatu(w http.ResponseWriter, r *http.Request) {
 	}
 
 	newStatus := "private"
+
 	if curr == "private" {
 		newStatus = "public"
+
+		if _, err := tp.DB.Exec(`
+				UPDATE follow_requests
+				   SET status = 'accepted'
+				 WHERE followed_id = ? AND status = 'pending'`,
+			userID,
+		); err != nil {
+			Error.JsonError(w, "db error", http.StatusInternalServerError, err)
+			return
+		}
+
+		if _, err := tp.DB.Exec(`
+				DELETE FROM notifications
+				 WHERE receiver_id = ?
+				   AND type = 'follow_request'
+				   AND related_follow_id IN (
+					   SELECT id
+						 FROM follow_requests
+						WHERE followed_id = ?
+				   )`,
+			userID, userID,
+		); err != nil {
+			Error.JsonError(w, "db error", http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	if _, err := tp.DB.Exec(`
