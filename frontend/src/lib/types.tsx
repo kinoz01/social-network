@@ -75,10 +75,17 @@ export interface FollowShip {
     totalPages: number;
 }
 
+// custom minimal User used for follow requests
+export type ReqUser = {
+	id: string;
+	first_name: string;
+	last_name: string;
+	profile_pic: string | null;
+	followId: string;
+}
 
 export interface FriendRequest {
-    requests: User[];
+    requests: ReqUser[];
     totalCount: number;
     totalPages: number;
-    followid: string;
 }

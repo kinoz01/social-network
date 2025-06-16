@@ -93,7 +93,6 @@ export default function NotificationItem({ n, onRemove }: Props) {
             body: JSON.stringify({ event_id: n.eventId, response: choice }),
         });
         onRemove(n.eventId || n.id); // remove the notification from front
-        await close(); //- remove from server, unlike other we don't do DELETE in the query here so we need to manually delete it.
     };
 
     const handleAction = async (

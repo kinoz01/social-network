@@ -10,14 +10,21 @@ import (
 	tp "social-network/handlers/types"
 )
 
+type ReqUser struct {
+	FollowID   string `json:"followId"`
+	ID         string `json:"id"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	ProfilePic string `json:"profile_pic"`
+}
+
 type FollowingRequests struct {
-	FollowingRequests []tp.User `json:"requests"`
+	FollowingRequests []ReqUser `json:"requests"`
 	TotalCount        int       `json:"totalCount"`
 	TotalPages        int       `json:"totalPages"`
 }
 
 func GetFollowingRequestsHandler(w http.ResponseWriter, r *http.Request) {
-	
 	userId, err := auth.GetUserId(r)
 	if err != nil {
 		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
@@ -76,35 +83,34 @@ func GetFollowingRequests(id, limitQuery, pageQuery string) (*FollowingRequests,
 	totalPages := (totalCount + limit - 1) / limit
 
 	selectFollowRequests := `
-	SELECT
-	    users.id,
-	    users.first_name,
-	    users.last_name,
-	    users.profile_pic
-	FROM
-	    follow_requests
-	    JOIN users ON follow_requests.follower_id = users.id AND status = "pending"
-	WHERE
-	    followed_id = ?
-	LIMIT ? OFFSET ?
-	;
-	`
+		SELECT
+		    fr.id,               
+		    u.id,
+		    u.first_name,
+		    u.last_name,
+		    u.profile_pic
+		FROM   follow_requests AS fr
+		JOIN   users           AS u ON u.id = fr.follower_id
+		WHERE  fr.followed_id = ?
+		  AND  fr.status      = 'pending'
+		ORDER BY fr.created_at DESC
+		LIMIT  ? OFFSET ?;`
+
 	rows, err := tp.DB.Query(selectFollowRequests, id, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var followRequests []tp.User
+	var followRequests []ReqUser
 	for rows.Next() {
-		var followRequest tp.User
+		var followRequest ReqUser
 
-		if err := rows.Scan(&followRequest.ID, &followRequest.FirstName, &followRequest.LastName, &followRequest.ProfilePic); err != nil {
+		if err := rows.Scan(&followRequest.FollowID, &followRequest.ID, &followRequest.FirstName, &followRequest.LastName, &followRequest.ProfilePic); err != nil {
 			return nil, err
 		}
 
 		followRequests = append(followRequests, followRequest)
-
 	}
 
 	if rows.Err() != nil {

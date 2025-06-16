@@ -9,6 +9,7 @@ import NoData from "../NoData";
 import Loading from "../Loading";
 import styles from "./menus.module.css";
 import { useInfiniteScroll } from "@/lib/scroller";
+import { useFollowSync } from "@/context/FollowSyncContext";
 
 const LIMIT = 8;
 
@@ -22,6 +23,7 @@ export default function FollowersList({ profileId, modal = false, onClose }: Pro
 	const { user: loggedUser } = useUser();
 
 	const [privateProfile, setPrivateProfile] = useState(false)
+	const { version } = useFollowSync()
 
 
 	/* Paging state */
@@ -35,7 +37,8 @@ export default function FollowersList({ profileId, modal = false, onClose }: Pro
 		setList([]);
 		setPage(1);
 		setMore(true);
-	}, [profileId]);
+	}, [profileId, version]);
+
 
 	/* Fetch one page */
 	const fetchPage = useCallback(async (p: number) => {
@@ -65,7 +68,7 @@ export default function FollowersList({ profileId, modal = false, onClose }: Pro
 		} finally {
 			setLoad(false);
 		}
-	}, [profileId]);
+	}, [profileId, version]);
 
 	/* Initial page */
 	useEffect(() => {

@@ -48,8 +48,7 @@ function useRequests(groupId: string) {
 
     /* 3. optimistic accept / refuse */
     const act = async (route: "accept" | "refuse", id: string) => {
-        setList(prev => prev.filter(x => x.id !== id));   // optimistic
-
+        setList(prev => prev.filter(x => x.id !== id));
         const endpoint =
             route === "accept"
                 ? "/api/groups/accept-request"
@@ -63,9 +62,9 @@ function useRequests(groupId: string) {
                 body: JSON.stringify({ request_id: id }),
             });
         } catch {
-            console.warn(`${route} failed — will resync`);
+            console.warn(`${route} failed`);
         } finally {
-            refresh();     // triggers members refresh + refetch here
+            refresh();     // triggers members refresh
             deleteNotification(id); // remove notification from UI
         }
     };

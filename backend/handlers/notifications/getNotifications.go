@@ -43,6 +43,7 @@ func GetNotifications(id string, limitQuery, pageQuery int) (*Notifcations, erro
 		    n.related_event_id,
 		    n.related_invitation_id,
 		    n.related_request_id,
+			n.related_follow_id,
 		    n.created_at,
 		    n.is_read
 		FROM
@@ -65,7 +66,7 @@ func GetNotifications(id string, limitQuery, pageQuery int) (*Notifcations, erro
 		var n tp.Notification
 
 		/* nullable FK columns */
-		var groupID, eventID, invitationID, requestID sql.NullString
+		var groupID, eventID, invitationID, requestID, followId sql.NullString
 
 		if err := rows.Scan(
 			/* sender */
@@ -83,6 +84,7 @@ func GetNotifications(id string, limitQuery, pageQuery int) (*Notifcations, erro
 			&eventID,
 			&invitationID,
 			&requestID,
+			&followId,
 			/* meta */
 			&n.CreatedAt,
 			&n.IsRead,
@@ -102,6 +104,9 @@ func GetNotifications(id string, limitQuery, pageQuery int) (*Notifcations, erro
 		}
 		if requestID.Valid {
 			n.RequestID = requestID.String
+		}
+		if followId.Valid {
+			n.FollowID = followId.String
 		}
 
 		notifications = append(notifications, &n)

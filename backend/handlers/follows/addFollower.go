@@ -53,21 +53,19 @@ func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := uuid.Must(uuid.NewV4()).String()
-	var notif tp.Notification
-
 	if followRequest.Action == "friendRequest" {
 		insertFollower := `
-							INSERT INTO 
-								follow_requests (id, follower_Id, followed_Id, status)
-							VALUES
-								(?, ?, ?, ?)`
+			INSERT INTO 
+				follow_requests (id, follower_Id, followed_Id, status)
+			VALUES
+				(?, ?, ?, ?)`
 
 		if _, err := tp.DB.Exec(insertFollower, id, followRequest.FollowerID, followRequest.FollowedID, "pending"); err != nil {
 
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
 		}
-		notif = tp.Notification{
+		notif := tp.Notification{
 			ID:        uuid.Must(uuid.NewV4()).String(),
 			Type:      "follow_request",
 			Content:   "sent you a new follow request",
@@ -77,7 +75,7 @@ func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 			IsRead:    false,
 			CreatedAt: time.Now().Local().Format("2006-01-02 15:04:05"),
 		}
-		ws.BroadcastNotification(notif)
+		go ws.BroadcastNotification(notif)
 	} else if followRequest.Status == "accepted" {
 		deleteFollowRequest := `
 							UPDATE
@@ -93,7 +91,16 @@ func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 			help.JsonError(w, "Unexpected error, try again later", http.StatusInternalServerError, err)
 			return
 		}
-
+		// Delete the related follow notification
+		if _, err := tp.DB.Exec(`
+			DELETE FROM notifications
+				WHERE related_follow_id = (
+				SELECT id FROM follow_requests
+				WHERE follower_id = ? AND followed_id = ?)`, 
+			followRequest.FollowerID, followRequest.FollowedID); err != nil {
+			help.JsonError(w, "db error", http.StatusInternalServerError, err)
+			return
+		}
 	} else if followRequest.Action == "follow" {
 		insertFollower := `
 			INSERT INTO 

@@ -82,7 +82,7 @@ export default function NotificationDashboard() {
             credentials: "include",
         });
         setItems([]);
-        deleteNotification("ALL"); // you may no-op on "ALL" in provider
+        deleteNotification("ALL");
         setLoading(false);
         setMore(false);
     };

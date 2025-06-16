@@ -12,7 +12,7 @@ function LeftMenu({ className = "" }: { className?: string }) {
   return (
     <div className={`${styles.leftMenu} ${className}`}>
       <>
-        <List type="friendRequests" title="Friend Requests" />
+        <List type="friendRequests" title="Follow Requests" />
         <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
       </>
     </div>

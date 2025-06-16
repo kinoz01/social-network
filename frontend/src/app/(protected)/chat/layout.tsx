@@ -14,7 +14,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
             </div>
             <div className={style.chatBox}>{children}</div>
             <div className={`${style.rMenuLayout}`}>
-                <List type="friendRequests" title="Friend Requests" />
+                <List type="friendRequests" title="Follow Requests" />
                 <SuggestionsList className={style.usersSuggestionsChat} />
             </div>
         </div>

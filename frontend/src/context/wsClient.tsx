@@ -207,9 +207,10 @@ export function WSProvider({ children }: { children: ReactNode }) {
     };
 
     // exposed deleting context
-    const deleteNotification = (key: string) =>
-        setNotifications(prev => key === "ALL" ? [] : prev.filter(n => n.id !== key && n.invitationId !== key &&  n.requestId !== key && n.eventId !== key && n.followId !== key));
-
+    const deleteNotification = (key: string) => {
+        setNotifications(prev => key === "ALL" ? [] : 
+            prev.filter(n => n.id !== key && n.invitationId !== key && n.requestId !== key && n.eventId !== key && n.followId !== key));
+    }
     return (
         <WSContext.Provider
             value={{

@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "./style/eventCard.module.css";
 import { API_URL } from "@/lib/api_url";
 import { useParams } from "next/navigation";
+import { useWS } from "@/context/wsClient";
 
 export interface Event {
     id: string;
@@ -34,6 +35,7 @@ export default function EventCard({
     const [goingCnt, setGoingCnt] = useState(ev.going_count);
     const [notCnt, setNotCnt] = useState(ev.not_going_count);
     const [busy, setBusy] = useState(false);
+    const { deleteNotification } = useWS();
 
     const choose = async (resp: "going" | "not_going") => {
         const wantGoing = resp === "going";
@@ -56,6 +58,7 @@ export default function EventCard({
             setNotCnt(not_going);
             setMyChoice(wantGoing);
             onUpdate(going, not_going, wantGoing);
+            deleteNotification(ev.id); // remove notification if exists (remove from UI, server is hnadled in the api call)
         }
         setBusy(false);
     };

@@ -5,6 +5,7 @@ import { requireSession } from "@/lib/auth";
 import SideBar from "@/components/SideBar";
 import { UserProvider } from "@/context/UserContext";
 import { WSProvider } from "@/context/wsClient";
+import { FollowSyncProvider } from "@/context/FollowSyncContext";
 
 export const metadata: Metadata = {
     title: "Social Network",
@@ -20,10 +21,12 @@ export default async function HomeLayout({
 
     return (
         <UserProvider>
-            <WSProvider>
-                <SideBar />
-                {children}
-            </WSProvider>
+            <FollowSyncProvider>
+                <WSProvider>
+                    <SideBar />
+                    {children}
+                </WSProvider>
+            </FollowSyncProvider>
         </UserProvider>
     );
 }

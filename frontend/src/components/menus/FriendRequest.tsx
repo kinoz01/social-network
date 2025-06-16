@@ -17,19 +17,15 @@ import Loading from "../Loading";
 import styles from "./menus.module.css";
 import { API_URL } from "@/lib/api_url";
 import { useInfiniteScroll } from "@/lib/scroller";
+import { ReqUser } from "@/lib/types";
+import { useFollowSync } from "@/context/FollowSyncContext";
 
 const LIMIT = 10;
 
-type ReqUser = {
-	id: string;
-	first_name: string;
-	last_name: string;
-	profile_pic: string | null;
-};
 
 // for modal
 type Props = {
-	modal?: boolean;       
+	modal?: boolean;
 	onClose?: () => void;
 };
 
@@ -37,6 +33,7 @@ type Props = {
 export default function FriendRequests({ modal = false, onClose }: Props) {
 	const { deleteNotification } = useWS();
 	const { user: loggedUser } = useUser();
+	const { refresh } = useFollowSync()
 
 	const [list, setList] = useState<ReqUser[]>([]);
 	const [page, setPage] = useState(1);
@@ -64,17 +61,16 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 	}, [fetchPage]);
 
 	/* optimistic remove */
-	const dropRow = (id: string) => {
-		console.log(id,"+++++++++++++++++++++++++++");
-		
-		setList(prev => prev.filter(u => u.id !== id));
-		deleteNotification(id);
+	const dropRow = (followId: string) => {
+		setList(prev => prev.filter(u => u.followId !== followId));
+		deleteNotification(followId);
 	};
 
 	/* unified callback */
 	const handleAction = async (
 		action: "accepted" | "rejected",
-		userId: string
+		userId: string,
+		followId: string
 	) => {
 		await addFollower(
 			{
@@ -85,8 +81,9 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 			},
 			"/api/followers/add"
 		);
-		dropRow(userId);
-	};
+		dropRow(followId);
+		refresh()
+	};	
 
 	/* infinite scroll */
 	const boxRef = useRef<HTMLDivElement>(null);
@@ -129,14 +126,14 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 								<button
 									className={styles.icnButton}
 									title="Accept"
-									onClick={() => handleAction("accepted", u.id)}
+									onClick={() => handleAction("accepted", u.id, u.followId)}
 								>
 									<Image src="/img/accept.svg" alt="" width={20} height={20} />
 								</button>
 								<button
 									className={styles.icnButton}
 									title="Reject"
-									onClick={() => handleAction("rejected", u.id)}
+									onClick={() => handleAction("rejected", u.id, u.followId)}
 								>
 									<Image src="/img/refuse.svg" alt="" width={20} height={20} />
 								</button>
@@ -173,7 +170,7 @@ export default function FriendRequests({ modal = false, onClose }: Props) {
 				<button className={styles.closeBtn} onClick={() => onClose?.()}>
 					×
 				</button>
-				<h4 className={styles.modalTitle}>Friend Requests</h4>
+				<h4 className={styles.modalTitle}>Follow Requests</h4>
 				{content}
 			</div>
 		</div>

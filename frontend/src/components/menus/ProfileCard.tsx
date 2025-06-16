@@ -12,6 +12,7 @@ import {
 	PostsIcon,
 	GroupsIconSmall,
 } from "@/components/icons";
+import { useFollowSync } from "@/context/FollowSyncContext";
 
 type Counters = {
 	total_posts: number;
@@ -23,6 +24,7 @@ type Counters = {
 export default function ProfileCard() {
 	const { user } = useUser();
 	const [stats, setStats] = useState<Counters | null>(null);
+	const { version } = useFollowSync();
 
 	// fetch profile when the logged-in user becomes available 
 	useEffect(() => {
@@ -47,7 +49,7 @@ export default function ProfileCard() {
 				setStats(null);
 			}
 		})();
-	}, [user]);
+	}, [user,version]);
 
 	if (!user) return null;
 

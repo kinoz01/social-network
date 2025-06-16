@@ -7,6 +7,7 @@ import styles from "./menus.module.css";
 import ListItem from "./ListItem";
 import NoData from "../NoData";
 import Loading from "../Loading";
+import { useFollowSync } from "@/context/FollowSyncContext";
 
 type Props = {
   className?: string;
@@ -15,6 +16,7 @@ type Props = {
 function SuggestionsList({ className = "" }: Props) {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [suggestions, setSuggestions] = useState<User[] | null>([]);
+  const { version } = useFollowSync()
 
   useEffect(() => {
     async function fetchSuggestions() {
@@ -23,7 +25,7 @@ function SuggestionsList({ className = "" }: Props) {
     }
     fetchSuggestions();
     setIsDataLoading(false);
-  }, []); // Empty dependency array means this only runs once on mount
+  }, [version]);
 
   return (
     <div className={`${styles.users} ${className}`}>

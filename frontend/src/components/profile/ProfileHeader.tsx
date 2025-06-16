@@ -11,6 +11,7 @@ import FriendRequestList from "@/components/menus/FriendRequest";
 import Loading from "../Loading";
 import { User } from "@/lib/types";
 import FollowButton from "./FollowButton";
+import { useFollowSync } from "@/context/FollowSyncContext";
 
 /* -------------------------------- Types -------------------------------- */
 
@@ -37,6 +38,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 	const [showFollowers, setShowFollowers] = useState(false);
 	const [showFollowings, setShowFollowings] = useState(false);
 	const [showRequests, setShowRequests] = useState(false);
+	const { version } = useFollowSync();
 
 	/* ---------------------- fetch on mount / id change --------------------- */
 	useEffect(() => {
@@ -88,7 +90,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 				setProfile(null);
 			}
 		})();
-	}, [profileId]);
+	}, [profileId, version]);
 
 	const onToggleClick = () => {
 		if (toggleLoading) return;
@@ -193,7 +195,7 @@ export default function ProfileHeader({ profileId }: { profileId?: string }) {
 
 					{privateProfile ? (
 						<div className={styles.empty}>
-							<img src="/img/lock.svg" alt="private" width={60} height={60} />
+							<img src="/img/hidden.svg" alt="private" width={40} height={40} />
 							<p>Follow user to see content</p>
 						</div>
 					) : (
