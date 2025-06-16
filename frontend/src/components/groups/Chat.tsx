@@ -48,14 +48,14 @@ export default function Chat() {
     useEffect(() => {
         (async () => {
             if (!groupId) return;
-            setLoadingFirst(true);                                       
+            setLoadingFirst(true);
             const pageRaw = await fetchPage(0);
-            const page = Array.isArray(pageRaw) ? pageRaw : [];          
+            const page = Array.isArray(pageRaw) ? pageRaw : [];
             idSetRef.current = new Set(page.map(m => m.id));
             setMsgs(page);
             setOff(page.length);
             setHM(page.length === PAGE);
-            setLoadingFirst(false);                                      
+            setLoadingFirst(false);
         })();
     }, [groupId]);
 
@@ -107,7 +107,7 @@ export default function Chat() {
     }, [msgs]);
 
     /* helpers */
-    const t = (iso: string) =>  {
+    const t = (iso: string) => {
         const dateStr = iso.endsWith('Z') ? iso.slice(0, -1) : iso;
         return new Date(dateStr).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }

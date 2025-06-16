@@ -1,7 +1,7 @@
 import React from "react";
-import { Post, User } from "@/components/types";
-import { popup } from "@/components/utils";
+import { popup } from "@/lib/utils";
 import { API_URL } from "@/lib/api_url";
+import { Post, User } from "./types";
 
 
 type handleSbmtParams = {
@@ -9,7 +9,6 @@ type handleSbmtParams = {
     onClose: () => void;
     onSubmit: (post: Post) => void;
     userData: User
-
 }
 
 const HandleCreation = async (props: handleSbmtParams) => {

@@ -1,4 +1,5 @@
-.follow {
+.unfollow {
+  color: var(--color1);
   background-color: var(--color5);
 }
 

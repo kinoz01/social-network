@@ -10,8 +10,8 @@ import (
 	postDB "social-network/database/repositories/db_posts"
 	auth "social-network/handlers/authentication"
 	"social-network/handlers/helpers"
+	hlp "social-network/handlers/helpers"
 	typeP "social-network/handlers/types"
-	Postsrv "social-network/service/service_posts"
 
 	"github.com/gofrs/uuid"
 )
@@ -36,10 +36,10 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 	newPost := typeP.Post{
 		ID:         postID.String(),
 		UserID:     user.ID,
-		Visibility: Postsrv.ValidVisibility(visibility),
+		Visibility: hlp.ValidVisibility(visibility),
 	}
 
-	if err := Postsrv.ValidInput(content); err != nil {
+	if err := hlp.ValidInput(content); err != nil {
 		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
 		return
 	}

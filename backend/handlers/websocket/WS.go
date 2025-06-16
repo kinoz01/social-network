@@ -3,6 +3,7 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sort"
 	"sync"
@@ -103,6 +104,8 @@ func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	// 2) Upgrade to WebSocket
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		fmt.Println("ws err2: ", err)
+
 		return
 	}
 
@@ -154,15 +157,22 @@ func GlobalWS(w http.ResponseWriter, r *http.Request) {
 
 	// 9) Broadcast updated online status
 	broadcastOnlineStatus()
+	sendUnreadNotificationCount(cl, u.ID)
+
 	conn.Close()
 }
 
 /*────────── Router ─────────*/
 func handleMessage(c *client, raw []byte, u *tp.User) {
 	var msg inbound
+	fmt.Println("raw, msg: ", string(raw), msg)
 	if err := json.Unmarshal(raw, &msg); err != nil {
+		fmt.Println("ws err3: ", err)
+
 		return
 	}
+
+	fmt.Println("ws msg: ", msg)
 
 	switch msg.Type {
 	// ───── Group: get member snapshot ─────

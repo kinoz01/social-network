@@ -29,7 +29,7 @@ export default function Comment(props: Params) {
 
     setLoading(true)
     try {
-      const oldComments = await COmmentsGetter({ postID: props.postID, page: curentPage })
+      const oldComments = await CommentsGetter({ postID: props.postID, page: curentPage })
       if (!oldComments || oldComments.length === 0) {
         sethasMore(false)
         return

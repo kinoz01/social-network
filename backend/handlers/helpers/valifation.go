@@ -1,4 +1,4 @@
-package service_posts
+package helpers
 
 import (
 	"fmt"

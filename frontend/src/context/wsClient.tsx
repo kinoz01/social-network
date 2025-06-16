@@ -16,11 +16,11 @@ import { useFollowSync } from "./FollowSyncContext";
 
 /* ───────── Types ───────── */
 export interface Member {
-    id: string;
-    first_name: string;
-    last_name: string;
-    profile_pic: string | null;
-    isOnline: boolean;
+  id: string;
+  first_name: string;
+  last_name: string;
+  profile_pic: string | null;
+  isOnline: boolean;
 }
 
 export interface ChatMsg {
@@ -182,6 +182,49 @@ export function WSProvider({ children }: { children: ReactNode }) {
         } else {
             ws.addEventListener("open", () => ws.send(txt), { once: true });
         }
+
+        case "unreadNotificationsCount":
+          setUnreadNotificationsCount(msg.count);
+          break;
+
+        case "getNotifications":
+          setNotifications((prevData) => {
+            const existingIds = new Set(
+              prevData.notifications.map((n) => n.id)
+            );
+            
+            const newNotifications = msg.notifications.filter(
+              (n: NotificationModel) => !existingIds.has(n.id)
+            );
+
+            return {
+              ...prevData,
+              notifications: [...prevData.notifications, ...newNotifications],
+              totalCount: msg.totalCount,
+              totalPages: msg.totalPages,
+            };
+          });
+          break;
+
+        case "updateNotifications":
+          setNotifications((prevData) => {
+            const existingIds = new Set(
+              prevData.notifications.map((n) => n.id)
+            );
+
+            const newNotifications = msg.notifications.filter(
+              (n: NotificationModel) => !existingIds.has(n.id)
+            );
+
+            return {
+              ...prevData,
+              notifications: [...newNotifications, ...prevData.notifications],
+              totalCount: msg.totalCount,
+              totalPages: msg.totalPages,
+            };
+          });
+          break;
+      }
     };
 
     /* simple wrappers */

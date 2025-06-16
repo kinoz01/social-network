@@ -9,7 +9,6 @@ import (
 )
 
 const fileLimit = 4 << 20 // 4MB
-
 // Handle serving static content.
 // Api files available at /api/storage/...
 func FilesHandler(w http.ResponseWriter, r *http.Request) {

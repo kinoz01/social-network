@@ -6,6 +6,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -19,8 +20,7 @@ body {
 }
   
 /******************* Welcome Popup *******************/
-.welcome-popup,
-.popup {
+.welcome-popup {
     position: fixed;
     top: 1%;
     left: 50%;
@@ -51,14 +51,6 @@ body {
     color: #f71515;
 }
 
-.popup.succ {
-    background-color: #8dc572;
-}
-
-.popup.fail {
-    background-color: #be6464;
-}
-
 /* Close Button */
 .close-popup {
     position: absolute;
@@ -79,8 +71,7 @@ body {
         font-weight: bold;
     }
 
-    .welcome-popup,
-    .popup {
+    .welcome-popup {
         padding: 1.5rem 2rem;
         font-size: 1.2rem;
         font-weight: normal;
@@ -90,4 +81,14 @@ body {
     .close-popup {
         font-size: 1.3rem;
     }
+}
+
+::selection {
+    background-color: #697077;
+    color: white;
+}
+
+::-moz-selection {
+    background-color: #697077;
+    color: white;
 }

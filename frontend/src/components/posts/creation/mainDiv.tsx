@@ -1,14 +1,14 @@
-import styles from "../posts.module.css"
+import styles from "../posts.module.css";
 import { CreateIcon } from "@/components/icons";
 import Image from "next/image";
 import { useState } from "react";
 
 type MainParams = {
-    onClose: () => void;
-    privacy: string;
-    showCHoice: () => void;
-    userName: string;
-}
+  onClose: () => void;
+  privacy: string;
+  showCHoice: () => void;
+  userName: string;
+};
 
 const MainDiv = (props: MainParams) => {
     const [fileName, setFileName] = useState("upload image (optional)");
@@ -56,4 +56,4 @@ const MainDiv = (props: MainParams) => {
     )
 }
 
-export { MainDiv }
+export { MainDiv };

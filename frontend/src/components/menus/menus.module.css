@@ -38,16 +38,14 @@
 }
 
 .header {
-  padding: 15px 15px 0px 15px;
-  top: 0;
-  left: 0;
+  padding: 25px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 3rem;
-  background-color: var(--color2);
+  height: auto;
+  /* background-color: var(--color2); */
 }
 
 .title {
@@ -93,7 +91,7 @@
 .listItem {
   font-size: clamp(0.8rem, 1rem, 1.4rem);
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.5rem;
   width: 100%;
@@ -178,7 +176,6 @@ label {
   cursor: pointer;
 } */
 
-/* GROUP LIST */
 .leftMenu.chat {
   height: 100%;
 }
@@ -237,7 +234,8 @@ label {
     right: 20px;
   }
 
-  .rightMenu {
+  .rightMenu:not(.profile) {
+    background-color: aqua;
     display: none;
   }
 
@@ -250,6 +248,7 @@ label {
   }
 
   /* PRIVATE CHAT MENU */
+
   .leftMenu.chat {
     flex-direction: row;
     height: 10%;

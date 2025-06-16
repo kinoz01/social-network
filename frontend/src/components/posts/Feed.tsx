@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import styles from "./posts.module.css";
 import "../../app/globals.css";
@@ -147,7 +147,51 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                         )}
                     </>
                 }
+                alt=""
+                width={40}
+                height={40}
+                className={styles.userIcon}
+              />
+              What's on your mind, {user && user.first_name?.toUpperCase()} ??
             </div>
-        </>
-    )
+          }
+        </div>
+      )}
+      <div className={styles.feed}>
+        {showFOrm && (
+          <NewPOst
+            onSubmit={handleNewPOst}
+            onClose={toggleFOrm}
+            userData={user}
+          />
+        )}
+
+        {currentPage === 0 && postedContent.length === 0 ? (
+          <NoData msg="No Posts Yet!" />
+        ) : (
+          <>
+            {postedContent.map((post, index) => (
+              <div
+                className={styles.post}
+                key={post.id}
+                ref={
+                  index === postedContent.length - 1 ? lastPostElementRef : null
+                }
+              >
+                <PostComponent post={post} />
+              </div>
+            ))}
+
+            {isLoading && <Loading />}
+
+            {!hasMOre && !isLoading && (
+              <div className={styles.noMorePosts}>
+                No more posts to load - Check back later.
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
 }

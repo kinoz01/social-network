@@ -5,6 +5,7 @@
     background: #fff;
     padding: 1rem;
     max-width: 600px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: .75rem;

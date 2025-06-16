@@ -1,4 +1,4 @@
-CREATE TABLE follow_requests (
+CREATE TABLE  follow_requests (
     id TEXT PRIMARY KEY,
     follower_id TEXT NOT NULL,
     followed_id TEXT NOT NULL,

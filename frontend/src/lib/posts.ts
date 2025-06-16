@@ -1,5 +1,5 @@
-import { Post, CommentInfo } from "@/components/types";
 import { API_URL } from "@/lib/api_url";
+import { CommentInfo, Post } from "./types";
 
 
 export const fetchOldPosts = async (pageNum: number) => {
@@ -21,7 +21,7 @@ export const fetchOldPosts = async (pageNum: number) => {
     }
 }
 
-export const COmmentsGetter = async ({ postID, page }: { postID: string, page: number }) => {
+export const CommentsGetter = async ({ postID, page }: { postID: string, page: number }) => {
     const queryParams = new URLSearchParams({
         postId: postID,
         page: page.toString()
