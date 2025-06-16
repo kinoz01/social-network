@@ -1,0 +1,131 @@
+.menu {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    padding: 1.5rem;
+    max-width: 600px;
+    top: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .05);
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    overflow-y: auto;
+    margin-right: 1rem;
+    overflow-wrap: anywhere;
+    scrollbar-width: none;
+    flex-shrink: 0;
+    max-height: 400px;
+    margin-top: 10px;
+}
+
+.section {
+    margin: 0;
+    font-size: .9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.search {
+    width: 100%;
+    padding: .45rem .6rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: .9rem;
+    margin-bottom: .6rem;
+}
+
+.search:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    overflow-y: auto;
+    max-height: 65vh;
+    scrollbar-width: none;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .45rem .6rem;
+    border-radius: 8px;
+    font-size: .92rem;
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: #000;
+    transition: background .15s, border-color .15s;
+    gap: .55rem;
+}
+
+.avt {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.name {
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
+}
+
+.crown {
+    width: 18px;
+    height: 18px;
+    color: #f1b400;
+    margin-left: auto;
+}
+
+.end {
+    text-align: center;
+    font-size: .8rem;
+    color: #777;
+    padding: .4rem 0;
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 3rem;
+    z-index: 1000;
+}
+
+.modal {
+    max-width: 640px;
+    width: 92%;
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.close {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    right: 1rem;
+    cursor: pointer;
+    position: relative;
+    margin-left: auto;
+}
+
+@media(max-width:970px) {
+    .menu {
+        overflow-x: auto;
+        flex-direction: column;
+        margin: 0;
+        max-width: 90vw;
+        width: 600px;
+    }
+
+    .section {
+        margin: auto;
+        margin-bottom: 10px;
+    }
+}

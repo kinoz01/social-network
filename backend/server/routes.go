@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+	"social-network/handlers/posts"
+	"social-network/handlers/users"
 	"time"
 
 	"social-network/handlers/posts"

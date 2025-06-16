@@ -39,7 +39,6 @@
 
 .header {
   padding: 15px 15px 0px 15px;
-  position: sticky;
   top: 0;
   left: 0;
   display: flex;
@@ -162,6 +161,22 @@
   align-items: center;
   gap: 8px;
 }
+
+/* posts */
+/* input[type="checkbox"] {
+  color: beige;
+  cursor: pointer;
+} */
+
+
+
+/* 
+label {
+  font-size: 0.8rem;
+  color: #343434;
+  margin-left: 0.5rem;
+  cursor: pointer;
+} */
 
 /* GROUP LIST */
 .leftMenu.chat {

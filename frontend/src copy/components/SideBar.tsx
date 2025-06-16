@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
 import {
+  AddIcon,
   ChatsIcon,
   GroupsIcon,
   HomeIcon,
@@ -12,22 +12,11 @@ import {
 } from "./icons";
 import Link from "next/link";
 import { useLogout } from "@/lib/logout";
-import { useWS } from "@/context/wsClient";
-
 export default function SideBar() {
-
   const [hover, setHover] = useState(false);
-  const user = useUser();
+
   const { handleLogout } = useLogout();
 
-  const { totalUnread, notifsCount } = useWS();
-  const badge = totalUnread > 99 ? "99+" : totalUnread.toString();
-  const showBadge = totalUnread > 0;
-
-  // Show notification badge with how many notifications
-  const notifbadge = notifsCount > 99 ? "99+" : notifsCount.toString();
-  const showNotifBadge = notifsCount > 0;
-  
   return (
     <div
       className="sideBar"
@@ -46,7 +35,7 @@ export default function SideBar() {
           <HomeIcon />
           {hover ? <span>Home</span> : null}
         </Link>
-        <Link href="/profile" className="navSection">
+        <Link href="/profile/1" className="navSection">
           <UserIcon />
           {hover ? <span>Profile</span> : null}
         </Link>
@@ -54,15 +43,13 @@ export default function SideBar() {
           <GroupsIcon />
           {hover ? <span>Groups</span> : null}
         </Link>
-        <Link href="/notifications" className="navSection iconWrap">
-          {showNotifBadge && <span className="badge">{notifbadge}</span>}
+        <Link href="/notifications/1" className="navSection">
           <NotificationIcon />
           {hover ? <span>Notifications</span> : null}
         </Link>
-        <Link href="/chat" className="navSection iconWrap">
+        <Link href="/chat/1" className="navSection">
           <ChatsIcon />
-          {showBadge && <span className="badge">{badge}</span>}
-          {hover && <span>Chats</span>}
+          {hover ? <span>Chats</span> : null}
         </Link>
 
       </div>
