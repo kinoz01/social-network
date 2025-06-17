@@ -13,25 +13,15 @@ const LeftMenu = ({
       {type == "home" ? (
         <>
           <ProfileCard />
-            <List type="followers" title="Followers" />
+          <List type="followers" title="Followers" />
         </>
       ) : type === "chat" ? (
         <>
-            <List type="chat" title="Chat" />
+          <List type="chat" title="Chat" />
         </>
       ) : type === "groups" ? (
         <>
-          {/* <div className="buttons">
-            <button>
-              <Link href="/groups/1">Posts</Link>
-            </button>
-            <button>
-              <Link href="/groups/1/chat">Chat</Link>
-            </button>
-            <button>
-              <Link href="/groups/1/events">Events</Link>
-            </button>
-          </div> */}
+
           <List type="groups" title="Groups" />
         </>
       ) : null}

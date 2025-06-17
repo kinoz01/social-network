@@ -9,6 +9,8 @@ import { API_URL } from "@/lib/api_url";
 
 import { useUser } from "@/context/UserContext";
 import { createPortal } from "react-dom";
+import FollowersList from "../menus/FollowersList";
+import FollowingsList from "../menus/FollowingsList";
 
 
 
@@ -24,24 +26,29 @@ function UserProfile({ userId }: any) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const [statusUpdated, setStatusUpdated] = useState<boolean>(false);
 
-  function ChangeStatus() {
-    setIsModalOpen((prev) => !prev);
-  }
+  const [followers, setFollowers] = useState<boolean>(false)
+  const [followings, setFollowings] = useState<boolean>(false)
+
+  // function ChangeStatus() {
+  //   setIsModalOpen((prev) => !prev);
+  // }
 
   const user = useUser();
 
-  function IsUserLoged() {
+  // function IsUserLoged() {
 
-    if (user.user?.id === userId) {
-      return true
-    }
-    return false
-  }
+  //   if (user.user?.id === userId) {
+  //     return true
+  //   }
+  //   return false
+  // }
 
-  function getOppositeOfAccountType(): string {
-    return userData?.account_type === "public" ? "private" : "public";
-  }
+  // function accoutType: string {
+  const accoutType = userData?.account_type === "public" ? "private" : "public";
+  // }
+
   async function handleStatus() {
     if (isLoading) return;
 
@@ -54,12 +61,15 @@ function UserProfile({ userId }: any) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          status: getOppositeOfAccountType() // "public" or "private"
+          status: accoutType // "public" or "private"
         }),
       })
       const data = await res.json();
-      await fetchData()
-      ChangeStatus()
+      console.log("daaaaaaaaaaaaaaaaaaata: ", data);
+
+      setStatusUpdated(prev => !prev);
+
+      setIsModalOpen((prev) => !prev);
     } catch (error) {
       console.log("error", error);
     } finally {
@@ -69,13 +79,8 @@ function UserProfile({ userId }: any) {
 
 
 
-function displqyfollowers() {
-
-}
-
-
   async function fetchData() {
-      if (isLoading) return;
+    if (isLoading) return;
 
     setIsLoading(true);
     try {
@@ -84,13 +89,13 @@ function displqyfollowers() {
       setData(data)
     } catch (error) {
       console.log("error", error);
-    }finally {
+    } finally {
       setIsLoading(false);
     }
   }
 
   async function fetchPost() {
-       if (isLoading) return;
+    if (isLoading) return;
 
     setIsLoading(true);
     try {
@@ -101,15 +106,18 @@ function displqyfollowers() {
       setPosts(posts)
     } catch (error) {
       console.log("error", error);
-    }finally {
+    } finally {
       setIsLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchData();
-    fetchPost();
-  }, [])
+    const fetch = async () => {
+      await fetchData();
+      await fetchPost();
+    }
+    fetch()
+  }, [statusUpdated])
 
   if (!userData) return <p>loading ...</p>
   return <>
@@ -120,8 +128,8 @@ function displqyfollowers() {
             src={userData.profile_pic ? `${API_URL}/api/storage/avatars/${userData.profile_pic}` : `${API_URL}/api/storage/avatars/avatar.webp`}
             alt={`${userData.profile_pic}`} className={styles.userImageprofil} width={150} height={150} />
           {
-            IsUserLoged() && (
-              <button className={`${styles.accountStatus}`} onClick={ChangeStatus} > account staut </button>
+            user.user?.id === userId && (
+              <button className={`${styles.accountStatus}`} onClick={() => setIsModalOpen((prev) => !prev)} > account staut </button>
             )
           }
         </div>
@@ -131,7 +139,7 @@ function displqyfollowers() {
             <div className={styles.username}>
               <span>{userData.first_name} {userData.last_name}</span>
               {
-                !IsUserLoged() && (
+                user.user?.id !== userId && (
                   <button className={`${styles.followBtn}`}>
                     Follow
                   </button>
@@ -140,13 +148,18 @@ function displqyfollowers() {
             </div>
             <div className={styles.numbers}>
               <div className={styles.postsNumber}> {userPosts?.post_nbr} Posts</div>
-              <div onClick={displqyfollowers} className={styles.followersNumber}>{userData.total_followers} Followers </div>
-              <div className={styles.followingNumber}>{userData.total_followings} Following</div>
+              <div onClick={() => {
+                setFollowers(prev => !prev)
+                setFollowings(false)
+
+              }} className={styles.followersNumber}>{userData.total_followers} Followers </div>
+              <div onClick={() => {
+                setFollowings(prev => !prev)
+                setFollowers(false)
+              }} className={styles.followingNumber}>{userData.total_followings} Following</div>
             </div>
           </div>
           <div className={styles.more_data}>
-            {/* <span></span> */}
-
             <span>{userData.username} </span>
             <span>{userData.about_me}</span>
             <span>{userData.birthday}</span>
@@ -162,18 +175,17 @@ function displqyfollowers() {
         </div>
       </section>
     </div>
-
     {
-      isModalOpen && createPortal(
+      isModalOpen &&
+      <>
         <div className={styles.modalcontainer}>
           <div className={styles.modal}>
             <div className={styles.header}>
               <h3>Change Profile Status</h3>
-              <button onClick={ChangeStatus} className={styles.closebtn}>&times;</button>
+              <button onClick={() => setIsModalOpen((prev) => !prev)} className={styles.closebtn}>&times;</button>
             </div>
-
             <div className={styles.content}>
-              <p>Do you want to change your profile from <strong>{userData.account_type}</strong> to <strong>{getOppositeOfAccountType()}</strong>?</p>
+              <p>Do you want to change your profile from <strong>{userData.account_type}</strong> to <strong>{accoutType}</strong>?</p>
 
               <div className={styles.info}>
                 <div className={styles.statusbox}>
@@ -185,16 +197,29 @@ function displqyfollowers() {
                 </div>
               </div>
             </div>
-
             <div className={styles.actions}>
-              <button onClick={ChangeStatus} className={styles.cancelbtn}>Cancel</button>
-              <button disabled={isLoading} onClick={handleStatus} className={styles.confirmbtn}>Change to {getOppositeOfAccountType()}</button>
+              <button onClick={() => setIsModalOpen((prev) => !prev)} className={styles.cancelbtn}>Cancel</button>
+              <button disabled={isLoading} onClick={handleStatus} className={styles.confirmbtn}>Change to {accoutType}</button>
             </div>
           </div>
-        </div>,
-        document.body
-      )
+        </div>
+      </>
     }
+    {
+      followers && 
+      <div className={styles.followers}>
+        <div>Followers</div>
+        <FollowersList profileId={userId} />
+      </div>
+    }
+    {
+      followings && 
+      <div className={styles.followings}>
+        <div>Followings</div>
+        <FollowingsList profileId={userId} />
+      </div>
+    }
+
   </>
 }
 

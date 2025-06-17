@@ -2,9 +2,10 @@ package server
 
 import (
 	"net/http"
+	"time"
+
 	"social-network/handlers/posts"
 	"social-network/handlers/users"
-	"time"
 
 	auth "social-network/handlers/authentication"
 	hlp "social-network/handlers/helpers"
@@ -84,10 +85,12 @@ func Routes() http.Handler {
 
 	mux.HandleFunc("/api/profileData/", profile.ProfileData)
 	mux.HandleFunc("/api/profilePosts/", profile.GetPosts)
-	mux.HandleFunc("/api/handleAccountStatu/", profile.ChangeStatu )
+	mux.HandleFunc("/api/handleAccountStatu/", profile.ChangeStatu)
 
 	// Followers search:
-	mux.HandleFunc("/api/followers", flw.GetFollowers)
+	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)
+	mux.HandleFunc("/api/followings", flw.GetFollowingsHandler)
+	mux.HandleFunc("/api/profile/info", flw.ProfileInfoHandler)
 
 	// Websocket
 	mux.HandleFunc("/api/ws", ws.GlobalWS)
