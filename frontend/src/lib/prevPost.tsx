@@ -4,10 +4,12 @@ import { API_URL } from "@/lib/api_url";
 
 export const fetchOldPosts = async (pageNum: number, type?: string, id?: string) => {
     const url =
-        type === "profile" ? `${API_URL}/api/allPosts?pageNum=${pageNum}&profileId=${id}`
+        type === "profile" ? `${API_URL}/api/profilePosts/${id}`
             : type === "group" ? `${API_URL}/api/allPosts?pageNum=${pageNum}&groupId=${id}`
                 : `${API_URL}/api/allPosts?pageNum=${pageNum}`;
 
+                console.log("url =========================",url);
+                
     try {
         const res = await fetch(url,
             {
@@ -15,6 +17,7 @@ export const fetchOldPosts = async (pageNum: number, type?: string, id?: string)
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include'
             })
+            
         if (res.status === 206) {
             throw Object.assign(new Error("private profile"), { status: 206 });
         } else if (res.status === 404) {

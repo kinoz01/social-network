@@ -379,6 +379,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 			})
 			const posts = await res.json();
 			setPosts(posts)
+			console.log("posts",posts);
 		} catch (error) {
 			console.log("error", error);
 		} finally {

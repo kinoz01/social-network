@@ -112,7 +112,7 @@ func Routes() http.Handler {
 	// mux.Handle("/api/users/profilesInfo", mw.GetMW(profile.ProfileData))
 	// mux.Handle("/api/handleAccountStatu", rl.RateLimitMW(mw.PostMW(profile.ChangeStatu)))
 	mux.HandleFunc("/api/profileData/", profile.ProfileData)
-	// mux.HandleFunc("/api/profilePosts/", profile.GetPosts)
+	mux.HandleFunc("/api/profilePosts/", profile.GetPosts)
 	mux.HandleFunc("/api/handleAccountStatu/", profile.ChangeStatu)
 
 	// Websocket

@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -38,41 +39,42 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("*********************************", IsPublicAccount, IsFriend)
+
 	if IsFriend || useid == user.ID || (useid != user.ID && IsPublicAccount) {
 		postsQuery := `SELECT
-    posts.group_id,
-    posts.body,
-    posts.img_post,
-    posts.visibility,
-    posts.created_at,
-    posts.post_id,
-    users.first_name,
-    users.last_name,
-    users.profile_pic,
-	users.id,
-    (
-        select
-            count(*)
-        FROM
-            like_reaction l
-        WHERE
-            l.post_id = posts.post_id
-    ) AS total_likes,
-    (
-        SELECT
-            COUNT(*)
-        FROM
-            comments c
-        WHERE
-            c.post_id = posts.post_id
-    ) AS comment_count
-FROM posts 
-LEFT JOIN users ON users.id = posts.user_id
-WHERE
-    user_id = ?
-ORDER BY
-    posts.created_at DESC;
-`
+		    posts.body,
+		    posts.img_post,
+		    posts.visibility,
+		    posts.created_at,
+		    posts.post_id,
+		    users.first_name,
+		    users.last_name,
+		    users.profile_pic,
+			users.id,
+		    (
+		        select
+		            count(*)
+		        FROM
+		            like_reaction l
+		        WHERE
+		            l.post_id = posts.post_id
+		    ) AS total_likes,
+		    (
+		        SELECT
+		            COUNT(*)
+		        FROM
+		            comments c
+		        WHERE
+		            c.post_id = posts.post_id
+		    ) AS comment_count
+		FROM posts 
+		LEFT JOIN users ON users.id = posts.user_id
+		WHERE
+		    user_id = ?
+		ORDER BY
+		    posts.created_at DESC;
+		`
 
 		rows, err := tp.DB.Query(postsQuery, useid)
 		if err != nil {
@@ -80,13 +82,13 @@ ORDER BY
 			return
 		}
 		defer rows.Close()
+		var img sql.NullString
 
 		for rows.Next() {
 			var post tp.PostData
 			err := rows.Scan(
-				&post.GroupID,
 				&post.Content,
-				&post.Imag_post,
+				&img,
 				&post.Visibility,
 				&post.CreatedAt,
 				&post.PostID,
@@ -97,8 +99,12 @@ ORDER BY
 				&post.TotalLIKes,
 				&post.TotalComments,
 			)
+			if img.Valid {
+				post.Imag_post = img.String
+			}
 			if err != nil {
 				Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+				fmt.Println(err)
 				return
 			}
 			resction, err := GitReaction(w, post.PostID, post.UserID)
@@ -112,18 +118,21 @@ ORDER BY
 			} else {
 				post.HasReact = resction
 			}
+			
 			userdata.Posts = append(userdata.Posts, post)
+			
 		}
-
 		if err = rows.Err(); err != nil {
 			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
-
+		fmt.Println(userdata.Posts)
+		
 	}
-
+	
 	userdata.PostNbr = len(userdata.Posts)
+	fmt.Println("////////////////", userdata )
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userdata)
+	json.NewEncoder(w).Encode(userdata.Posts)
 }
