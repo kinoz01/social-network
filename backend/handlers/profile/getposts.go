@@ -52,7 +52,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("*********************************", IsPublicAccount, IsFriend)
 
-	if IsFriend || useid == user.ID || ( IsPublicAccount ) {
+	if useid == user.ID || IsPublicAccount {
 		postsQuery := `SELECT
 		    posts.body,
 		    posts.img_post,
@@ -129,7 +129,15 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			} else {
 				post.HasReact = resction
 			}
-
+			
+			if post.Visibility == "almost-private" {
+				if !IsFriend {
+					continue
+				}
+			}
+			if post.Visibility == "private" {
+				// does it exist 
+			}
 			userdata.Posts = append(userdata.Posts, post)
 
 		}
