@@ -13,10 +13,6 @@ import (
 )
 
 func HandleCommentLike(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
 	u, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)

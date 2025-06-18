@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "./style/eventCard.module.css";
 import { API_URL } from "@/lib/api_url";
 import { useParams } from "next/navigation";
+import { useWS } from "@/context/wsClient";
 
 export interface Event {
     id: string;
@@ -20,9 +21,11 @@ export interface Event {
 
 export default function EventCard({
     ev,
+    expired,
     onUpdate,
 }: {
     ev: Event;
+    expired: boolean;
     onUpdate: (going: number, notGoing: number, myChoice: boolean) => void;
 }) {
 
@@ -32,10 +35,11 @@ export default function EventCard({
     const [goingCnt, setGoingCnt] = useState(ev.going_count);
     const [notCnt, setNotCnt] = useState(ev.not_going_count);
     const [busy, setBusy] = useState(false);
+    const { deleteNotification } = useWS();
 
     const choose = async (resp: "going" | "not_going") => {
         const wantGoing = resp === "going";
-        if (busy) return;
+        if (busy || expired) return;
         if ((wantGoing && myChoice === true) || (!wantGoing && myChoice === false)) return;
 
         setBusy(true);
@@ -54,6 +58,7 @@ export default function EventCard({
             setNotCnt(not_going);
             setMyChoice(wantGoing);
             onUpdate(going, not_going, wantGoing);
+            deleteNotification(ev.id); // remove notification if exists (remove from UI, server is hnadled in the api call)
         }
         setBusy(false);
     };
@@ -77,18 +82,18 @@ export default function EventCard({
                 <button
                     className={`${styles.button} ${myChoice === true ? styles.sel : ""}`}
                     onClick={() => choose("going")}
-                    disabled={busy}
+                    disabled={busy || expired}
                 >
                     Going
                 </button>
                 <button
                     className={`${styles.button} ${myChoice === false ? styles.sel : ""}`}
                     onClick={() => choose("not_going")}
-                    disabled={busy}
+                    disabled={busy || expired}
                 >
                     Not going
                 </button>
-                <p className={styles.date}>{date}</p>
+                <p className={styles.date}> {expired && "expired at"} {date}</p>
             </div>
         </div>
     );

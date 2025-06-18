@@ -7,30 +7,37 @@ import React from "react";
 import { useRef, useCallback } from "react";
 import { PostComponent } from "./Post";
 import { NewPOst } from "./AddPost";
-import { fetchOldPosts } from "@/apiService/posts/prevPost";
+import { fetchOldPosts } from "@/lib/prevPost";
 import Image from "next/image";
-import { Post } from "../types";
+import { Post } from "../../lib/types";
 import { useUser } from "@/context/UserContext";
 import { API_URL } from "@/lib/api_url";
+import GroupPostInput from "./groupPostInput";
+import Loading from "../Loading";
+import ProfileHeader from "../profile/ProfileHeader";
 
-export default function Feed({ type }: { type: "home" | "group" }) {
+// id is the profile id or group id
+export default function Feed({ type, id }: { type?: string, id?: string }) {
     const [showFOrm, setShowForm] = useState(false)
     const [postedContent, setPostedContent] = useState<Post[]>([])
     const [currentPage, setPage] = useState(0)
-    const [isLoading, setLoading] = useState(false)
+    const [isLoading, setLoading] = useState(true)
     const [hasMOre, sethasMore] = useState(true)
+    const [profileNotFound, setProfileNotFound] = useState(false);
+    const [privateProfile, setPrivateProfile] = useState(false)
+
     const observer = useRef<IntersectionObserver | null>(null)
     const requestedPages = useRef<Set<number>>(new Set())
 
     const { user } = useUser();
 
     const loadMOre = useCallback(async () => {
-        if (!hasMOre || isLoading || requestedPages.current.has(currentPage)) return
+        if (!hasMOre || requestedPages.current.has(currentPage)) return
         requestedPages.current.add(currentPage)
 
         setLoading(true)
         try {
-            const oldPosts = await fetchOldPosts(currentPage)
+            const oldPosts = await fetchOldPosts(currentPage, type, id)
             if (!oldPosts || oldPosts.length === 0) {
                 sethasMore(false)
                 return
@@ -48,7 +55,16 @@ export default function Feed({ type }: { type: "home" | "group" }) {
 
             setPostedContent((prev) => [...prev, ...uniquePosts])
         } catch (err) {
-            console.error("error in loading posts", err)
+            const { status } = err as { status: number };
+            if (status === 404) {
+                setProfileNotFound(true);
+                sethasMore(false);
+            } else if (status === 206) {
+                setPrivateProfile(true);
+                sethasMore(false);
+            } else {
+                console.error("error loading posts", err);
+            }
         } finally {
             setLoading(false)
         }
@@ -82,43 +98,47 @@ export default function Feed({ type }: { type: "home" | "group" }) {
         setShowForm(!showFOrm)
     }
 
+    const showProfileHeader = type === "profile" && !(isLoading && currentPage === 0) && !profileNotFound;
+
     return (
         <>
-            <div className={`${styles.feed} ${styles[type]}`}>
-                <div className={styles.toggleFOrm} onClick={toggleFOrm}>
-                    {<div className={styles.insideFOrm}>
-                        <Image
-                            src={user?.profile_pic ? `${API_URL}/api/storage/avatars/${user.profile_pic}` : "/img/default-avatar.png"}
-                            alt=""
-                            width={40}
-                            height={40}
-                            className={styles.userIcon}
-                        />
-                        What's on your mind, {user && user.first_name?.toUpperCase()} ??
-                    </div>}
-                </div>
+            <div className={`${styles.feed}`}>
+                {type === "home" && (
+                    <div className={styles.toggleFOrm} onClick={toggleFOrm}>
+                        {<div className={styles.insideFOrm}>
+                            <Image
+                                src={user?.profile_pic ? `${API_URL}/api/storage/avatars/${user.profile_pic}` : "/img/default-avatar.png"}
+                                alt=""
+                                width={40}
+                                height={40}
+                                className={styles.userIcon}
+                            />
+                            What's on your mind, {user && user.first_name?.toUpperCase()} ??
+                        </div>}
+                    </div>
+                )}
                 {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
+                {/* //here */}
+                {showProfileHeader && <ProfileHeader profileId={id} />}
 
-                {currentPage === 0 && postedContent.length === 0 ?
+                {type === "group" && <GroupPostInput groupId={id} onAdd={handleNewPOst} />}
+
+                {currentPage === 0 && postedContent.length === 0 && !isLoading ?
                     <div className={styles.status}>
-                        <p>EMPTY FEED.</p>
-                        <Image src="/img/empty.svg" alt="" width={200} height={200} />
+                        <Image src={`/img/${privateProfile && type === "profile" ? "lock.svg" : "empty.svg"}`} alt="" width={200} height={200} />
+                        <p className={styles.empty}>{profileNotFound && type === "profile" ? "User Not Found"
+                            : privateProfile && type === "profile" ? "This Profile Is Private"
+                                : "Empty Feed"}</p>
                     </div>
                     :
                     <>
                         {postedContent.map((post, index) => (
                             <div className={styles.post} key={post.id} ref={index === postedContent.length - 1 ? lastPostElementRef : null}>
-                                <PostComponent post={post} />
+                                <PostComponent post={post} type={type} />
                             </div>
                         )
                         )}
-
-                        {isLoading && (
-                            <div className={styles.loadingIndicator}>
-                                <div className={styles.loading}></div>
-                                Loading more posts...
-                            </div>
-                        )}
+                        {isLoading && (<Loading />)}
 
                         {!hasMOre && !isLoading && (
                             <div className={styles.noMorePosts}>

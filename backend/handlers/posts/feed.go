@@ -4,32 +4,44 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 
 	repoPosts "social-network/database/repositories/db_posts"
 	auth "social-network/handlers/authentication"
 	"social-network/handlers/helpers"
+	tp "social-network/handlers/types"
 )
 
 func AllPosts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		helpers.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	user, err := auth.GetUser(r)
 	if err != nil {
 		helpers.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
-	currentPage, err := strconv.Atoi((strings.Split(r.URL.Path, "/")[3]))
-	if err != nil {
-		helpers.JsonError(w, err.Error(), http.StatusBadRequest, nil)
+	pageStr := r.URL.Query().Get("pageNum")
+	if pageStr == "" {
+		pageStr = "0"
+	}
+	currentPage, err := strconv.Atoi(pageStr)
+	if err != nil || currentPage < 0 {
+		helpers.JsonError(w, "Invalid pageNum", http.StatusBadRequest, nil)
 		return
 	}
-	posts, err := repoPosts.GetAllPOst(currentPage, user.ID)
+
+	var posts []tp.PostData
+	if r.URL.Query().Get("profileId") != "" {
+		posts, err = repoPosts.GetProfilePosts(currentPage, user.ID, r.URL.Query().Get("profileId"))
+	} else if r.URL.Query().Get("groupId") != "" {
+		posts, err = repoPosts.GetGroupPOsts(currentPage, user.ID, r.URL.Query().Get("groupId"))
+	} else {
+		posts, err = repoPosts.GetAllPOst(currentPage, user.ID)
+	}
+
 	if err != nil {
-		helpers.JsonError(w, err.Error(), http.StatusInternalServerError, nil)
+		if err.Error() == "private profile" {
+			helpers.JsonError(w, "private profile", http.StatusPartialContent, err)
+		} else if err.Error() == "profile not found" {
+			helpers.JsonError(w, "profile not found", http.StatusNotFound, err)
+		}
 		return
 	}
 

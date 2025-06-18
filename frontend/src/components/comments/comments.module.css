@@ -12,13 +12,20 @@
 /* white card - centre */
 .card {
     width: min(800px, 95vw);
-    height: 70vh;
+    height: 90vh;
     background: #fff;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
     position: relative;
     padding: 1rem 1.25rem 1rem;
+}
+
+@media (max-width: 350px) {
+    .card {
+        overflow-x: scroll;
+        width: 95vw;
+    }
 }
 
 /* top bar */

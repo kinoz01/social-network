@@ -6,7 +6,7 @@ import Image from "next/image";
 import styles from "./style/inviteMenu.module.css";
 import Loading from "@/components/Loading";
 import { API_URL } from "@/lib/api_url";
-import { throttle } from "../utils";
+import { throttle } from "../../lib/utils";
 
 const SLICE = 50;
 
@@ -42,8 +42,8 @@ export default function InviteMenu({
 
     /* misc ui */
     const [submitting, setSubmitting] = useState(false);
-    const [msg, setMsg] = useState("");          // flash message
-    const [cls, setCls] = useState<"" | "ok" | "err">("");
+    const [msg, setMsg] = useState("");          // flash message (success / error)
+    const [cls, setCls] = useState<"" | "ok" | "err">(""); // set corresponding class
 
     const listRef = useRef<HTMLUListElement>(null);
 
@@ -57,7 +57,7 @@ export default function InviteMenu({
         const qs =
             `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
         const r = await fetch(
-            `${API_URL}/api/followers?${qs}`,
+            `${API_URL}/api/followers/search?${qs}`,
             { credentials: "include" }
         );
         if (r.status === 204) return [];

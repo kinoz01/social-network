@@ -1,32 +1,22 @@
+"use client";
+
 import styles from "./menus.module.css";
-import ProfileCard from "./ProfileCrad";
+import ProfileCard from "./ProfileCard";
 import List from "./List";
-import Link from "next/link";
+import { useUser } from "@/context/UserContext";
+import FriendRequestList from "./FriendRequest";
+import UserSearchMenu from "./UsersSearch";
 
-const LeftMenu = ({
-  type,
-}: {
-  type: "home" | "chat" | "profile" | "group" | "groups";
-}) => {
+function LeftMenu({ className = "" }: { className?: string }) {
+  const { user: loggedUser } = useUser();
   return (
-    <div className={`${styles.leftMenu} ${styles[type]}`}>
-      {type == "home" ? (
-        <>
-          <ProfileCard />
-          <List type="followers" title="Followers" />
-        </>
-      ) : type === "chat" ? (
-        <>
-          <List type="chat" title="Chat" />
-        </>
-      ) : type === "groups" ? (
-        <>
-
-          <List type="groups" title="Groups" />
-        </>
-      ) : null}
+    <div className={`${styles.leftMenu} ${className}`}>
+      <>
+        <List type="friendRequests" title="Follow Requests" />
+        <List type="suggestions" title="Suggestions" loggedUser={loggedUser} />
+      </>
     </div>
   );
-};
+}
 
 export default LeftMenu;

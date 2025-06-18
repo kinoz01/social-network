@@ -1,5 +1,5 @@
 .groupMenu {
-    border: 1px solid #ddd;
+    border: 1px solid #c5c5c5;
     border-radius: 12px;
     background-color: #fff;
     overflow-y: auto;
@@ -13,7 +13,7 @@
     position: sticky;
     top: 1rem;
     overflow-wrap: anywhere;
-    margin-top: 30px;
+    margin-top: 45px;
     margin-left: 20px;
     scrollbar-width: none;
     font-family: 'Zain', sans-serif;
@@ -107,7 +107,7 @@
     padding-bottom: 0px;
 }
 
-@media (min-width: 970px) {
+@media (min-width: 1100px) {
     .menuItem img {
         margin-right: 10px;
     } 
@@ -125,7 +125,7 @@
 }
 
 /* Responsive Collapse */
-@media (max-width: 970px) {
+@media (max-width: 1100px) {
     .groupMenu {
         max-width: none;
         border-radius: 0;

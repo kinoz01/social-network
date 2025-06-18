@@ -1,11 +1,11 @@
 import Image from "next/image";
 import style from "../posts/posts.module.css";
 import styles from "./comments.module.css";
-import { User, CommentInfo } from "../types";
+import { User, CommentInfo } from "../../lib/types";
 import { createPortal } from "react-dom";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { COmmentComponent, CommentForm } from "./AddComments";
-import { COmmentsGetter } from "@/apiService/posts/prevPost";
+import { COmmentsGetter } from "@/lib/prevPost";
 
 type Params = {
   userData: User | null
@@ -95,7 +95,7 @@ export default function Comment(props: Params) {
                     className={styles.item}
                     ref={index === postedComments.length - 1 ? lastCOmmentElementRef : null}
                   >
-                    <COmmentComponent comments={c} />
+                    <COmmentComponent comments={c} onClick={props.onClose}/>
                   </div>
                 ))}
 

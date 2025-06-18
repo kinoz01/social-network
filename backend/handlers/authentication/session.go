@@ -18,17 +18,12 @@ type CheckUser struct {
 
 // Checks whether the user has a valid session.
 func CheckSession(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		helpers.JsonError(w, "Only GET method is allowed!", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 
 	user, err := GetUser(r)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprintf(w, `{"loggedIn": false}`)
+		fmt.Fprintf(w, `{"loggedIn": false, "error": %q}`, err.Error())
 		return
 	}
 	fmt.Fprintf(w, `{"loggedIn": true, "username": %q, "profile_pic": %q}`, user.Username, user.ProfilePic)
@@ -92,31 +87,45 @@ func CreateSession(w http.ResponseWriter, user *tp.User) error {
 	}
 
 	// Set the token in a cookie
-	cookie := &http.Cookie{
+	raw := (&http.Cookie{
 		Name:     "session_token",
 		Value:    token,
-		Expires:  expiresAt,
-		HttpOnly: true,
 		Path:     "/",
-	}
+		Expires:  expiresAt,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}).String()
+	
+	w.Header().Add("Set-Cookie", raw+"; Partitioned")
 
-	http.SetCookie(w, cookie)
 	return nil
 }
 
 // API for fetching the logged-in user's information
 func GetUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		helpers.JsonError(w, "Method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	user, err := GetUser(r)
 	if err != nil {
 		helpers.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
 		return
 	}
-fmt.Println("user 1 =======> ", user)
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
+}
+
+// quick helper to get user id
+func GetUserId(r *http.Request) (string, error) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		return "", err
+	}
+	token := cookie.Value
+
+	GetUserId := `SELECT user_id FROM sessions WHERE token = ?`
+	var userID string
+	if err := tp.DB.QueryRow(GetUserId, token).Scan(&userID); err != nil {
+		return "", err
+	}
+	return userID, nil
 }

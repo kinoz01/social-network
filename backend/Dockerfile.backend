@@ -1,0 +1,39 @@
+# Backend Build Stage
+FROM golang:1.24-alpine AS backend-builder
+
+WORKDIR /app
+
+# Install necessary dependencies
+RUN apk add --no-cache gcc musl-dev
+ENV CGO_ENABLED=1
+
+# Copy backend files
+COPY . .
+
+# Download dependencies
+RUN go mod tidy
+
+# Build the backend
+RUN go build -o socNet ./main.go
+
+# Final Container for Backend
+FROM alpine:latest
+
+WORKDIR /app
+
+# Install SQLite and necessary dependencies
+RUN apk add --no-cache sqlite
+
+# Copy database files //-- Needed for deployement as we already have volume mounting in docker-compose
+COPY ./database /app/database
+# Copy storage directory
+COPY ./storage /app/storage
+
+# Copy built backend
+COPY --from=backend-builder /app/socNet /app/socNet
+
+# Expose backend port
+EXPOSE 8080
+
+# Start backend
+CMD ["/app/socNet"]

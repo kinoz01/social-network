@@ -2,8 +2,8 @@ import Image from "next/image";
 import styles from "./comments.module.css";
 import Link from "next/link";
 import TimeAgo from "../groups/TimeAgo";
-import { CommentInfo, User } from "../types";
-import { popup } from "../utils";
+import { CommentInfo, User } from "../../lib/types";
+import { popup } from "../../lib/utils";
 import { useState, useRef } from "react";
 import { API_URL } from "@/lib/api_url";
 import { Heart } from "../icons";
@@ -36,10 +36,6 @@ export const CommentForm = (props: FormParams) => {
       return
     }
 
-    formDAta.append('avatar', props.userData?.profile_pic || '')
-    formDAta.append('userID', props.userData?.id || '')
-    formDAta.append('firstName', props.userData?.first_name || '')
-    formDAta.append('lastName', props.userData?.last_name || '')
     formDAta.append('postID', props.postID)
     try {
       const res = await fetch(`${API_URL}/api/addcomment`,
@@ -132,7 +128,7 @@ export const CommentForm = (props: FormParams) => {
   )
 }
 
-export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
+export const COmmentComponent = ({ comments, onClick }: { comments: CommentInfo, onClick: any }) => {
   const [liked, setLiked] = useState(comments.hasReact === "1");
   const [count, setCount] = useState(comments.likesCount ?? 0);
 
@@ -166,7 +162,7 @@ export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
       setLiked(comments.hasReact === "1");
       setCount(comments.likesCount ?? 0);
     }
-  };
+  };  
 
   return (
     <div className={styles.bubble}>
@@ -185,7 +181,7 @@ export const COmmentComponent = ({ comments }: { comments: CommentInfo }) => {
             className={styles.avt}
           />
         </Link>
-        <Link href={`/profile/${comments.avatar}`} className={styles.nameLink}>
+        <Link href={`/profile/${comments.userID}`} className={styles.nameLink} onClick={onClick}>
           <span className={styles.name}>
             {comments.first_name} {comments.last_name}
           </span>

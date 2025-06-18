@@ -2,6 +2,12 @@
 run:  check-npm check-nextjs killPorts run-backend run-frontend
 	@echo "Frontend signal killed"
 
+build: check-npm check-nextjs killPorts run-backend build-frontend
+	@echo "Frontend signal killed"
+
+fresh:  check-npm check-nextjs killPorts fresh-backend run-frontend
+	@echo "Frontend signal killed"
+
 # Check if npm is installed
 check-npm:
 	@command -v npm >/dev/null 2>&1 || { \
@@ -41,6 +47,12 @@ fresh-backend:
 	@echo "Starting Go backend with Fresh..."
 	@cd backend && "$$(go env GOPATH)/bin/fresh" &
 
+# remove fresh
+remove-fresh:
+	@echo "Removing Fresh binary..."
+	@rm -f "$$(go env GOPATH)/bin/fresh"
+	@echo "Fresh has been removed."
+
 # Run backend.
 go:
 	@echo "Starting Go backend..."
@@ -51,15 +63,21 @@ run-frontend:
 	@echo "Starting Next.js frontend..."
 	cd frontend && npm run dev
 
-#------------------------- Docker -------------------------#
-buildDocker:
-	-docker-compose down --volumes --remove-orphans
-	docker-compose up --build
+# Build frontend
+build-frontend:
+	@echo "Building and running Next.js frontend..."
+	@cd frontend && npm run build && npm run start
 
-# Stop and remove backend and frontend containers
+##- Without --build: Docker Compose uses existing images (from cache or previous builds)
+#------------------------- Docker -------------------------#
+buildDocker: killPorts
+	-docker-compose down --volumes --remove-orphans
+	docker-compose up --build 
+
+# Stop and remove backend and frontend containers, images and volumes
 cleanDocker:
-	-docker stop $(docker-compose ps -q backend) $(docker compose ps -q frontend)
-	-docker rm $(docker-compose ps -q backend) $(docker compose ps -q frontend)
+	-docker stop $(docker-compose ps -q backend) $(docker-compose ps -q frontend)
+	-docker rm $(docker-compose ps -q backend) $(docker-compose ps -q frontend)
 	-docker rmi $(docker images -q backend) $(docker images -q frontend)
 	-docker system prune -f --volumes
 
@@ -103,15 +121,23 @@ users:
 	done
 	@echo "✅ users_insert.sql generated with x static UUIDs."
 
-
 followers:
 	@echo "Generating follow_requests.sql with uuid-1 to uuid-x as followers..."
 	@echo "INSERT INTO follow_requests (id, follower_id, followed_id, status, created_at) VALUES" > follow_requests.sql
 	@for i in $$(seq 1 7001); do \
 		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
-		echo "('foll-$$i','uuid-$$i','d8506a0f-e788-4b71-8aaa-952b87e91cb5','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
+		echo "('foll-$$i','uuid-$$i','d9f67f93-a778-4041-9ff8-3b4da298796c','pending',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
 	done
 	@echo "✅ follow_requests.sql generated with x accepted follow requests."
+
+following:
+	@echo "Generating follow_requests.sql with uuid-1 to uuid-x as followed users..."
+	@echo "INSERT INTO follow_requests (id, follower_id, followed_id, status, created_at) VALUES" > follow_requests.sql
+	@for i in $$(seq 1 7001); do \
+		end=$$(test $$i -eq 7001 && echo ";" || echo ","); \
+		echo "('folll-$$i','b724fe7e-b44e-4918-864e-5c42c763b3ee','uuid-$$i','accepted',CURRENT_TIMESTAMP)$$end" >> follow_requests.sql; \
+	done
+	@echo "✅ follow_requests.sql generated with x accepted followings."
 
 group_users:
 	@echo "Generating group_users_insert.sql with static IDs (uuid-1 to uuid-7001)..."

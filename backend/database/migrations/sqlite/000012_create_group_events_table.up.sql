@@ -9,3 +9,10 @@ CREATE TABLE group_events (
     FOREIGN KEY (group_id) REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (creator_id) REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+CREATE TRIGGER IF NOT EXISTS delete_expired_event AFTER INSERT ON group_events BEGIN
+DELETE FROM group_events
+WHERE
+    start_time < DATETIME ('now');
+
+END;

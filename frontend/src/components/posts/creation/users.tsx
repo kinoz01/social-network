@@ -1,6 +1,6 @@
 "use client";
 
-import { throttle } from "@/components/utils";
+import { throttle } from "@/lib/utils";
 import styles from "../posts.module.css";
 import { BackIcon } from "@/components/icons";
 import Loading from "@/components/Loading";
@@ -8,7 +8,7 @@ import Image from "next/image";
 import React, {
     useState, useEffect, useRef
 } from "react";
-import { User } from "@/components/types";
+import { User } from "@/lib/types";
 import { API_URL } from "@/lib/api_url";
 
 const SLICE = 50;
@@ -53,7 +53,7 @@ export default function ShowUsers({ onBack, onUserCHange }: Props) {
 
     const fetchSlice = async (q: string, off: number) => {
         const qs = `query=${encodeURIComponent(q)}&limit=${SLICE}&offset=${off}`;
-        const r = await fetch(`${API_URL}/api/followers?${qs}`, {
+        const r = await fetch(`${API_URL}/api/followers/search?${qs}`, {
             credentials: "include",
         });
         if (r.status === 204) return [];

@@ -9,6 +9,7 @@ import (
 
 )
 
+// Middleware that checks if the user is a member of a group
 func Gm(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := auth.GetUser(r)
@@ -35,3 +36,4 @@ func Gm(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r)
 	}
 }
+

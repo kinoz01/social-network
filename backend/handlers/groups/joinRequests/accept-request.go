@@ -12,18 +12,15 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// Handles owner's acceptance of a join request to a group.
 func AcceptJoinRequest(w http.ResponseWriter, r *http.Request) {
-	user, err := auth.GetUser(r)
-	if err != nil {
-		help.JsonError(w, "Unauthorized", 401, err)
-		return
-	}
-
+	userId, _ := auth.GetUserId(r)
+	
 	var body struct {
 		RequestID string `json:"request_id"`
 	}
 	if json.NewDecoder(r.Body).Decode(&body) != nil || body.RequestID == "" {
-		help.JsonError(w, "Bad request", 400, err)
+		help.JsonError(w, "Bad request", 400, nil)
 		return
 	}
 
@@ -44,8 +41,8 @@ func AcceptJoinRequest(w http.ResponseWriter, r *http.Request) {
 	// Verify ownership
 	var owner string
 	_ = tp.DB.QueryRow(`SELECT group_owner FROM groups WHERE id = ?`, groupID).Scan(&owner)
-	if owner != user.ID {
-		help.JsonError(w, "Forbidden", 403, err)
+	if owner != userId {
+		help.JsonError(w, "Forbidden", 403, nil)
 		return
 	}
 
@@ -63,7 +60,7 @@ func AcceptJoinRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Delete existing invitation
+	// Delete existing invitation (if there are)
 	_, err = tx.Exec(`DELETE FROM group_invitations WHERE group_id = ? AND invitee_id = ?`, groupID, requesterID)
 	if err != nil {
 		tx.Rollback()

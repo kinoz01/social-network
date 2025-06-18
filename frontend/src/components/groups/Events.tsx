@@ -189,7 +189,7 @@ export default function Events() {
                 <Loading />
             ) : !events || events.length === 0 ? (
                 <div className={styles.empty}>
-                    <img src="/img/empty.svg" alt="empty" width={160} height={160} />
+                    <img src="/img/empty.svg" alt="empty" width={180} height={180} />
                     <p>No events available</p>
                 </div>
             ) : (
@@ -198,6 +198,7 @@ export default function Events() {
                         <EventCard
                             key={ev.id}
                             ev={ev}
+                            expired={new Date(ev.start_time).getTime() < Date.now()} 
                             onUpdate={(goingCnt, notCnt, myChoice) =>
                                 setEvents(prev =>
                                     prev.map(p => p.id === ev.id ? { ...p, going_count: goingCnt, not_going_count: notCnt, going: myChoice } : p)

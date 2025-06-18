@@ -20,17 +20,12 @@ const (
 	maxNameSize     = 16
 	maxPasswordSize = 30
 	maxPicSize      = 2 << 20 // 2 MB for profile pic
-	maxAboutMeSize  = 400
+	maxAboutMeSize  = 120
 	maxDateSize     = 15
 )
 
 // Signing up a new user.
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed, nil)
-		return
-	}
-
 	mr, err := r.MultipartReader()
 	if err != nil {
 		help.JsonError(w, "Invalid form submission", http.StatusBadRequest, err)

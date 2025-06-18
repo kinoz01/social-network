@@ -1,5 +1,5 @@
 import GroupMenu from "@/components/groups/GroupMenu";
-import MembersMenu from "@/components/groups/MembersMenu";
+import MembersMenu from "@/components/groups/OnlineMembers";
 import InviteMenu from "@/components/groups/InviteMenu";
 import RequestsMenu from "@/components/groups/RequestsMenu";
 import { checkMembership } from "@/lib/auth";

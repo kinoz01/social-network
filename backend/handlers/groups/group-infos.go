@@ -11,17 +11,9 @@ import (
 
 // GET /api/groups/info?id=<group-id>
 func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
-	user, err := auth.GetUser(r)
-	if err != nil {
-		help.JsonError(w, "Unauthorized", http.StatusUnauthorized, err)
-		return
-	}
+	userId, _ := auth.GetUserId(r)
 
 	gid := r.URL.Query().Get("group_id")
-	if gid == "" {
-		help.JsonError(w, "Missing id", http.StatusBadRequest, nil)
-		return
-	}
 
 	row := tp.DB.QueryRow(`
 		SELECT g.id, g.group_name, g.description, g.group_pic, g.group_owner,
@@ -43,7 +35,7 @@ func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 		IsOwner bool `json:"isOwner"`
 	}{
 		Group:   out,
-		IsOwner: user.ID == ownerID,
+		IsOwner: userId == ownerID,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

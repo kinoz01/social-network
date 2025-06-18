@@ -12,10 +12,10 @@ export default function GroupsGrid() {
             <div className={styles.groupGrid}>
                 <GroupCard title="Your Groups" />
                 <GroupCard title="Joined Groups" refreshKey={joinedRefreshKey} />
-                <GroupCard title="Available Groups" />
+                <GroupCard title="Available Groups" refreshKey={joinedRefreshKey}/>
                 <GroupCard
                     title="Invitations"
-                    onAccept={() => setJoinedRefreshKey((prev) => prev + 1)}
+                    onAction={() => setJoinedRefreshKey((prev) => prev + 1)}
                 />
             </div>
         </div>

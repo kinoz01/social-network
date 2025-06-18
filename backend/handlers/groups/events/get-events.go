@@ -12,21 +12,10 @@ import (
 )
 
 func GetEvents(w http.ResponseWriter, r *http.Request) {
-	u, err := auth.GetUser(r)
-	if err != nil {
-		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
-		return
-	}
+	userId, _ := auth.GetUserId(r)
 	gid := r.URL.Query().Get("group_id")
-	if gid == "" {
-		help.JsonError(w, "group_id required", http.StatusBadRequest, nil)
-		return
-	}
-
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
-
-	viewerID := u.ID
 
 	rows, err := tp.DB.Query(`
 	    SELECT
@@ -39,8 +28,8 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 	    LEFT JOIN event_responses r ON r.event_id = e.id
 	    WHERE e.group_id = ?
 	    GROUP BY e.id
-	    ORDER BY e.start_time ASC, e.id ASC
-	    LIMIT ? OFFSET ?`, viewerID, gid, limit, offset)
+	    ORDER BY e.start_time DESC, e.ROWID DESC
+	    LIMIT ? OFFSET ?`, userId, gid, limit, offset)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
 		return
@@ -65,7 +54,7 @@ func GetEvents(w http.ResponseWriter, r *http.Request) {
 			v := myResp.String == "going"
 			ev.Going = &v // true or false
 		} else {
-			ev.Going = nil // nil ⇒ hasn’t voted
+			ev.Going = nil // nil ⇒ hasn't voted yet
 		}
 		out = append(out, ev)
 	}

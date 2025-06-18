@@ -4,6 +4,7 @@
     padding: 1rem;
     background-color: white;
     font-family: 'Zain';
+    margin-bottom: 10px;
 }
 
 .title {
@@ -39,6 +40,23 @@
     gap: .5rem;
 }
 
+@media (max-width:520px) {
+    .actionRow {
+        flex-direction: column-reverse;
+    }
+
+    .button {
+        margin: auto;
+        width: 250px;
+    }
+}
+
+@media (max-width:600px) {
+    .button {
+        font-size: 1rem !important;
+    }
+}
+
 .button {
     background: transparent;
     color: #000;
@@ -53,4 +71,11 @@
 .sel {
     background: #000;
     color: #fff;
+}
+
+.button:disabled {
+    opacity: 0.45;
+    filter: grayscale(60%);
+    pointer-events: none;
+    transition: opacity 0.2s ease;
 }

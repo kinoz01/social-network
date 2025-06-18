@@ -21,17 +21,8 @@ type joinReq struct {
 /* GET /api/groups/requests?group_id=…  → only owner can call           */
 /* -------------------------------------------------------------------- */
 func ListJoinRequests(w http.ResponseWriter, r *http.Request) {
-	u, err := auth.GetUser(r)
-	if err != nil {
-		help.JsonError(w, "Unauthorized", 401, err)
-		return
-	}
-
+	userId, _ := auth.GetUserId(r)
 	gid := r.URL.Query().Get("group_id")
-	if gid == "" {
-		help.JsonError(w, "group_id required", 400, err)
-		return
-	}
 
 	/* ensure caller is the owner */
 	var ownerID string
@@ -39,8 +30,8 @@ func ListJoinRequests(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "Group not found", 404, err)
 		return
 	}
-	if ownerID != u.ID {
-		help.JsonError(w, "unauthorized", http.StatusNoContent , err)
+	if ownerID != userId {
+		help.JsonError(w, "unauthorized", http.StatusNoContent, nil)
 		return
 	}
 

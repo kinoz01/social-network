@@ -10,8 +10,8 @@ type GroupSyncContextType = {
 const GroupSyncContext = createContext<GroupSyncContextType | null>(null);
 
 export function GroupSyncProvider({ children }: { children: React.ReactNode }) {
+    // the change initiator use refresh and the re-render use version
     const [version, setVersion] = useState(0);
-
     const refresh = () => setVersion(v => v + 1);
 
     return (

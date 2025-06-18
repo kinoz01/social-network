@@ -3,18 +3,25 @@
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    height: 90vh;
+    height: 85vh;
     margin: 0 auto;
     background: #fff;
-    margin-top: 30px;
+    margin-top: 45px;
     width: 100%;
     font-family: 'Zain', sans-serif;
+    padding-bottom: 2rem;
 }
 
 @media (max-width: 970px) {
     .chatBox {
         margin-top: 20px;
         height: calc(90vh - 120px);
+    }
+}
+
+@media (max-width: 800px) {
+    .chatBox {
+        width: 90%;
     }
 }
 
@@ -112,6 +119,7 @@
     display: flex;
     flex-direction: column;
     gap: .8rem;
+    scrollbar-width: none;
 }
 
 .emojiBtn {
@@ -182,4 +190,5 @@
     border: 1px solid #ddd;
     border-radius: 12px;
     overflow-y: scroll;
+    scrollbar-width: none;
 }

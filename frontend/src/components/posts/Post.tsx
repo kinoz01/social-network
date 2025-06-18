@@ -1,20 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import styles from "./posts.module.css";
 import { useState, useEffect } from "react";
-// import { Post } from "./Feed";
-import { Post } from "../types";
+import { Post } from "../../lib/types";
 import { CloseFriendIcon, CommentIcon, LikeIcon, PublicIcon, PrivateIcon } from "../icons";
 import Comment from "../comments/Comment";
 import TimeAgo from "../groups/TimeAgo";
-import { popup } from "../utils";
+import { popup } from "../../lib/utils";
 import { useUser } from "@/context/UserContext";
 import Link from "next/link";
 import { API_URL } from "@/lib/api_url";
 
-export const PostComponent: React.FC<{ post: Post; type?: "group" }> = ({ post, type }) => {
-console.log("postyy",post);
+export const PostComponent: React.FC<{ post: Post; type?: any }> = ({ post, type }) => {
 
   const [showComments, setShowComments] = useState(false)
   const [totalLikes, setTotalLikes] = useState(post.totalLikes || 0)
@@ -53,13 +50,10 @@ console.log("postyy",post);
   const imgName =
     typeof post.imag_post === "string"
       ? post.imag_post
-      : post.imag_post?? "";
+      : post.imag_post ?? ""; 
 
   return (
-    <div
-      key={post.id}
-      className={type === "group" ? styles.postGroup : undefined}
-    >
+    <div key={post.id}>
       {/* HEADER */}
       <div className={styles.postHeader}>
         <Link
@@ -84,7 +78,7 @@ console.log("postyy",post);
           </Link>
           <div className={styles.postCreationDate}>
             <div className={styles.timeAgo}>
-              <TimeAgo dateStr={post.createdAt}/>
+              <TimeAgo dateStr={post.createdAt} />
             </div>
             {post.visibility === "private" ? <CloseFriendIcon /> : post.visibility === "almost-private" ? <PrivateIcon /> : <PublicIcon />}
           </div>
@@ -98,7 +92,7 @@ console.log("postyy",post);
         {imgName && (
           <img
             className={styles.postImage}
-            src={`${API_URL}/api/storage/${type === "group" ? "groups_posts" : "posts"}/${imgName}`}
+            src={`${API_URL}/api/storage/${type === "group" ? "groups_posts" : post.groupID ? "groups_posts" : "posts"}/${imgName}`}
             alt={`${post.firstName} post`}
             width={450}
             height={450}

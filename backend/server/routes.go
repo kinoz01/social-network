@@ -10,8 +10,8 @@ import (
 	auth "social-network/handlers/authentication"
 	hlp "social-network/handlers/helpers"
 	mw "social-network/handlers/middlewares"
-	profile "social-network/handlers/profile"
 
+	"social-network/handlers/chat"
 	cmnts "social-network/handlers/comments"
 	flw "social-network/handlers/follows"
 	grps "social-network/handlers/groups"
@@ -19,7 +19,8 @@ import (
 	grpevent "social-network/handlers/groups/events"
 	grpsInvite "social-network/handlers/groups/invitations"
 	grpsRequest "social-network/handlers/groups/joinRequests"
-	grpsPost "social-network/handlers/groups/posts"
+	notif "social-network/handlers/notifications"
+	"social-network/handlers/profile"
 	ws "social-network/handlers/websocket"
 )
 
@@ -33,67 +34,89 @@ func Routes() http.Handler {
 	rl := mw.NewRateLimiter(20 * time.Microsecond)
 
 	// Serving storage
-	mux.HandleFunc("/api/storage/", hlp.FilesHandler)
+	mux.Handle("/api/storage/", mw.GetMW(hlp.FilesHandler))
 
 	// Authentication:
-	mux.HandleFunc("/api/check-session", auth.CheckSession)
-	mux.Handle("/api/signup", rl.RateLimitMW(http.HandlerFunc(auth.SignUpHandler)))
-	mux.Handle("/api/login", rl.RateLimitMW(http.HandlerFunc(auth.LoginHandler)))
-	mux.Handle("/api/logout", rl.RateLimitMW(http.HandlerFunc(auth.LogoutHandler)))
-	mux.HandleFunc("/api/userInfo", auth.GetUserHandler)
-	mux.Handle("/api/allUsers", rl.RateLimitMW(http.HandlerFunc(users.GetUsersHandler)))
+	mux.Handle("/api/check-session", mw.GetMW(auth.CheckSession))
+	mux.Handle("/api/userInfo", mw.GetMW(auth.GetUserHandler))
+	mux.Handle("/api/signup", rl.RateLimitMW(mw.PostMW(auth.SignUpHandler)))
+	mux.Handle("/api/login", rl.RateLimitMW(mw.PostMW(auth.LoginHandler)))
+	mux.Handle("/api/logout", rl.RateLimitMW(mw.PostMW(auth.LogoutHandler)))
+	mux.Handle("/api/users/search", mw.GetMW(users.SearchUsers))
 
 	// posts
-	mux.Handle("/api/createPost", rl.RateLimitMW(http.HandlerFunc(posts.CreatPosts)))
-	mux.Handle("/api/allPosts/", rl.RateLimitMW(http.HandlerFunc(posts.AllPosts)))
+	mux.Handle("/api/createPost", rl.RateLimitMW(mw.PostMW(posts.CreatPosts)))
+	mux.Handle("/api/allPosts/", mw.GetMW(posts.AllPosts))
 
 	// comments
-	mux.Handle("/api/addcomment", rl.RateLimitMW(http.HandlerFunc(cmnts.AddComment)))
-	mux.Handle("/api/comments", rl.RateLimitMW(http.HandlerFunc(cmnts.GetComments)))
+	mux.Handle("/api/addcomment", rl.RateLimitMW(mw.PostMW(cmnts.AddComment)))
+	mux.Handle("/api/comments", mw.GetMW(cmnts.GetComments))
 
-	// reactions
-	mux.Handle("/api/comment/like", rl.RateLimitMW(http.HandlerFunc(cmnts.HandleCommentLike)))
-	mux.Handle("/api/react", rl.RateLimitMW(http.HandlerFunc(posts.HandleLike)))
+	// comment reactions
+	mux.Handle("/api/comment/like", rl.RateLimitMW(mw.PostMW(cmnts.HandleCommentLike)))
+	// post reactions
+	mux.Handle("/api/react", rl.RateLimitMW(mw.PostMW(posts.HandleLike)))
 
 	// Groups-dashboard:
-	mux.HandleFunc("/api/groups/owned", grpsD.GetOwnedGroups)
-	mux.HandleFunc("/api/groups/joined", grpsD.GetJoinedGroups)
-	mux.HandleFunc("/api/groups/available", grpsD.AvailableGroups)
-	mux.HandleFunc("/api/groups/invitations", grpsD.Invitations)
-	mux.Handle("/api/groups/create", rl.RateLimitMW(http.HandlerFunc(grps.CreateGroup)))
-	mux.Handle("/api/groups/join-request", rl.RateLimitMW(http.HandlerFunc(grpsRequest.JoinRequest)))
-	mux.Handle("/api/groups/accept-invitation", rl.RateLimitMW(http.HandlerFunc(grpsInvite.AcceptInvitation)))
-	mux.Handle("/api/groups/refuse-invitation", rl.RateLimitMW(http.HandlerFunc(grpsInvite.RefuseInvitation)))
+	mux.Handle("/api/groups/owned", mw.GetMW(grpsD.GetOwnedGroups))
+	mux.Handle("/api/groups/joined", mw.GetMW(grpsD.GetJoinedGroups))
+	mux.Handle("/api/groups/available", mw.GetMW(grpsD.AvailableGroups))
+	mux.Handle("/api/groups/invitations", mw.GetMW(grpsD.Invitations))
+	mux.Handle("/api/groups/create", rl.RateLimitMW(mw.PostMW(grps.CreateGroup)))
+	mux.Handle("/api/groups/join-request", rl.RateLimitMW(mw.PostMW(grpsRequest.JoinRequest)))
+	mux.Handle("/api/groups/accept-invitation", rl.RateLimitMW(mw.PostMW(grpsInvite.AcceptInvitation)))
+	mux.Handle("/api/groups/refuse-invitation", rl.RateLimitMW(mw.PostMW(grpsInvite.RefuseInvitation)))
 	// Groups:
-	mux.Handle("/api/groups/is-member", rl.RateLimitMW(http.HandlerFunc(grps.IsGroupMember)))
-	mux.Handle("/api/groups/groupInfo", rl.RateLimitMW(http.HandlerFunc(grps.GetGroupInfo)))
-	mux.Handle("/api/groups/invite", rl.RateLimitMW(http.HandlerFunc(grpsInvite.InviteFollowers)))
-	mux.Handle("/api/groups/requests", rl.RateLimitMW(http.HandlerFunc(grpsRequest.ListJoinRequests)))
-	mux.Handle("/api/groups/accept-request", rl.RateLimitMW(http.HandlerFunc(grpsRequest.AcceptJoinRequest)))
-	mux.Handle("/api/groups/refuse-request", rl.RateLimitMW(http.HandlerFunc(grpsRequest.RefuseJoinRequest)))
-	// Groups posts:
-	mux.Handle("/api/groups/posts", rl.RateLimitMW(http.HandlerFunc(grpsPost.GroupPosts)))
-	mux.Handle("/api/groups/create-post", rl.RateLimitMW(http.HandlerFunc(grpsPost.CreateGroupPost)))
+	mux.Handle("/api/groups/is-member", mw.GetMW(grps.IsGroupMember))
+	mux.Handle("/api/groups/groupInfo", mw.GetMW(mw.Gm(grps.GetGroupInfo)))
+	mux.Handle("/api/groups/invite", rl.RateLimitMW(mw.Gm(mw.PostMW(grpsInvite.InviteFollowers))))
+	mux.Handle("/api/groups/requests", mw.Gm(grpsRequest.ListJoinRequests))
+	mux.Handle("/api/groups/accept-request", rl.RateLimitMW(mw.PostMW(grpsRequest.AcceptJoinRequest)))
+	mux.Handle("/api/groups/refuse-request", rl.RateLimitMW(mw.PostMW(grpsRequest.RefuseJoinRequest)))
+	// Groups create post:
+	mux.Handle("/api/groups/create-post", rl.RateLimitMW(mw.Gm(mw.PostMW(grps.CreateGroupPost))))
 	// Groups Rest Chat:
-	mux.Handle("/api/groups/chat", rl.RateLimitMW(http.HandlerFunc(grps.ChatPage)))
+	mux.Handle("/api/groups/chat", mw.GetMW(mw.Gm(grps.ChatPage)))
 	// Group Events:
-	mux.Handle("/api/groups/create-event", rl.RateLimitMW(http.HandlerFunc(grpevent.CreateEvent)))
-	mux.Handle("/api/groups/get-events", rl.RateLimitMW(http.HandlerFunc(grpevent.GetEvents)))
-	mux.Handle("/api/groups/event-response", rl.RateLimitMW(http.HandlerFunc(grpevent.EventResponse)))
+	mux.Handle("/api/groups/create-event", rl.RateLimitMW(mw.Gm(mw.PostMW(grpevent.CreateEvent))))
+	mux.Handle("/api/groups/get-events", mw.GetMW(mw.Gm(grpevent.GetEvents)))
+	mux.Handle("/api/groups/event-response", rl.RateLimitMW(mw.Gm(mw.PostMW(grpevent.EventResponse))))
 	// Restful members menu:
-	mux.HandleFunc("/api/groups/members", grps.GetMembers)
+	mux.Handle("/api/groups/members", mw.GetMW(mw.Gm(grps.GetMembers)))
 
+	// CHAT
+	// Chat menu:
+	mux.Handle("/api/chat/list", mw.GetMW(chat.GetChatList))
+	mux.Handle("/api/users/dmprofiles", mw.GetMW(chat.GetDMProfile))
+	// Chat Rest DMs
+	mux.Handle("/api/chat/messages", mw.GetMW(chat.GetPrivateMessages))
+	mux.Handle("/api/chat/dm-list", mw.GetMW(chat.ChatDMList))
+	mux.Handle("/api/chat/mark-read", rl.RateLimitMW(mw.PostMW(chat.ChatMarkRead)))
+	mux.Handle("/api/chat/unread-summary", mw.GetMW(chat.GetUnreadSummary))
+
+	// Notifications:
+	mux.HandleFunc("/api/delete-notification", notif.DeleteNotification)
+	mux.HandleFunc("/api/clear-notifications", notif.ClearAllNotifications)
+	mux.Handle("/api/notifications/totalcount", mw.GetMW(notif.NotificationsCount))
+
+	// Following:
+	mux.Handle("/api/suggestions", mw.GetMW(flw.SuggestionsHandler))
+	mux.Handle("/api/followers/isfollowed", mw.GetMW(flw.IsFollwedHandler))
+	mux.Handle("/api/followers/requests", mw.GetMW(flw.GetFollowingRequestsHandler))
+	mux.Handle("/api/getfollows", mw.GetMW(flw.GetFollowsHandler))
+	mux.Handle("/api/followers/add", rl.RateLimitMW(mw.PostMW(flw.AddFollowRequest)))
+	// search followers
+	mux.Handle("/api/followers/search", mw.GetMW(flw.SearchFollowers))
+
+	// Profiles:
+	// mux.Handle("/api/users/profilesInfo", mw.GetMW(profile.ProfileData))
+	// mux.Handle("/api/handleAccountStatu", rl.RateLimitMW(mw.PostMW(profile.ChangeStatu)))
 	mux.HandleFunc("/api/profileData/", profile.ProfileData)
-	mux.HandleFunc("/api/profilePosts/", profile.GetPosts)
+	// mux.HandleFunc("/api/profilePosts/", profile.GetPosts)
 	mux.HandleFunc("/api/handleAccountStatu/", profile.ChangeStatu)
 
-	// Followers search:
-	mux.HandleFunc("/api/followers", flw.GetFollowersHandler)
-	mux.HandleFunc("/api/followings", flw.GetFollowingsHandler)
-	mux.HandleFunc("/api/profile/info", flw.ProfileInfoHandler)
-
 	// Websocket
-	mux.HandleFunc("/api/ws", ws.GlobalWS)
+	mux.Handle("/api/ws", mw.GetMW(ws.GlobalWS))
 
 	return mw.EnableCORS(mw.SecureHeaders(mux))
 }

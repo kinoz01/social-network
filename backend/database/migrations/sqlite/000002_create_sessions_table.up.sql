@@ -7,14 +7,14 @@ CREATE TABLE
         FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE
     );
 
-CREATE TRIGGER IF NOT EXISTS delete_expired_insert BEFORE INSERT ON sessions BEGIN
+CREATE TRIGGER IF NOT EXISTS delete_expired_insert AFTER INSERT ON sessions BEGIN
 DELETE FROM sessions
 WHERE
     expires_at < DATETIME ('now');
 
 END;
 
-CREATE TRIGGER IF NOT EXISTS delete_expired_delete BEFORE DELETE ON sessions BEGIN
+CREATE TRIGGER IF NOT EXISTS delete_expired_delete AFTER DELETE ON sessions BEGIN
 DELETE FROM sessions
 WHERE
     expires_at < DATETIME ('now');

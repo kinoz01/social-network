@@ -1,87 +1,73 @@
-import Link from "next/link";
-import styles from "./menus.module.css";
-import ListItem from "./ListItem";
-// import GroupCard from "./GroupCard";
+"use client";
 
-function List({
+import { useState } from "react";
+import FollowersList from "./FollowersList";
+import FollowingsList from "./FollowingsList";
+import FriendRequestList from "./FriendRequest";
+import SuggestionsList from "./SuggestionsList";
+import { User } from "@/lib/types";
+import styles from "./menus.module.css";
+
+type ListProps = {
+  type: "friendRequests" | "followers" | "followings" | "suggestions";
+  title: string;
+  profileId?: string;
+  loggedUser?: User | null;
+};
+
+export default function List({
   type,
   title,
-}: {
-  type:
-  | "friendRequests"
-  | "followers"
-  | "followings"
-  | "suggestions"
-  | "chat"
-  | "group"
-  | "groups"
-  | "event";
-  title: String;
-}) {
+  profileId,
+  loggedUser,
+}: ListProps) {
+  /* modal flag */
+  const [showModal, setShow] = useState(false);
+  const open = () => setShow(true);
+  const close = () => setShow(false);
+
+  /* header "See all" */
+  const seeAll =
+    type === "followers" ||
+      type === "followings" ||
+      type === "friendRequests" ? (
+      <div className={styles.link} onClick={open}>
+        See all
+      </div>
+    ) : null;
+
+  /* ───────── render ───────── */
   return (
-    <div className={`${styles.List} ${styles[type]} `}>
-      {/* TOP  */}
-      <div className={styles.header}>
-        <span className={styles.title}>{title}</span>
-        {type === "friendRequests" ? (
-          <>
-            <Link className={styles.link} href="\notifications">
-              See all
-            </Link>
-          </>
-        ) : type === "followers" || type === "followings" ? (
-          <>
-            <Link className={styles.link} href="\profile">
-              See all
-            </Link>
-          </>
+    <>
+      <div className={`${styles.list} ${styles[type]}`}>
+        {/* header */}
+        <div className={styles.header}>
+          <span className={styles.title}>{title}</span>
+          {seeAll}
+        </div>
+
+        {/* compact list */}
+        {type === "followers" ? (
+          <FollowersList profileId={profileId} />
+        ) : type === "followings" ? (
+          <FollowingsList profileId={profileId} />
+        ) : type === "friendRequests" ? (
+          <FriendRequestList />
+        ) : type === "suggestions" ? (
+          <SuggestionsList />
         ) : null}
       </div>
-      <div className={type !== "groups" ? styles.users : styles.groups}>
-        {type === "chat" ? (
-          // Fetch all users
-          <>
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-          </>
 
-        ) : type === "groups" ? (
-          <>
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-            <ListItem type="groups" name={"zone01"} />
-          </>
-        ) : (
-          // Fetch just a few users
-          <>
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-            <ListItem type={type} name={"Wayne Burton"} />
-          </>
-        )}
-      </div>
-    </div>
+      {/* modal overlays */}
+      {showModal && type === "followers" && (
+        <FollowersList modal profileId={profileId} onClose={close} />
+      )}
+      {showModal && type === "followings" && (
+        <FollowingsList modal profileId={profileId} onClose={close} />
+      )}
+      {showModal && type === "friendRequests" && (
+        <FriendRequestList modal onClose={close} />
+      )}
+    </>
   );
 }
-
-export default List;

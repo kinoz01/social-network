@@ -34,21 +34,20 @@ type Post struct {
 }
 
 type PostData struct {
-	PostID     string   `json:"id"`
-	UserID     string   `json:"userID"`
-	Content    string   `json:"content"`
-	Imag_post  any      `json:"imag_post,omitempty"`
-	Visibility string   `json:"visibility"`
-	VipUsers   []string `json:"vipUsers"`
-	FirstName  string   `json:"firstName"`
-	LastName   string   `json:"lastName"`
-	ProfilePic string   `json:"profile_pic"`
-
-	HasReact      string `json:"hasReact"`
-	TotalLIKes    int    `json:"totalLikes"`
-	TotalComments int    `json:"totalComments"`
-	CreatedAt     string `json:"createdAt"`
-	GroupID       any    `json:"groupID,omitempty"`
+	PostID        string   `json:"id"`
+	UserID        string   `json:"userID"`
+	Content       string   `json:"content"`
+	Imag_post     string   `json:"imag_post,omitempty"`
+	Visibility    string   `json:"visibility"`
+	VipUsers      []string `json:"vipUsers"`
+	FirstName     string   `json:"firstName"`
+	LastName      string   `json:"lastName"`
+	ProfilePic    string   `json:"profile_pic"`
+	HasReact      string   `json:"hasReact"`
+	TotalLIKes    int      `json:"totalLikes"`
+	TotalComments int      `json:"totalComments"`
+	CreatedAt     string   `json:"createdAt"`
+	GroupID       string   `json:"groupID,omitempty"`
 }
 
 type React struct {
@@ -82,6 +81,32 @@ type Group struct {
 	CreatedAt   string `json:"created_at"`
 	Request     string `json:"request"` // pending toggle when rendering all groups
 	Members     int    `json:"members"`
+}
+
+type Notification struct {
+	ID       string `json:"id"`
+	Type     string `json:"type"`
+	Content  string `json:"content"`  // free-text
+	Receiver string `json:"receiver"` // user-ID that should see it
+	Sender   User   `json:"sender"`   // minimal User payload (ID + names/pic)
+
+	/* contextual foreign keys — at most one is non-empty */
+	Group        string `json:"groupId,omitempty"`      // related_group_id
+	Event        string `json:"eventId,omitempty"`      // related_event_id
+	InvitationID string `json:"invitationId,omitempty"` // related_invitation_id
+	RequestID    string `json:"requestId,omitempty"`    // related_request_id
+	FollowID     string `json:"followId,omitempty"`     // related_follow_request_id
+
+	CreatedAt string `json:"createdAt"`
+	IsRead    bool   `json:"isRead"`
+}
+
+type FollowRequest struct {
+	ID         string `json:"id"`
+	Action     string `json:"action"`
+	Status     string `json:"status"`
+	FollowerID string `json:"followerId"`
+	FollowedID string `json:"followedId"`
 }
 
 type UserData struct {

@@ -1,0 +1,356 @@
+.messages {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+  scrollbar-width: none;
+}
+
+.emojiBtn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  margin-right: .4rem;
+  line-height: 1;
+}
+
+
+.emojiItem {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emojiItem:hover {
+  transform: scale(1.15);
+}
+
+
+/******************************************* MESSAGES DM BOX ****************************************************/
+.chatBox {
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  margin: 30px auto 0;
+  background: #fff;
+  width: 100%;
+  font-family: 'Zain', sans-serif;
+  font-size: 1.2rem;
+}
+
+
+/* Header row: peer avatar + name + online/offline indicator */
+.headerRow {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #ddd;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.headerText a {
+  width: fit-content;
+}
+
+.headerText .name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #222222;
+}
+
+.name:hover {
+  color: #666;
+}
+
+/* Day divider */
+.dayDivider {
+  text-align: center;
+  margin: 1rem 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+}
+
+/* Individual message wrapper */
+.msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+/* Incoming vs outgoing alignment */
+.incoming {
+  justify-content: flex-start;
+}
+
+.outgoing {
+  justify-content: flex-end;
+}
+
+/* Avatar */
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Speech bubble */
+.bubble {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  max-width: 60%;
+  position: relative;
+}
+
+.content {
+  margin: 0;
+  font-size: 1.4rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: rgb(63, 63, 63);
+}
+
+/* Time stamp for incoming */
+.time {
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #707070;
+  margin-left: 0.4rem;
+}
+
+/* Time stamp aligned right for outgoing */
+.timeRight {
+  display: block;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #707070;
+  text-align: right;
+  margin-top: 0.3rem;
+}
+
+/* Empty chat placeholder */
+.emptyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 90vh;
+  gap: 1rem;
+  background: #fff;
+  margin-top: 30px;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  min-width: 250px;
+}
+
+.emptyBox img {
+  width: 200px;
+  height: auto;
+  object-fit: cover;
+}
+
+.status {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Input row */
+.inputRow {
+  border-top: 1px solid #ddd;
+  padding: 0.6rem 1rem;
+  display: flex;
+  gap: 0.6rem;
+  position: relative;
+  background: #fff;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.input {
+  flex: 1 1 auto;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.sendBtn {
+  border: none;
+  background: #000;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.sendBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.emojiPicker {
+  position: absolute;
+  bottom: 3.5rem;
+  width: 270px;
+  height: 200px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  z-index: 200;
+}
+
+.emptyStatus {
+  font-size: 1.6rem;
+  color: #575757;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  text-align: center;
+  font-family: 'Zain';
+}
+
+/****************************************** LAYOUT ******************************/
+/* Left and Right Menus */
+.menuLayout {
+  overflow-y: auto;
+  max-height: 93vh;
+  scrollbar-width: none;
+  min-width: min-content;
+}
+
+.menuLayoutLeft {
+  max-width: 370px;
+  margin-top: 30px;
+}
+
+@media (max-width: 1500px) {
+  .menuLayoutLeft {
+    width: 300px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .menuLayoutLeft {
+    display: none;
+  }
+}
+
+.mainContent {
+  background-color: var(--color2);
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border-radius: 25px 0 0 25px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+@media (max-width:700px) {
+  .mainContent {
+    width: fit-content;
+  }
+}
+
+.jumpBadge {
+  position: relative;
+  background-color: #0c0c0c;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.7rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  width: fit-content;
+  margin: auto;
+  font-family: 'Inter';
+}
+
+.jumpBadge:hover {
+  background-color: #222222;
+}
+
+.usersSuggestionsChat {
+  background-color: white;
+  max-width: 270px;
+  border: 1px solid #c5c5c5;
+  margin-top: 30px;
+  border-radius: 12px;
+  height: fit-content;
+  font-family: 'Zain';
+  font-size: 1.1rem;
+}
+
+.usersSuggestionsChat p {
+  margin-left: 15px;
+  font-family: 'Zain';
+  font-size: .9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: #333;
+  margin-top: 10px;
+}
+
+@media (max-width:1100px) {
+  .usersSuggestionsChat {
+    display: none !important;
+  }
+}
+
+@media (min-width:700px) {
+  .notifLeftMenu {
+    display: block;
+  }
+}
+
+.rMenuLayout {
+  min-width: 280px;
+  max-height: 95vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  padding: 5px;
+  margin-top: 22px;
+}
+
+@media (max-width:1100px) {
+  .rMenuLayout { 
+    display: none !important;
+  }
+}

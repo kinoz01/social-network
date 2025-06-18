@@ -13,6 +13,11 @@ body {
     background-color: var(--body-bg);
 }
 
+::selection {
+    background-color: #3e444d; 
+    color: #ffffff;        
+}
+  
 /******************* Welcome Popup *******************/
 .welcome-popup,
 .popup {
@@ -20,11 +25,9 @@ body {
     top: 1%;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #fff;
-    color: rgba(34, 34, 34, 0.92);
+    background-color: #202020;
+    color: rgba(252, 252, 252, 0.92);
     padding: 2rem 2.5rem;
-    font-size: 1.3rem;
-    font-weight: bold;
     border-radius: 7px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     z-index: 10000;
@@ -33,15 +36,19 @@ body {
     width: auto;
     transition: opacity 1.5s ease;
     opacity: 1;
-    /* Start fully visible */
+    font-family: 'Zain';
+    font-size: 1.4rem;
+    max-width: 450px;
 }
 
 .popup.succ {
-    background-color: #8dc572;
+    background-color: #242424;
+    color: rgb(49, 206, 35);
 }
 
 .popup.fail {
-    background-color: #be6464;
+    background-color: #242424;
+    color: #f71515;
 }
 
 /* Close Button */
@@ -51,7 +58,7 @@ body {
     right: 15px;
     cursor: pointer;
     font-size: 1.4rem;
-    color: #333;
+    color: #e6e6e6;
 }
 
 /* Fade-out effect */

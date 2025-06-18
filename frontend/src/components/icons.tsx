@@ -412,18 +412,57 @@ const PrivateIcon = () => (
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
 )
-function Heart({ filled=false, ...p }:
+function Heart({ filled = false, ...p }:
   { filled?: boolean } & React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" {...p}
-         fill={filled ? "currentColor" : "none"}
-         stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor" strokeWidth={2} strokeLinecap="round">
       <path d="M12 21s-8-7.63-8-12.6C4 5.52 6.24 3 9 3
                c1.66 0 3.15.8 4 2 .85-1.2 2.34-2 4-2
                2.76 0 5 2.52 5 5.4 0 4.97-8 12.6-8 12.6z"/>
     </svg>
   );
 }
+
+export const FollowersIcon = () => (
+  <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+    <circle cx="9" cy="7" r="4" />
+    <circle cx="17" cy="7" r="3" />
+    <path d="M2 21v-2a4 4 0 0 1 4-4h6" />
+    <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
+  </svg>
+);
+
+/* following – one head + plus */
+export const FollowingIcon = () => (
+  <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+    <circle cx="12" cy="7" r="4" />
+    <path d="M6 21v-2a4 4 0 0 1 4-4h2" />
+    <path d="M19 16v6M22 19h-6" />
+  </svg>
+);
+
+/* posts – paper sheet */
+export const PostsIcon = () => (
+  <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <line x1="8" y1="10" x2="16" y2="10" />
+    <line x1="8" y1="14" x2="16" y2="14" />
+  </svg>
+);
+
+/* groups – three heads */
+export const GroupsIconSmall = () => (
+  <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+    <circle cx="12" cy="7" r="3" />
+    <circle cx="5" cy="11" r="2.5" />
+    <circle cx="19" cy="11" r="2.5" />
+    <path d="M3 21v-1a5 5 0 0 1 5-5" />
+    <path d="M9 21v-1a5 5 0 0 1 5-5" />
+    <path d="M15 21v-1a5 5 0 0 1 5-5" />
+  </svg>
+);
 
 export {
   PrivateIcon,

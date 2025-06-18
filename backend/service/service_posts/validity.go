@@ -2,7 +2,6 @@ package service_posts
 
 import (
 	"fmt"
-	"mime/multipart"
 	"strings"
 )
 
@@ -25,26 +24,8 @@ func ValidInput(inputs string) error {
 		return fmt.Errorf("post content cannot be empty")
 	}
 
-	if len(trimSpace) > 5000 {
-		return fmt.Errorf("post content exceeds 5000 characters limit")
-	}
-	return nil
-}
-
-func ValidFile(handler *multipart.FileHeader) error {
-	// fmt.Printf("here fileeeee------------->%v \n and handler %v\n", handler.Size, handler.Header.Get("Content-Type"))
-	maxSize := int64(10 << 20)
-	if handler.Size > maxSize {
-		return fmt.Errorf("file size exceeds 10MB limit")
-	}
-	contentType := handler.Header.Get("Content-Type")
-	allowedType := map[string]bool{
-		"image/jpeg": true,
-		"image/png":  true,
-		"image/webp": true,
-	}
-	if !allowedType[contentType] {
-		return fmt.Errorf("invalid file type: %s. Only images (JPEG, PNG, WEBP) are allowed", contentType)
+	if len(trimSpace) > 3000 {
+		return fmt.Errorf("post content exceeds 3000 characters limit")
 	}
 	return nil
 }

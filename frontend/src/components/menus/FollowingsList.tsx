@@ -1,148 +1,135 @@
-"use client"
+"use client";
 
-import { getFollowings, getProfileInfo } from "@/lib/followers";
-import { useEffect, useRef, useState } from "react";
-import styles from "./menus.module.css";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getFollowShip } from "@/lib/followers";
+import { FollowShip, User } from "@/lib/types";
+import { useUser } from "@/context/UserContext";
 import ListItem from "./ListItem";
-
 import NoData from "../NoData";
 import Loading from "../Loading";
-import { useUser } from "@/context/UserContext";
-import { Followings, User } from "../types";
-import { throttle } from "../utils";
+import styles from "./menus.module.css";
+import { useInfiniteScroll } from "@/lib/scroller";
+import { useFollowSync } from "@/context/FollowSyncContext";
 
+const LIMIT = 8;
 
-function FollowingsList({
-  page,
-  profileId,
-}: {
-  page?: "home" | "profile";
-  profileId?: string;
-}) {
-  const limit = 5;
-  const { user: loggedUser } = useUser();
+type Props = {
+	profileId?: string;
+	modal?: boolean;
+	onClose?: () => void;
+};
 
-  const [profileUser, setProfileUser] = useState<User | null>(null);
+export default function FollowingsList({
+	profileId,
+	modal = false,
+	onClose,
+}: Props) {
+	const { user: loggedUser } = useUser();
 
-  useEffect(() => {
-    const fetchProfileInfo = async () => {
-      const profileInfo = await getProfileInfo(profileId || "");
-      setProfileUser(profileInfo);
-    };
+	const [privateProfile, setPrivateProfile] = useState(false);
+	const [list, setList] = useState<User[]>([]);
+	const [page, setPage] = useState(1);
+	const [hasMore, setMore] = useState(true);
+	const [loading, setLoad] = useState(false);
+	const { version } = useFollowSync()
 
-    fetchProfileInfo();
-  }, [profileId]);
+	/* Reset when profile changes */
+	useEffect(() => {
+		setList([]);
+		setPage(1);
+		setMore(true);
+		setPrivateProfile(false);
+	}, [profileId, version]);
 
-  const user: User | null = page === "home" ? loggedUser : profileUser;
+	/* Fetch one page */
+	const fetchPage = useCallback(
+		
+		async (p: number) => {
+			if (!profileId) return;
+			setLoad(true);
+			try {
+				const res: FollowShip | null = await getFollowShip("following", profileId, LIMIT, p);
+				if (!res || !res.followList) {
+					setMore(false);
+					return;
+				}
+				setList(prev => {
+					const ids = new Set(prev.map(u => u.id));
+					const uniq = res.followList.filter(u => !ids.has(u.id));
+					return [...prev, ...uniq];
+				});
+				setMore(p < res.totalPages);
+				setPage(p + 1);
+			} catch (err) {
+				const { status } = err as { status?: number };
+				if (status === 206) {
+					setPrivateProfile(true);
+					setMore(false);
+				}
+			} finally {
+				setLoad(false);
+			}
+		},
+		[profileId, version],
+	);
 
-  const scrollTrigger = useRef<HTMLDivElement>(null);
-  const [currentPage, setPage] = useState<number>(1);
-  const [hasMoreData, setHasMoreData] = useState<Boolean>(true);
-  const [followings, setFollowings] = useState<Followings>({
-    followings: [],
-    totalCount: 0,
-    totalPages: 0,
-  });
+	/* Initial page */
+	useEffect(() => {
+		if (profileId) fetchPage(1);
+	}, [profileId, fetchPage]);
 
+	/* Infinite scroll */
+	const boxRef = useRef<HTMLDivElement>(null);
+	useInfiniteScroll(boxRef, { loading, hasMore, page, fetchPage });
 
+	const content = privateProfile ? (
+		<div className={styles.empty}>
+			<img src="/img/lock.svg" alt="private" width={100} height={100} />
+			<p className={styles.empty}>This profile is private</p>
+		</div>
+	) : list.length === 0 && !loading ? (
+		<NoData msg="No followings yet" />
+	) : (
+		<>
+			{list.map(f => (
+				<ListItem
+					key={f.id}
+					type="followings"
+					item={f}
+					loggedUser={loggedUser}
+				/>
+			))}
+		</>
+	);
 
-  const [isDataLoading, setIsDataLoading] = useState(false);
+	/* Inline variant */
+	if (!modal) {
+		return (
+			<div className={styles.users} ref={boxRef}>
+				{content}
+				{loading && <Loading />}
+			</div>
+		);
+	}
 
-  const loadMore = async () => {
-    if (isDataLoading || !hasMoreData) {
-      return;
-    }
-
-    setIsDataLoading(true);
-
-    const data: Followings | null = await getFollowings(
-      user?.id || "",
-      limit,
-      currentPage
-    );
-
-    if (data && data.followings) {
-      if (data.followings.length === 0 || currentPage === data.totalPages) {
-        setHasMoreData(false);
-      }
-
-      setFollowings((prevData) => {
-        const existingIds = new Set(prevData.followings.map((n) => n.id));
-        const newFollowing = data.followings.filter(
-          (n) => !existingIds.has(n.id)
-        );
-        return {
-          ...prevData,
-          followings: [...prevData.followings, ...newFollowing],
-          totalCount: data.totalCount,
-          totalPages: data.totalPages,
-        };
-      });
-
-      setPage((prevPage) => prevPage + 1);
-    }
-    setIsDataLoading(false);
-  };
-
-  useEffect(() => {
-    if (!scrollTrigger.current || !hasMoreData) {
-      return;
-    }
-
-    const handleScroll = throttle(async () => {
-
-      if (
-        scrollTrigger.current &&
-        scrollTrigger.current.scrollTop +
-        scrollTrigger.current.clientHeight >=
-        scrollTrigger.current.scrollHeight
-      ) {
-        // If we've reached the bottom and not loading data, trigger loadMore
-        if (!isDataLoading) {
-          await loadMore();
-        }
-      }
-    }, 300);
-
-
-    // Attach the scroll event listener
-    const container = scrollTrigger.current;
-    container.addEventListener("scroll", handleScroll);
-
-    // Cleanup the scroll event listener
-    return () => {
-      container.removeEventListener("scroll", handleScroll);
-    };
-  }, [user, hasMoreData, currentPage, isDataLoading]); // Watch for changes in `hasMoreData` and `isDataLoading`
-
-  useEffect(() => {
-    async function initialFetch() {
-      await loadMore(); // Initial fetch on component mount
-    }
-    initialFetch();
-  }, [user]); // Empty dependency array means this only runs once on mount
-
-  console.log("user follofwings: ", user, followings);
-
-  return (
-    <div className={styles.users} ref={scrollTrigger}>
-      {followings.followings === null || followings.followings.length === 0 ? (
-        <NoData msg="No followings yet" />
-      ) : (
-        followings.followings.map((following) => {
-          return (
-            <ListItem
-              key={following.id}
-              type="followers"
-              item={following}
-              loggedUser={loggedUser}
-            />
-          );
-        })
-      )}
-      {isDataLoading && <Loading />}
-    </div>
-  );
+	/* Modal overlay */
+	return (
+		<div
+			className={styles.modalBackdrop}
+			onClick={() => onClose?.()}
+		>
+			<div
+				className={styles.modalPanel}
+				onClick={e => e.stopPropagation()}
+				ref={boxRef}
+			>
+				<button className={styles.closeBtn} onClick={() => onClose?.()}>
+					×
+				</button>
+				<h4 className={styles.modalTitle}>Followings</h4>
+				{content}
+				{loading && <Loading />}
+			</div>
+		</div>
+	);
 }
-
-export default FollowingsList;

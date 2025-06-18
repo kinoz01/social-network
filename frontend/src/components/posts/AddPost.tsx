@@ -6,8 +6,8 @@ import { MainDiv } from "./creation/mainDiv";
 import ShowUsers from "./creation/users";
 import { PostAudience } from "./creation/audience";
 import { useState } from "react";
-import { HandleCreation } from "@/apiService/posts/savePost";
-import { User, Post } from "../types";
+import { HandleCreation } from "@/lib/savePost";
+import { User, Post } from "../../lib/types";
 
 type PostParams = {
   isOpen?: boolean;
@@ -49,32 +49,28 @@ export const NewPOst = ({ onClose, onSubmit, userData }: PostParams) => {
   }
 
   return (
-    <>
-      {(
-        <div className={styles.formContainer}>
-          <form className={styles.form} onSubmit={(e) => HandleCreation({ e, onClose, onSubmit, userData })}>
-            {/* {!showAudiance ? */}
-            <input type="hidden" name="privacy" value={privacy} />
+    <div className={styles.formContainer}>
+      <form className={styles.form} onSubmit={(e) => HandleCreation({ e, onClose, onSubmit, userData })}>
+        {/* {!showAudiance ? */}
+        <input type="hidden" name="privacy" value={privacy} />
 
-            <div style={{ display: showAudiance || showUsers ? "none" : "block", width: "100%", boxSizing: "border-box", padding: "20px", overflow: "auto", scrollbarWidth: "none" }}>
-              <MainDiv onClose={onClose} privacy={privacy} showCHoice={showCHoice} userName={userData.first_name} />
-            </div>
+        <div style={{ display: showAudiance || showUsers ? "none" : "block", width: "100%", boxSizing: "border-box", padding: "20px", overflow: "auto", scrollbarWidth: "none", paddingTop: "0px" }}>
+          <MainDiv onClose={onClose} privacy={privacy} showCHoice={showCHoice} userName={userData.first_name} />
+          <button type="submit" className={styles.submitBtn}>Create</button>
+        </div>
 
-            <div style={{ display: showAudiance && !showUsers ? "block" : "none", overflow: "auto", scrollbarWidth: "none" }}>
-              <PostAudience onBack={handleBack} selectedPrivacy={privacy} onPrivacyChange={handleOnChange} />
-            </div>
+        <div style={{ display: showAudiance && !showUsers ? "block" : "none", overflow: "auto", scrollbarWidth: "none" }}>
+          <PostAudience onBack={handleBack} selectedPrivacy={privacy} onPrivacyChange={handleOnChange} />
+        </div>
 
-            <div style={{ display: showUsers ? "block" : "none", overflow: "auto", scrollbarWidth: "none" }}>
-              <ShowUsers onBack={handleBack} onUserCHange={setSelectedUsers} userID={userData.id} />
-            </div>
+        <div style={{ display: showUsers ? "block" : "none", overflow: "auto", scrollbarWidth: "none" }}>
+          <ShowUsers onBack={handleBack} onUserCHange={setSelectedUsers} userID={userData.id} />
+        </div>
 
-            {selectedUsers.map(id => (
-              <input type="hidden" name="vipUsers" value={id} key={id} />
-            ))}
-          </form>
-        </div >
-      )
-      }
-    </>
+        {selectedUsers.map(id => (
+          <input type="hidden" name="vipUsers" value={id} key={id} />
+        ))}
+      </form>
+    </div >
   )
 }

@@ -1,90 +1,102 @@
 "use client";
 import Image from "next/image";
-import styles from "./menus.module.css";
-import { useState } from "react";
-import { addFollower } from "@/lib/followers";
 import Link from "next/link";
-import { User } from "../types";
+import { useState, MouseEvent, ReactNode } from "react";
 
-function ListItem({
-  type,
-  item,
-  loggedUser,
-}: {
-  type:
-    | "friendRequests"
-    | "followers"
-    | "followings"
-    | "suggestions"
-    | "chat"
-    | "group"
-    | "event";
+import styles from "./menus.module.css";
+import {
+  AcceptIcon,
+  AddFriendIcon,
+  ChatIcon,
+  RejectIcon,
+  UserIcon,
+} from "../icons";
+
+import { User } from "@/lib/types";
+import { addFollower } from "@/lib/followers";
+import { API_URL } from "@/lib/api_url";
+
+type ListTypes =
+  | "friendRequests"
+  | "followers"
+  | "followings"
+  | "suggestions"
+  | "chat"
+  | "group"
+  | "event";
+
+interface Props {
+  type: ListTypes;
+  name?: string;
   item?: User;
   loggedUser?: User | null;
-}) {
-  const [isResponed, setResponed] = useState(false);
+}
 
-  const handleResponse = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const action = e.currentTarget.value;
-    setResponed(true);
+function ListItem({ type, name, item, loggedUser }: Props) {
+  const [isResponded, setResponded] = useState(false);
 
-    const res = await addFollower(
+  /* ----------  friend-request handler  ---------- */
+  const handleResponse = async (e: MouseEvent<HTMLButtonElement>) => {
+    const action = e.currentTarget.value as "accepted" | "rejected";
+    setResponded(true);
+
+    await addFollower(
       {
-        action: action,
+        action,
         status: action,
         followerID: item?.id,
         followedId: String(loggedUser?.id),
       },
-      "/api/followers/add"
+      "/api/followers/add",
     );
-
-    console.log("follow res: ", res);
   };
 
-  const profilePic = `${process.env.NEXT_PUBLIC_API_URL}/api/storage/avatars/${item?.profile_pic}`;
+  /* ----------  avatar path  ---------- */
+  const profilePic = `${API_URL}/api/storage/avatars/${item?.profile_pic}`;
 
-  return (
-    <>
-      {!isResponed && (
-        <div
-          className={`${styles.listItem} ${styles[type]}`}
-          // onClick={handelEvent}
-        >
-          <div className={styles.listItemInfo}>
-            <Image
-              className={styles.userIcon}
-              src={profilePic}
-              alt=""
-              width={40}
-              height={40}
-            />
-            <span className={styles.listItemName}>
-              {item?.first_name + " " + item?.last_name}
-            </span>{" "}
-          </div>
-          {type !== "chat" &&
-            (type === "friendRequests" ? (
-              <div className={styles.options}>
-                <button onClick={handleResponse} value="accepted">
-                  Accept
-                </button>
-                <button onClick={handleResponse} value="rejected">
-                  Reject
-                </button>
-              </div>
-            ) : type === "suggestions" ? (
-              <Link href={`/profile/${item?.id}`} className={styles.profileBtn}>
-                <button>View Profile</button>
-              </Link>
-            ) : type === "followers" || type === "followings" ? (
-              <Link href={`/profile/${item?.id}`} className={styles.profileBtn}>
-                <button>View Profile</button>
-              </Link>
-            ) : null)}
+  /* ----------  link wrapper – only for items that used to have “View Profile”  ---------- */
+  const needsLink =
+    type === "followers" || type === "followings" || type === "suggestions";
+
+  const Wrapper = ({ children }: { children: ReactNode }) =>
+    needsLink ? (
+      <Link href={`/profile/${item?.id}`} className={styles.linkWrapper}>
+        {children}
+      </Link>
+    ) : (
+      <>{children}</>
+    );
+
+  /* ----------  render  ---------- */
+  return !isResponded ? (
+    <Wrapper>
+      <div className={`${styles.listItem} ${styles[type]}`}>
+        <div className={styles.listItemInfo}>
+          <Image
+            className={styles.userIcon}
+            src={profilePic}
+            alt={`${item?.first_name}'s avatar`}
+            width={40}
+            height={40}
+          />
+          <span className={styles.listItemName}>
+            {item ? `${item.first_name} ${item.last_name}` : name}
+          </span>
         </div>
-      )}
-    </>
-  );
+
+        {type === "friendRequests" && (
+          <div className={styles.options}>
+            <button onClick={handleResponse} value="accepted">
+              Accept
+            </button>
+            <button onClick={handleResponse} value="rejected">
+              Reject
+            </button>
+          </div>
+        )}
+      </div>
+    </Wrapper>
+  ) : null;
 }
 
 export default ListItem;
