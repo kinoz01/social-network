@@ -139,6 +139,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 	useid := strings.Split(r.URL.Path, "/")[3]
 	defer r.Body.Close()
 	err := tp.DB.QueryRow(`SELECT 
+	id,
 	first_name,
 	last_name,
 	birthday,
@@ -152,7 +153,8 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
       COUNT(*) 
       from follow_requests 
       WHERE 
-      follow_requests.followed_id =  ?
+      follow_requests.followed_id = ?
+	   AND follow_requests.status = "accepted"
     ) as total_follower,
     (
         SELECT 
@@ -160,12 +162,21 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
       from follow_requests 
       WHERE 
       follow_requests.follower_id = ?
-    ) as total_follower
+	   AND follow_requests.status = "accepted"
+    ) as total_follower,
+    (
+        SELECT 
+      COUNT(*) 
+      from posts 
+      WHERE 
+      posts.user_id = ?
+    ) as total_posts
 	from 
 	users 
     
 	where 
-	id = ?`, useid, useid, useid).Scan(&userdata.Firstname,
+	id = ?`, useid, useid, useid , useid).Scan(&userdata.Id,
+		&userdata.Firstname,
 		&userdata.Lastname,
 		&userdata.Birthday,
 		&userdata.About_me,
@@ -175,6 +186,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		&userdata.Username,
 		&userdata.TotalFollowers,
 		&userdata.TotalFollowings,
+		&userdata.PostNbr,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {

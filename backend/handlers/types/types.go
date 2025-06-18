@@ -110,6 +110,7 @@ type FollowRequest struct {
 }
 
 type UserData struct {
+	Id              string     `json:"id"`
 	Email           string     `json:"email"`
 	Firstname       string     `json:"first_name"`
 	Lastname        string     `json:"last_name"`

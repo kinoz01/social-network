@@ -4,7 +4,7 @@ import { API_URL } from "@/lib/api_url";
 
 export const fetchOldPosts = async (pageNum: number, type?: string, id?: string) => {
     const url =
-        type === "profile" ? `${API_URL}/api/profilePosts/${id}`
+        type === "profile" ? `${API_URL}/api/profilePosts/${id}?pageNum=${pageNum}`
             : type === "group" ? `${API_URL}/api/allPosts?pageNum=${pageNum}&groupId=${id}`
                 : `${API_URL}/api/allPosts?pageNum=${pageNum}`;
 

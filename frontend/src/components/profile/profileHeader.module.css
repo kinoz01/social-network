@@ -164,7 +164,7 @@
 } */
 
 /* ---------- CTA ---------- */
-/* .cta {
+.cta {
   padding: .75rem 2.5rem;
   background: linear-gradient(135deg, #141414, #202020);
   border: 0;
@@ -177,7 +177,7 @@
 
 .cta:hover {
   filter: brightness(1.1);
-} */
+}
 
 /* ---------- PRIVATE NOTICE ---------- */
 /* .empty {
@@ -326,13 +326,13 @@
   line-height: 1;
   cursor: pointer;
   color: #0e0e0e;
-}
+}*/
 
 .pending {
   opacity: 0.4;  
   cursor: default;    
   pointer-events: none;
-} */
+}
 /* here */
 
 /* Profile Component Styles */

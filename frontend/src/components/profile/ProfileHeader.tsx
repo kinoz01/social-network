@@ -13,6 +13,7 @@ import { User } from "@/lib/types";
 import FollowButton from "./FollowButton";
 import { useFollowSync } from "@/context/FollowSyncContext";
 import { useUser } from "@/context/UserContext";
+import Feed from "../posts/Feed";
 /* -------------------------------- Types -------------------------------- */
 
 type Adjoin = {
@@ -24,8 +25,9 @@ type Adjoin = {
 	is_followed?: boolean;
 	is_own?: boolean;
 };
-
+// **********************************
 export interface Profile {
+	id : string;
 	email: string;
 	username: string;
 	profile_pic: string;
@@ -39,6 +41,22 @@ export interface Profile {
 	total_followers: number;
 	total_followings: number;
 }
+
+
+// export interface User {
+//     id: string;
+//     email: string;
+//     username?: string;
+//     profile_pic: string;
+//     first_name: string;
+//     last_name: string;
+//     birthday: string;
+//     about_me?: string;
+//     account_type: string;
+//     followers?: string[];
+//     followRequests?: string[];
+// }
+
 
 // export default function ProfileHeader({ profileId }: { profileId?: string }) {
 // 	const [profile, setProfile] = useState<User | null>(null);
@@ -318,7 +336,10 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 
 	const [followers, setFollowers] = useState<boolean>(false)
 	const [followings, setFollowings] = useState<boolean>(false)
-	const user = useUser();
+	const { user } = useUser();
+	console.log("-----------------------------------------------+", user);
+	if (!user) return
+
 
 	const accoutType = userData?.account_type === "public" ? "private" : "public";
 
@@ -360,7 +381,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 			const res = await fetch(`http://localhost:8080/api/profileData/${profileId}`)
 			const data = await res.json();
 			setData(data)
-			console.log('profile data', data);
+			console.log('profile data----------------------------------1212', data);
 
 		} catch (error) {
 			console.log("error", error);
@@ -378,8 +399,8 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 				credentials: "include",
 			})
 			const posts = await res.json();
+			console.log("*************************************************<", posts);
 			setPosts(posts)
-			console.log("posts",posts);
 		} catch (error) {
 			console.log("error", error);
 		} finally {
@@ -404,7 +425,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 						src={userData.profile_pic ? `${API_URL}/api/storage/avatars/${userData.profile_pic}` : `${API_URL}/api/storage/avatars/avatar.webp`}
 						alt={`${userData.profile_pic}`} className={styles.userImageprofil} width={150} height={150} />
 					{
-						user.user?.id === profileId && (
+						user?.id === profileId && (
 							<button className={`${styles.accountStatus}`} onClick={() => setIsModalOpen((prev) => !prev)} > account staut </button>
 						)
 					}
@@ -415,15 +436,11 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 						<div className={styles.username}>
 							<span>{userData.first_name} {userData.last_name}</span>
 							{
-								user.user?.id !== profileId && (
-									<button className={`${styles.followBtn}`}>
-										Follow
-									</button>
-								)
+								<FollowButton profileUser={userData} />
 							}
 						</div>
 						<div className={styles.numbers}>
-							<div className={styles.postsNumber}> {userPosts?.post_nbr} Posts</div>
+							<div className={styles.postsNumber}> {userData?.post_nbr} Posts</div>
 							<div onClick={() => {
 								setFollowers(prev => !prev)
 								setFollowings(false)
@@ -446,7 +463,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 			{/* <section className={styles.posts}>
 				<div className={styles.profile_posts}>
 					{
-						userPosts?.posts?.map((elem, i) => <PostComponent post={elem} key={elem.id} />)
+						userPosts?.posts?.map((elem, i) => <Feed type="profile" id={id}  />)
 					}
 				</div>
 			</section> */}

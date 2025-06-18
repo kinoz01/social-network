@@ -49,6 +49,7 @@ FROM follow_requests
 	}
 	return false, nil
 }
+
 func IsPublicAccount(w http.ResponseWriter, userProfil_id string) (bool, error) {
 	var row int
 	err := tp.DB.QueryRow(`

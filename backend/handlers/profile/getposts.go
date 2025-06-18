@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	auth "social-network/handlers/authentication"
+	"social-network/handlers/helpers"
 	Error "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
@@ -21,6 +23,15 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("err", err)
 		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
+		return
+	}
+	pageStr := r.URL.Query().Get("pageNum")
+	if pageStr == "" {
+		pageStr = "0"
+	}
+	currentPage, err := strconv.Atoi(pageStr)
+	if err != nil || currentPage < 0 {
+		helpers.JsonError(w, "Invalid pageNum", http.StatusBadRequest, nil)
 		return
 	}
 	fmt.Println("user", user.ID)
@@ -41,7 +52,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("*********************************", IsPublicAccount, IsFriend)
 
-	if IsFriend || useid == user.ID || (useid != user.ID && IsPublicAccount) {
+	if IsFriend || useid == user.ID || ( IsPublicAccount ) {
 		postsQuery := `SELECT
 		    posts.body,
 		    posts.img_post,
@@ -73,10 +84,10 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		WHERE
 		    user_id = ?
 		ORDER BY
-		    posts.created_at DESC;
+		    posts.created_at DESC
+			LIMIT 5 OFFSET ?;
 		`
-
-		rows, err := tp.DB.Query(postsQuery, useid)
+		rows, err := tp.DB.Query(postsQuery, useid, currentPage)
 		if err != nil {
 			Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 			return
@@ -118,20 +129,21 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			} else {
 				post.HasReact = resction
 			}
-			
+
 			userdata.Posts = append(userdata.Posts, post)
-			
+
 		}
 		if err = rows.Err(); err != nil {
 			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
 		fmt.Println(userdata.Posts)
-		
+
 	}
-	
+
 	userdata.PostNbr = len(userdata.Posts)
-	fmt.Println("////////////////", userdata )
+	fmt.Println(userdata.PostNbr)
+	fmt.Println("////////////////", userdata)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata.Posts)

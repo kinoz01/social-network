@@ -54,7 +54,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 return
             }
 
-           // await new Promise((resolve) => setTimeout(resolve, 50))
+           await new Promise((resolve) => setTimeout(resolve, 50))
 
            setPostedContent((prev) => [...prev, ...uniquePosts])
         } catch (err) {

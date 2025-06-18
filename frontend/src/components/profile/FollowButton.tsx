@@ -21,10 +21,12 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   useEffect(() => {
     const checkFollowStatus = async () => {
       const res = await isUserFollowed(profileUser.id);
+      
       setIsFollowed(res === "isFollowed" ? true : false);
-
+      
       setFollowingAction(res === "noRelationship" ? false : true);
       setIsDataLoading(false);
+      console.log("11111111111111111111111111111111111",res);
     };
 
     checkFollowStatus();
@@ -36,7 +38,9 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
 
   if (isDataLoading) {
     buttonText = "Loading...";
+    console.log("2222222222222222222222222222222222");
   } else if (followingAction) {
+    console.log("3333333333333333333333333333");
     if (isPublic) {
       buttonText = "UnFollow";
     } else {
@@ -45,6 +49,7 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   }
 
   const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("///////////////////////////////////////---->");
     if (!loggedUser) return;
 
     if (isPublic) {
