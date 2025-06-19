@@ -37,7 +37,6 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   const isPublic = profileUser?.account_type === "public";
   let buttonText = "Follow";
 
-  console.log(followingAction, "**************************************************");
   
   if (isDataLoading) {
     buttonText = "Loading...";
