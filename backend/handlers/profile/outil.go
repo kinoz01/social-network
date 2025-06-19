@@ -92,3 +92,12 @@ and post_privacy.allowed_users = ?
 	}
 	return false, nil
 }
+
+func Found(useid string) bool {
+    var found bool
+    _ = tp.DB.QueryRow(`
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE users.id = ?
+        )`, useid).Scan(&found)
+    return found
+}

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	auth "social-network/handlers/authentication"
 	tp "social-network/handlers/types"
 
 	Error "social-network/handlers/helpers"
@@ -129,16 +130,37 @@ import (
 // 	json.NewEncoder(w).Encode(out)
 // }
 
-func ProfileData(w http.ResponseWriter, r *http.Request) {
+func ProfileData(w http.ResponseWriter, r *http.Request){
 	if r.Method != http.MethodGet {
 		Error.JsonError(w, "Method not allowed", 405, nil)
 		return
 	}
+	user, err := auth.GetUser(r)
+	if err != nil {
+		fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", err)
+		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
+		return
+	}
+	useid := strings.Split(r.URL.Path, "/")[3]
+
+	IsFriend, err := IsFollower(w, useid, user.ID)
+	if err != nil {
+		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		return
+	}
+	IsPublicAccount, err := IsPublicAccount(w, useid)
+	if err != nil {
+		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		return
+	}
+	if !IsPublicAccount && !IsFriend && useid != user.ID {
+		Error.JsonError(w, "private account", http.StatusPartialContent, nil)
+		return
+	}
 
 	var userdata tp.UserData
-	useid := strings.Split(r.URL.Path, "/")[3]
 	defer r.Body.Close()
-	err := tp.DB.QueryRow(`SELECT 
+	err = tp.DB.QueryRow(`SELECT 
 	id,
 	first_name,
 	last_name,
@@ -175,7 +197,7 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 	users 
     
 	where 
-	id = ?`, useid, useid, useid , useid).Scan(&userdata.Id,
+	id = ?`, useid, useid, useid, useid).Scan(&userdata.Id,
 		&userdata.Firstname,
 		&userdata.Lastname,
 		&userdata.Birthday,

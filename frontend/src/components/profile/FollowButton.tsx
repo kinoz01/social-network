@@ -21,6 +21,8 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   useEffect(() => {
     const checkFollowStatus = async () => {
       const res = await isUserFollowed(profileUser.id);
+      console.log("----------------------------------------", res);
+      
       
       setIsFollowed(res === "isFollowed" ? true : false);
       
@@ -35,6 +37,8 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   const isPublic = profileUser?.account_type === "public";
   let buttonText = "Follow";
 
+  console.log(followingAction, "**************************************************");
+  
   if (isDataLoading) {
     buttonText = "Loading...";
   } else if (followingAction) {

@@ -27,7 +27,7 @@ type Adjoin = {
 };
 // **********************************
 export interface Profile {
-	id : string;
+	id: string;
 	email: string;
 	username: string;
 	profile_pic: string;
@@ -328,17 +328,16 @@ export interface Profile {
 
 const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 	const [userData, setData] = useState<Profile | null>(null);
-	const [userPosts, setPosts] = useState<Profile | null>(null);
+	// const [userPosts, setPosts] = useState<Profile | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-
+	const [privateProfile, setPrivate] = useState<boolean>(false);
 	const [statusUpdated, setStatusUpdated] = useState<boolean>(false);
+
 
 	const [followers, setFollowers] = useState<boolean>(false)
 	const [followings, setFollowings] = useState<boolean>(false)
 	const { user } = useUser();
-	if (!user) return
-
 
 	const accoutType = userData?.account_type === "public" ? "private" : "public";
 
@@ -369,7 +368,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 		}
 	}
 
-console.log("------------------------++++++++++++++++", userData);
+	console.log("------------------------++++++++++++++++", userData);
 
 
 	async function fetchData() {
@@ -377,8 +376,13 @@ console.log("------------------------++++++++++++++++", userData);
 
 		setIsLoading(true);
 		try {
-			const res = await fetch(`http://localhost:8080/api/profileData/${profileId}`)
+			const res = await fetch(`http://localhost:8080/api/profileData/${profileId}`,{
+				credentials:"include",
+			})
 			const data = await res.json();
+			if (res.status == 206) {
+				setPrivate(true)
+			}
 			setData(data)
 
 		} catch (error) {
@@ -388,30 +392,31 @@ console.log("------------------------++++++++++++++++", userData);
 		}
 	}
 
-	async function fetchPost() {
-		if (isLoading) return;
+	// async function fetchPost() {
+	// 	if (isLoading) return;
 
-		setIsLoading(true);
-		try {
-			const res = await fetch(`http://localhost:8080/api/profilePosts/${profileId}`, {
-				credentials: "include",
-			})
-			const posts = await res.json();
-			setPosts(posts)
-		} catch (error) {
-			console.log("error", error);
-		} finally {
-			setIsLoading(false);
-		}
-	}
+	// 	setIsLoading(true);
+	// 	try {
+	// 		const res = await fetch(`http://localhost:8080/api/profilePosts/${profileId}`, {
+	// 			credentials: "include",
+	// 		})
+	// 		const posts = await res.json();
+	// 		setPosts(posts)
+	// 	} catch (error) {
+	// 		console.log("error", error);
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// }
 
 	useEffect(() => {
 		const fetch = async () => {
 			await fetchData();
-			await fetchPost();
+			// await fetchPost();
 		}
 		fetch()
 	}, [statusUpdated])
+	
 
 	if (!userData) return <p>loading ...</p>
 	return <>
@@ -436,25 +441,32 @@ console.log("------------------------++++++++++++++++", userData);
 								<FollowButton profileUser={userData} />
 							}
 						</div>
-						<div className={styles.numbers}>
-							<div className={styles.postsNumber}> {userData?.post_nbr} Posts</div>
-							<div onClick={() => {
-								setFollowers(prev => !prev)
-								setFollowings(false)
 
-							}} className={styles.followersNumber}>{userData.total_followers} Followers </div>
-							<div onClick={() => {
-								setFollowings(prev => !prev)
-								setFollowers(false)
-							}} className={styles.followingNumber}>{userData.total_followings} Following</div>
-						</div>
+						{!privateProfile &&
+							<>
+								<div className={styles.numbers}>
+									<div className={styles.postsNumber}> {userData?.post_nbr} Posts</div>
+									<div onClick={() => {
+										setFollowers(prev => !prev)
+										setFollowings(false)
+
+									}} className={styles.followersNumber}>{userData.total_followers} Followers </div>
+									<div onClick={() => {
+										setFollowings(prev => !prev)
+										setFollowers(false)
+									}} className={styles.followingNumber}>{userData.total_followings} Following</div>
+								</div>
+								<div className={styles.more_data}>
+									<span>{userData.username} </span>
+									<span>{userData.about_me}</span>
+									<span>{userData.birthday}</span>
+									<span>{userData.email}</span>
+								</div>
+							</>
+						}
+
 					</div>
-					<div className={styles.more_data}>
-						<span>{userData.username} </span>
-						<span>{userData.about_me}</span>
-						<span>{userData.birthday}</span>
-						<span>{userData.email}</span>
-					</div>
+
 				</div>
 			</div>
 			{/* <section className={styles.posts}>

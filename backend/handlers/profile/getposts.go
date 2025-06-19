@@ -24,6 +24,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
 		return
 	}
+
 	pageStr := r.URL.Query().Get("pageNum")
 	if pageStr == "" {
 		pageStr = "0"
@@ -37,6 +38,12 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	var userdata tp.UserData
 	useid := strings.Split(r.URL.Path, "/")[3]
 	defer r.Body.Close()
+// *************************************
+	if !Found(useid) {
+        Error.JsonError(w, "user not found", 404, nil)
+        return
+    }
+
 	IsFriend, err := IsFollower(w, useid, user.ID)
 	if err != nil {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
@@ -47,6 +54,12 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
+	// *********************************
+	if !IsPublicAccount && !IsFriend && useid != user.ID {
+        Error.JsonError(w, "private account", http.StatusPartialContent, nil)
+        return
+    }
+	
 
 	postsQuery := `SELECT
 		    posts.body,
