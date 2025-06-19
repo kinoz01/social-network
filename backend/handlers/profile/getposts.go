@@ -21,7 +21,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := auth.GetUser(r)
 	if err != nil {
-		fmt.Println("err", err)
 		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
 		return
 	}
@@ -34,7 +33,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		helpers.JsonError(w, "Invalid pageNum", http.StatusBadRequest, nil)
 		return
 	}
-	fmt.Println("user", user.ID)
 
 	var userdata tp.UserData
 	useid := strings.Split(r.URL.Path, "/")[3]
@@ -50,7 +48,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("*********************************", IsPublicAccount, IsFriend)
 
 	// if useid == user.ID || IsPublicAccount {
 		postsQuery := `SELECT
@@ -115,11 +112,9 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			}
 			if err != nil {
 				Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-				fmt.Println(err)
 				return
 			}
 			resction, err := GitReaction(w, post.PostID, post.UserID)
-			fmt.Println("react", resction)
 			if err != nil {
 				// Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 				return
@@ -131,24 +126,21 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if post.Visibility == "almost-private" || !IsPublicAccount && post.Visibility == "public"  {
-				if !IsFriend {
+				if !IsFriend && useid != user.ID{
 					continue
 				}
 			}
 
 			if post.Visibility == "private" {
-				// does it exist
-				isVisible, err := PostVisibility(post.PostID, useid)
+				isVisible, err := PostVisibility(post.PostID, user.ID)
 				if err != nil {
 					Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 					return
 				}
-
 				if !isVisible {
 					continue
 				}
 			}
-
 			userdata.Posts = append(userdata.Posts, post)
 
 		}
@@ -156,13 +148,10 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
-		fmt.Println(userdata.Posts)
 
 	// }
 
 	userdata.PostNbr = len(userdata.Posts)
-	fmt.Println(userdata.PostNbr)
-	fmt.Println("////////////////", userdata)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata.Posts)

@@ -199,6 +199,5 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	fmt.Println("TEST DATA", userdata)
 	json.NewEncoder(w).Encode(userdata)
 }

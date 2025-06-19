@@ -83,7 +83,6 @@ func ChangeStatu(w http.ResponseWriter, r *http.Request) {
 	}
 
 	useid := strings.Split(r.URL.Path, "/")[3]
-	fmt.Println("rrrrry", useid)
 	var status AccountStatus
 	err := json.NewDecoder(r.Body).Decode(&status)
 	if err != nil {
@@ -91,21 +90,17 @@ func ChangeStatu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	fmt.Println("u", status.Stauts)
 	msg, err := UpDateStatus(w, status.Stauts, useid)
 	if err != nil {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
-	fmt.Println("msg", msg)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(msg)
 }
 
 func UpDateStatus(w http.ResponseWriter, status string, useid string) (msg string, err error) {
-	fmt.Println("id ldakhal", useid)
-	fmt.Println("status ldakhal", status)
 	sqlStatement := `
 UPDATE users
 SET account_type = ?
@@ -116,6 +111,5 @@ WHERE id =?;
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return "", err
 	}
-	fmt.Println("")
 	return `update account_type successfully`, nil
 }
