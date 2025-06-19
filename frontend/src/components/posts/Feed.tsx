@@ -43,9 +43,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 return
             }
 
-            
-            console.log("----------------------////////-------", oldPosts);
-            
+                        
             const uniquePosts = oldPosts.filter(
                 (post) => !postedContent.some((p) => p.id === post.id)
             )
@@ -75,7 +73,6 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
     useEffect(() => {
         loadMOre()
-        console.log("//////////////////////////////////////////////--");
         
     }, [currentPage, loadMOre])
 

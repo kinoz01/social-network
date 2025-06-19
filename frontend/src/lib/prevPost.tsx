@@ -7,8 +7,6 @@ export const fetchOldPosts = async (pageNum: number, type?: string, id?: string)
         type === "profile" ? `${API_URL}/api/profilePosts/${id}?pageNum=${pageNum}`
             : type === "group" ? `${API_URL}/api/allPosts?pageNum=${pageNum}&groupId=${id}`
                 : `${API_URL}/api/allPosts?pageNum=${pageNum}`;
-
-                console.log("url =========================",url);
                 
     try {
         const res = await fetch(url,

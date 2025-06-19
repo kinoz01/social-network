@@ -337,7 +337,6 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 	const [followers, setFollowers] = useState<boolean>(false)
 	const [followings, setFollowings] = useState<boolean>(false)
 	const { user } = useUser();
-	console.log("-----------------------------------------------+", user);
 	if (!user) return
 
 
@@ -359,7 +358,6 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 				}),
 			})
 			const data = await res.json();
-			console.log("daaaaaaaaaaaaaaaaaaata: ", data);
 
 			setStatusUpdated(prev => !prev);
 
@@ -371,6 +369,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 		}
 	}
 
+console.log("------------------------++++++++++++++++", userData);
 
 
 	async function fetchData() {
@@ -381,7 +380,6 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 			const res = await fetch(`http://localhost:8080/api/profileData/${profileId}`)
 			const data = await res.json();
 			setData(data)
-			console.log('profile data----------------------------------1212', data);
 
 		} catch (error) {
 			console.log("error", error);
@@ -399,7 +397,6 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 				credentials: "include",
 			})
 			const posts = await res.json();
-			console.log("*************************************************<", posts);
 			setPosts(posts)
 		} catch (error) {
 			console.log("error", error);

@@ -48,9 +48,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
-	// if useid == user.ID || IsPublicAccount {
-		postsQuery := `SELECT
+	postsQuery := `SELECT
 		    posts.body,
 		    posts.img_post,
 		    posts.visibility,
@@ -84,74 +82,70 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		    posts.created_at DESC
 			LIMIT 5 OFFSET ?;
 		`
-		rows, err := tp.DB.Query(postsQuery, useid, currentPage)
+	rows, err := tp.DB.Query(postsQuery, useid, currentPage)
+	if err != nil {
+		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		return
+	}
+	defer rows.Close()
+	var img sql.NullString
+
+	for rows.Next() {
+		var post tp.PostData
+		err := rows.Scan(
+			&post.Content,
+			&img,
+			&post.Visibility,
+			&post.CreatedAt,
+			&post.PostID,
+			&post.FirstName,
+			&post.LastName,
+			&post.ProfilePic,
+			&post.UserID,
+			&post.TotalLIKes,
+			&post.TotalComments,
+		)
+		if img.Valid {
+			post.Imag_post = img.String
+		}
 		if err != nil {
-			Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
-		defer rows.Close()
-		var img sql.NullString
+		resction, err := GitReaction(w, post.PostID, post.UserID)
+		if err != nil {
+			// Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+			return
+		}
+		if resction == "ErrNoRows" {
+			post.HasReact = ""
+		} else {
+			post.HasReact = resction
+		}
 
-		for rows.Next() {
-			var post tp.PostData
-			err := rows.Scan(
-				&post.Content,
-				&img,
-				&post.Visibility,
-				&post.CreatedAt,
-				&post.PostID,
-				&post.FirstName,
-				&post.LastName,
-				&post.ProfilePic,
-				&post.UserID,
-				&post.TotalLIKes,
-				&post.TotalComments,
-			)
-			if img.Valid {
-				post.Imag_post = img.String
+		if post.Visibility == "almost-private" || !IsPublicAccount && post.Visibility == "public" {
+			if !IsFriend && useid != user.ID {
+				continue
 			}
+		}
+
+		if post.Visibility == "private" {
+			isVisible, err := PostVisibility(post.PostID, user.ID)
 			if err != nil {
 				Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 				return
 			}
-			resction, err := GitReaction(w, post.PostID, post.UserID)
-			if err != nil {
-				// Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-				return
+			if !isVisible || !IsFriend && useid != user.ID {
+				continue
 			}
-			if resction == "ErrNoRows" {
-				post.HasReact = ""
-			} else {
-				post.HasReact = resction
-			}
-
-			if post.Visibility == "almost-private" || !IsPublicAccount && post.Visibility == "public"  {
-				if !IsFriend && useid != user.ID{
-					continue
-				}
-			}
-
-			if post.Visibility == "private" {
-				isVisible, err := PostVisibility(post.PostID, user.ID)
-				if err != nil {
-					Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-					return
-				}
-				if !isVisible {
-					continue
-				}
-			}
-			userdata.Posts = append(userdata.Posts, post)
-
 		}
-		if err = rows.Err(); err != nil {
-			Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
-			return
-		}
+		userdata.Posts = append(userdata.Posts, post)
 
-	// }
-
-	userdata.PostNbr = len(userdata.Posts)
+	}
+	if err = rows.Err(); err != nil {
+		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(userdata.Posts)
