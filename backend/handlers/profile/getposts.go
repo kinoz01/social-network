@@ -52,7 +52,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("*********************************", IsPublicAccount, IsFriend)
 
-	if useid == user.ID || IsPublicAccount {
+	// if useid == user.ID || IsPublicAccount {
 		postsQuery := `SELECT
 		    posts.body,
 		    posts.img_post,
@@ -121,7 +121,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			resction, err := GitReaction(w, post.PostID, post.UserID)
 			fmt.Println("react", resction)
 			if err != nil {
-				Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+				// Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 				return
 			}
 			if resction == "ErrNoRows" {
@@ -129,15 +129,26 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			} else {
 				post.HasReact = resction
 			}
-			
-			if post.Visibility == "almost-private" {
+
+			if post.Visibility == "almost-private" || !IsPublicAccount && post.Visibility == "public"  {
 				if !IsFriend {
 					continue
 				}
 			}
+
 			if post.Visibility == "private" {
-				// does it exist 
+				// does it exist
+				isVisible, err := PostVisibility(post.PostID, useid)
+				if err != nil {
+					Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+					return
+				}
+
+				if !isVisible {
+					continue
+				}
 			}
+
 			userdata.Posts = append(userdata.Posts, post)
 
 		}
@@ -147,7 +158,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Println(userdata.Posts)
 
-	}
+	// }
 
 	userdata.PostNbr = len(userdata.Posts)
 	fmt.Println(userdata.PostNbr)

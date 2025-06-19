@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+
 	Error "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
@@ -63,6 +64,27 @@ FROM users
 		// 	return false, nil
 		// }
 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
+		return false, err
+	}
+	if row == 1 {
+		return true, nil
+	}
+	return false, nil
+}
+
+func PostVisibility(PostID string, useid string) (bool, error) {
+	var row int
+	err := tp.DB.QueryRow(`
+SELECT COUNT (*) 
+ FROM post_privacy
+WHERE post_privacy.post_id = ?
+and post_privacy.allowed_users = ?
+`, PostID, useid).Scan(&row)
+	if err != nil {
+		// if err == sql.ErrNoRows {
+		// 	return false, nil
+		// }
+		// Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return false, err
 	}
 	if row == 1 {
