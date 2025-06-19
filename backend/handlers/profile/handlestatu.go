@@ -81,7 +81,6 @@ func ChangeStatu(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Method not allowed", 405, nil)
 		return
 	}
-
 	useid := strings.Split(r.URL.Path, "/")[3]
 	var status AccountStatus
 	err := json.NewDecoder(r.Body).Decode(&status)

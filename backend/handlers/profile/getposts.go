@@ -123,7 +123,8 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 			post.HasReact = resction
 		}
 
-		if post.Visibility == "almost-private" || !IsPublicAccount && post.Visibility == "public" {
+		if post.Visibility == "almost-private" || (!IsPublicAccount && post.Visibility == "public") {
+			fmt.Println("isvissible")
 			if !IsFriend && useid != user.ID {
 				continue
 			}
