@@ -39,7 +39,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var userdata tp.UserData
-//**************************handle Split err******************************
 	pathParts := strings.Split(r.URL.Path, "/")
 	if len(pathParts) < 4 {
 		Error.JsonError(w, "Invalid URL path", http.StatusBadRequest, nil)
@@ -171,7 +170,6 @@ if !IsPublicAccount && !is_follower && useid != user.ID {
 		}
 		resction, err := GitReaction(w, post.PostID, post.UserID)
 		if err != nil {
-			// Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 			return
 		}
 		if resction == "ErrNoRows" {

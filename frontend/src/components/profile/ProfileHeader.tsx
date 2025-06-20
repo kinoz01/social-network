@@ -14,10 +14,8 @@ import FollowButton from "./FollowButton";
 import { useFollowSync } from "@/context/FollowSyncContext";
 import { useUser } from "@/context/UserContext";
 import Feed from "../posts/Feed";
-/* -------------------------------- Types -------------------------------- */
 
 
-// **********************************
 export interface Profile {
 	id: string;
 	email: string;
@@ -119,7 +117,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 						alt={`${userData.profile_pic}`} className={styles.userImageprofil} width={150} height={150} />
 					{
 						user?.id === profileId && (
-							<button className={`${styles.accountStatus}`} onClick={() => setIsModalOpen((prev) => !prev)} > account staut </button>
+							<button className={`${styles.accountStatus}`} onClick={() => setIsModalOpen((prev) => !prev)} > account staut ({userData.account_type}) </button>
 						)
 					}
 				</div>
