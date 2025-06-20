@@ -71,7 +71,10 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
+if !IsPublicAccount && !is_follower && useid != user.ID {
+        Error.JsonError(w, "private account", http.StatusPartialContent, nil)
+        return
+    }
 // 	var is_accountexist , is_follower, IsPublicAccount bool
 
 // 	err = tp.DB.QueryRow(`

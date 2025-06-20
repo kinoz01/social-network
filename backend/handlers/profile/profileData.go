@@ -152,12 +152,21 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error", 500, nil)
 		return
 	}
+	var userdata tp.UserData
 	if !IsPublicAccount && !IsFriend && useid != user.ID {
-		Error.JsonError(w, "private account", http.StatusPartialContent, nil)
+		userdata.Id = useid
+		if IsPublicAccount{
+			userdata.AccountType = "public"
+		}else{
+			userdata.AccountType = "private"
+		}
+		w.WriteHeader(http.StatusPartialContent)
+		json.NewEncoder(w).Encode(userdata)
+		// Error.JsonError(w, "private account", http.StatusPartialContent, nil)
 		return
 	}
 
-	var userdata tp.UserData
+
 	defer r.Body.Close()
 	//****************update query******************
 	err = tp.DB.QueryRow(`SELECT
@@ -170,7 +179,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
     u.account_type,
     u.email,
     u.username,
-    -- Count followers
     COALESCE(
         (
             (
@@ -185,7 +193,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
         ),
         0
     ) AS total_followers,
-    -- Count following
     COALESCE(
         (
             SELECT
