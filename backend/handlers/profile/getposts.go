@@ -26,25 +26,41 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pageStr := r.URL.Query().Get("pageNum")
+
 	if pageStr == "" {
 		pageStr = "0"
 	}
+
 	currentPage, err := strconv.Atoi(pageStr)
+
 	if err != nil || currentPage < 0 {
 		helpers.JsonError(w, "Invalid pageNum", http.StatusBadRequest, nil)
 		return
 	}
 
 	var userdata tp.UserData
-	useid := strings.Split(r.URL.Path, "/")[3]
-	defer r.Body.Close()
-// *************************************
-	if !Found(useid) {
-        Error.JsonError(w, "user not found", 404, nil)
-        return
-    }
+//**************************handle Split err******************************
+	pathParts := strings.Split(r.URL.Path, "/")
+	if len(pathParts) < 4 {
+		Error.JsonError(w, "Invalid URL path", http.StatusBadRequest, nil)
+		return
+	}
+	useid := pathParts[3]
 
-	IsFriend, err := IsFollower(w, useid, user.ID)
+	if useid == "" {
+		Error.JsonError(w, "User ID is required", http.StatusBadRequest, nil)
+		return
+	}
+
+	defer r.Body.Close()
+
+
+	if !Found(useid) {
+		Error.JsonError(w, "user not found", 404, nil)
+		return
+	}
+
+	is_follower, err := IsFollower(w, useid, user.ID)
 	if err != nil {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
@@ -54,12 +70,37 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
 		return
 	}
-	// *********************************
-	if !IsPublicAccount && !IsFriend && useid != user.ID {
-        Error.JsonError(w, "private account", http.StatusPartialContent, nil)
-        return
-    }
-	
+
+
+// 	var is_accountexist , is_follower, IsPublicAccount bool
+
+// 	err = tp.DB.QueryRow(`
+// SELECT
+//     CASE
+//         WHEN users.id IS NOT NULL THEN 1
+//         ELSE 0
+//     END as is_accountexist ,
+//     CASE
+//         WHEN follow_requests.follower_id IS NOT NULL THEN 1
+//         ELSE 0
+//     END as is_follower,
+//     CASE WHEN users.account_type = "public" THEN 1 ELSE 0 END AS is_public
+// FROM
+//     users
+//     LEFT JOIN follow_requests  ON follow_requests.follower_id = ?
+//     AND follow_requests.followed_id = users.id
+//     AND follow_requests.status = 'accepted'
+// WHERE
+//     users.id = ?`, user.ID, useid).Scan(&is_accountexist ,&is_follower, &IsPublicAccount)
+// 	if err != nil {
+// 		if err == sql.ErrNoRows {
+// 			Error.JsonError(w, "user not found", 404, nil)
+// 			return
+// 		}
+// 		Error.JsonError(w, "Internal Server Error", 500, nil)
+// 	}
+
+
 
 	postsQuery := `SELECT
 		    posts.body,
@@ -97,7 +138,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		`
 	rows, err := tp.DB.Query(postsQuery, useid, currentPage)
 	if err != nil {
-		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		Error.JsonError(w, "Internal Server Error", 500, nil)
 		return
 	}
 	defer rows.Close()
@@ -138,7 +179,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 		if post.Visibility == "almost-private" || (!IsPublicAccount && post.Visibility == "public") {
 			fmt.Println("isvissible")
-			if !IsFriend && useid != user.ID {
+			if !is_follower && useid != user.ID {
 				continue
 			}
 		}
@@ -149,7 +190,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 				Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 				return
 			}
-			if !isVisible || !IsFriend && useid != user.ID {
+			if !isVisible || !is_follower && useid != user.ID {
 				continue
 			}
 		}

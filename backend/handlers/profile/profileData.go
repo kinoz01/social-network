@@ -130,14 +130,13 @@ import (
 // 	json.NewEncoder(w).Encode(out)
 // }
 
-func ProfileData(w http.ResponseWriter, r *http.Request){
+func ProfileData(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		Error.JsonError(w, "Method not allowed", 405, nil)
 		return
 	}
 	user, err := auth.GetUser(r)
 	if err != nil {
-		fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", err)
 		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
 		return
 	}
@@ -145,12 +144,12 @@ func ProfileData(w http.ResponseWriter, r *http.Request){
 
 	IsFriend, err := IsFollower(w, useid, user.ID)
 	if err != nil {
-		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		Error.JsonError(w, "Internal Server Error", 500, nil)
 		return
 	}
 	IsPublicAccount, err := IsPublicAccount(w, useid)
 	if err != nil {
-		Error.JsonError(w, "Internal Server Error"+fmt.Sprintf("%v", err), 500, nil)
+		Error.JsonError(w, "Internal Server Error", 500, nil)
 		return
 	}
 	if !IsPublicAccount && !IsFriend && useid != user.ID {
@@ -160,44 +159,60 @@ func ProfileData(w http.ResponseWriter, r *http.Request){
 
 	var userdata tp.UserData
 	defer r.Body.Close()
-	err = tp.DB.QueryRow(`SELECT 
-	id,
-	first_name,
-	last_name,
-	birthday,
-	about_me,
-	profile_pic,
-	account_type,
-	email,
-	username,
-    (
-        SELECT 
-      COUNT(*) 
-      from follow_requests 
-      WHERE 
-      follow_requests.followed_id = ?
-	   AND follow_requests.status = "accepted"
-    ) as total_follower,
-    (
-        SELECT 
-      COUNT(*) 
-      from follow_requests 
-      WHERE 
-      follow_requests.follower_id = ?
-	   AND follow_requests.status = "accepted"
-    ) as total_follower,
-    (
-        SELECT 
-      COUNT(*) 
-      from posts 
-      WHERE 
-      posts.user_id = ?
+	//****************update query******************
+	err = tp.DB.QueryRow(`SELECT
+    u.id,
+    u.first_name,
+    u.last_name,
+    u.birthday,
+    u.about_me,
+    u.profile_pic,
+    u.account_type,
+    u.email,
+    u.username,
+    -- Count followers
+    COALESCE(
+        (
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    follow_requests
+                WHERE
+                    followed_id = u.id
+                    AND status = 'accepted'
+            )
+        ),
+        0
+    ) AS total_followers,
+    -- Count following
+    COALESCE(
+        (
+            SELECT
+                COUNT(*)
+            FROM
+                follow_requests
+            WHERE
+                follower_id = u.id
+                AND status = 'accepted'
+        ),
+        0
+    ) as total_following,
+    COALESCE(
+        (
+            SELECT
+                COUNT(*)
+            from
+                posts
+            WHERE
+                posts.user_id = u.id
+        ),
+        0
     ) as total_posts
-	from 
-	users 
-    
-	where 
-	id = ?`, useid, useid, useid, useid).Scan(&userdata.Id,
+FROM
+    users u
+WHERE
+    u.id = ?`, useid).Scan(&userdata.Id,
 		&userdata.Firstname,
 		&userdata.Lastname,
 		&userdata.Birthday,
