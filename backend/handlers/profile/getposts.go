@@ -15,10 +15,7 @@ import (
 )
 
 func GetPosts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		Error.JsonError(w, "Method not allowed", 405, nil)
-		return
-	}
+	
 	user, err := auth.GetUser(r)
 	if err != nil {
 		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
@@ -26,7 +23,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pageStr := r.URL.Query().Get("pageNum")
-
 	if pageStr == "" {
 		pageStr = "0"
 	}

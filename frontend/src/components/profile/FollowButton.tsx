@@ -20,9 +20,7 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   // Fetch follow status only when profileUser is ready
   useEffect(() => {
     const checkFollowStatus = async () => {
-      const res = await isUserFollowed(profileUser.id);
-      console.log("----------------------------------------", res);
-      
+      const res = await isUserFollowed(profileUser.id);      
       
       setIsFollowed(res === "isFollowed" ? true : false);
       

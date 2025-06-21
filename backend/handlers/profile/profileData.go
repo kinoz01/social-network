@@ -13,12 +13,7 @@ import (
 	Error "social-network/handlers/helpers"
 )
 
-
 func ProfileData(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		Error.JsonError(w, "Method not allowed", 405, nil)
-		return
-	}
 	user, err := auth.GetUser(r)
 	if err != nil {
 		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
@@ -48,7 +43,6 @@ func ProfileData(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(userdata)
 		return
 	}
-
 
 	defer r.Body.Close()
 	err = tp.DB.QueryRow(`SELECT
