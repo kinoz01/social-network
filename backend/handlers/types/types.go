@@ -108,3 +108,19 @@ type FollowRequest struct {
 	FollowerID string `json:"followerId"`
 	FollowedID string `json:"followedId"`
 }
+
+type UserData struct {
+	Id              string     `json:"id"`
+	Email           string     `json:"email"`
+	Firstname       string     `json:"first_name"`
+	Lastname        string     `json:"last_name"`
+	Profile_pic     string     `json:"profile_pic,omitempty"`
+	Username        string     `json:"username"`
+	Birthday        string     `json:"birthday"`
+	About_me        string     `json:"about_me,omitempty"`
+	AccountType     string     `json:"account_type"`
+	Posts           []PostData `json:"posts"`
+	PostNbr         int        `json:"post_nbr"`
+	TotalFollowers  int        `json:"total_followers"`
+	TotalFollowings int        `json:"total_followings"`
+}

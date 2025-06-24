@@ -60,8 +60,7 @@ func GetChatList(w http.ResponseWriter, r *http.Request) {
 	    FROM users u
 	   WHERE u.id <> ?  -- exclude self
 	     AND (
-	       u.account_type = 'public'
-	       OR EXISTS(
+		 	EXISTS(
 	         SELECT 1
 	           FROM follow_requests fr
 	          WHERE fr.follower_id = ? AND fr.followed_id = u.id

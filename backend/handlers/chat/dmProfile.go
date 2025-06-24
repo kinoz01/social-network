@@ -24,12 +24,12 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var fn, ln, pic, accType string
+	var fn, ln, pic string
 	err = tp.DB.QueryRow(`
-        SELECT first_name, last_name, profile_pic, account_type
+        SELECT first_name, last_name, profile_pic
         FROM users
         WHERE id = ?
-    `, userID).Scan(&fn, &ln, &pic, &accType)
+    `, userID).Scan(&fn, &ln, &pic)
 	if err == sql.ErrNoRows {
 		help.JsonError(w, "user not found", http.StatusNotFound, nil)
 		return
@@ -39,38 +39,25 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accType == "private" {
-		var count int
+	var count int
 
-		err = tp.DB.QueryRow(`
-			SELECT COUNT(*) FROM (
-				-- accepted follow
-				SELECT 1
-				FROM follow_requests
-				WHERE status = 'accepted'
-				  AND (
-						(follower_id = ? AND followed_id = ?)
-					 OR (follower_id = ? AND followed_id = ?)
-				  )
-	
-				UNION
-	
-				-- any private chat in either direction
-				SELECT 1
-				FROM private_chats
-				WHERE (sender_id   = ? AND receiver_id = ?)
-				   OR (sender_id   = ? AND receiver_id = ?)
-			) AS t
+	err = tp.DB.QueryRow(`
+		SELECT COUNT(*)
+			FROM follow_requests
+			WHERE status = 'accepted'
+			  	AND (
+			        (follower_id = ? AND followed_id = ?)  -- you → them
+			    OR (follower_id = ? AND followed_id = ?)  -- them → you
+			);
 		`, u.ID, userID, userID, u.ID,
-			u.ID, userID, userID, u.ID).Scan(&count)
-		if err != nil {
-			help.JsonError(w, "db error", http.StatusInternalServerError, err)
-			return
-		}
-		if count == 0 {
-			help.JsonError(w, "user not found", http.StatusNotFound, nil)
-			return
-		}
+		u.ID, userID, userID, u.ID).Scan(&count)
+	if err != nil {
+		help.JsonError(w, "db error", http.StatusInternalServerError, err)
+		return
+	}
+	if count == 0 {
+		help.JsonError(w, "user not found", http.StatusNotFound, nil)
+		return
 	}
 
 	resp := map[string]string{

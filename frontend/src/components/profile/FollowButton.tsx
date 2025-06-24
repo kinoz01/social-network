@@ -20,9 +20,10 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   // Fetch follow status only when profileUser is ready
   useEffect(() => {
     const checkFollowStatus = async () => {
-      const res = await isUserFollowed(profileUser.id);
+      const res = await isUserFollowed(profileUser.id);      
+      
       setIsFollowed(res === "isFollowed" ? true : false);
-
+      
       setFollowingAction(res === "noRelationship" ? false : true);
       setIsDataLoading(false);
     };
@@ -34,6 +35,7 @@ export default function FollowButton({ profileUser }: { profileUser: User }) {
   const isPublic = profileUser?.account_type === "public";
   let buttonText = "Follow";
 
+  
   if (isDataLoading) {
     buttonText = "Loading...";
   } else if (followingAction) {

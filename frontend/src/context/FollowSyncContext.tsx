@@ -21,4 +21,3 @@ export function FollowSyncProvider({ children }: { children: React.ReactNode }) 
         </FollowContext.Provider>
     );
 }
-

@@ -1,169 +1,4 @@
-/* ---------- LAYOUT WRAPPER ---------- */
-.wrapper {
-  position: relative;
-  width: 100%;
-  margin-top: 30px;
-}
 
-/* ---------- COVER ---------- */
-.cover {
-  height: 320px;
-  border-radius: 32px 32px 10px 10px;
-  overflow: hidden;
-  position: relative;
-  min-width: 360px;
-}
-
-.coverImg {
-  object-fit: cover;
-}
-
-/* .cover::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #ff4e9a90, #ff695e90);
-  mix-blend-mode: overlay;
-} */
-
-/* ---------- CARD ---------- */
-.card {
-  position: relative;
-  width: min(640px, 90%);
-  margin: -160px auto 2.5rem;
-  background: #f5f5f5;
-  border-radius: 16px;
-  padding: 100px 2rem 1.7rem;
-  box-shadow: 0 4px 4px 1px rgba(0 0 0 / .15);
-  text-align: center;
-}
-
-/* ---------- MESSAGE BUTTON ---------- */
-.msgBtn {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-  padding: .45rem .9rem;
-  font: 400 1.1rem "Zain", sans-serif;
-  color: #0e0e0e;
-  background: rgba(255 255 255 / .15);
-  border: 0;
-  border-radius: 24px;
-  backdrop-filter: blur(6px);
-  cursor: pointer;
-  transition: background .2s;
-}
-
-.msgBtn:hover {
-  background: rgba(255 255 255 / .25);
-}
-
-.msgText {
-  display: none;
-}
-
-@media(min-width:600px) {
-  .msgText {
-    display: inline;
-    margin-top: 5px;
-  }
-}
-
-/* ---------- AVATAR ---------- */
-.avatarWrap {
-  position: absolute;
-  top: -60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 2px 2px rgba(0 0 0 / .2);
-}
-
-.avatar {
-  object-fit: cover;
-  background: #f2f2f2b2;
-}
-
-/* ---------- TEXT ---------- */
-.name {
-  font: 600 1.5rem "Zain";
-  color: #141414;
-  margin-top: -20px;
-}
-
-.username {
-  font: 1rem "Zain";
-  color: #141414;
-  margin-bottom: 10px;
-}
-
-.about {
-  color: #6d747c;
-  font: 1.1rem "Zain";
-  margin-bottom: 10px;
-  overflow-wrap: anywhere;
-}
-
-/* ---------- CONTACT LIST ---------- */
-.contact {
-  list-style: none;
-  margin: 0 0 1.3rem;
-  padding: 0;
-}
-
-.contact li {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: .5rem;
-  font: .9375rem "Zain";
-  color: #495057;
-}
-
-.contactIcon {
-  color: #868e96;
-  flex-shrink: 0;
-}
-
-/* ---------- STATS ---------- */
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  list-style: none;
-  margin: 0 0 1.5rem;
-  padding: 0;
-}
-
-.statLink {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-}
-
-.statLink:hover * {
-  color: #000;
-}
-
-.stats strong {
-  display: block;
-  font-size: 1.25rem;
-  color: #292929;
-}
-
-.stats span {
-  font-size: .75rem;
-  color: #868e96;
-  text-transform: uppercase;
-}
-
-/* ---------- CTA ---------- */
 .cta {
   padding: .75rem 2.5rem;
   background: linear-gradient(135deg, #141414, #202020);
@@ -179,157 +14,320 @@
   filter: brightness(1.1);
 }
 
-/* ---------- PRIVATE NOTICE ---------- */
-.empty {
-  text-align: center;
-  font: 1rem "Zain";
-  color: #242424;
-  margin-top: 10px;
-}
-
-.empty p {
-  margin-bottom: 15px;
-}
-
-/************************************* Privacy Toggle *************************************/
-.privacyToggle {
-  position: absolute;
-  top: 30px;
-  left: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-/* labels */
-.labelLeft,
-.labelRight {
-  font-size: 11px;
-  font-weight: 600;
-  user-select: none;
-  line-height: 1;
-  font-family: 'Zain';
-}
-
-.switchTrack {
-  position: relative;
-  width: 35px;
-  height: 20px;
-  border-radius: 10px;
-  flex-shrink: 0;
-  transition: background 0.25s;
-}
-
-.switchThumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  transition: left 0.25s;
-}
-
-/* PUBLIC (black track) */
-.pub .switchTrack {
-  background: #000;
-}
-
-.pub .switchThumb {
-  left: 18px;
-}
-
-.pub .labelRight,
-.pub .labelLeft {
-  color: #111111;
-}
-
-
-.priv .switchTrack {
-  background: #aaa;
-}
-
-.priv .labelLeft {
-  color: #000;
-}
-
-.priv .labelRight {
-  color: #777;
-}
-
-/* ─────────── CONFIRM DIALOG ─────────── */
-.confirmBackdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: grid;
-  place-items: center;
-  z-index: 1000;
-}
-
-.confirmBox {
-  background: #fff;
-  padding: 1.4rem 1.8rem;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 320px;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-  position: relative;
-}
-
-.confirmBtns {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.6rem;
-}
-
-.confirmBtns button {
-  padding: 0.4rem 0.9rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.confirmBtns button:first-child {
-  background: #eee;
-}
-
-.confirmBtns button:last-child {
-  background: #000;
-  color: #fff;
-}
-
-.confirmBtns button[disabled] {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.confirmBox p {
-  margin-bottom: 40px;
-}
-
-.confirmClose {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  border: none;
-  background: transparent;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  color: #0e0e0e;
-}
 
 .pending {
   opacity: 0.4;  
   cursor: default;    
   pointer-events: none;
+}
+
+
+.container {
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.userInfo {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  border-bottom: 1px solid #e1e8ed;
+}
+
+.image_btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.userImageprofil {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e1e8ed;
+  transition: transform 0.2s ease;
+}
+
+
+.userImageprofil:hover {
+  transform: scale(1.05);
+}
+
+.accountStatus {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+}
+
+.accountStatus:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+
+.username {
+
+  margin-bottom: 15px;
+}
+
+.username span {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.followBtn {
+  background: #1da1f2;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.followBtn:hover {
+  background: #1991db;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 161, 242, 0.3);
+}
+
+.numbers {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.postsNumber,
+.followersNumber,
+.followingNumber {
+  font-size: 16px;
+  color: #657786;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.postsNumber:hover,
+.followersNumber:hover,
+.followingNumber:hover {
+  color: #1da1f2;
+}
+
+.more_data {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.more_data span {
+  color: #657786;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.more_data span:first-child {
+  font-weight: 600;
+  color: #1a202c;
+  font-size: 16px;
+}
+
+.posts {
+  margin-top: 30px;
+}
+
+.profile_posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .userInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .username {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .numbers {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .profile_posts {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .userImageprofil {
+    width: 120px;
+    height: 120px;
+  }
+
+  .username span {
+    font-size: 24px;
+  }
+
+  .numbers {
+    gap: 15px;
+  }
+
+  .postsNumber,
+  .followersNumber,
+  .followingNumber {
+    font-size: 14px;
+  }
+}
+
+.modalcontainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.closebtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closebtn:hover {
+  color: #666;
+}
+
+.content {
+  padding: 20px;
+}
+
+.content p {
+  margin: 0 0 20px 0;
+  color: #555;
+  line-height: 1.4;
+}
+
+.info {
+  margin-top: 15px;
+}
+
+.statusbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #6c757d;
+}
+
+.icon {
+  font-size: 24px;
+}
+
+.statusbox h4 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.statusbox p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  justify-content: flex-end;
+  border-top: 1px solid #eee;
+}
+
+.cancelbtn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #666;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.cancelbtn:hover {
+  background: #f8f9fa;
+}
+
+.confirmbtn {
+  padding: 8px 16px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.confirmbtn:hover {
+  background: #0056b3;
 }

@@ -19,8 +19,8 @@ import (
 	grpevent "social-network/handlers/groups/events"
 	grpsInvite "social-network/handlers/groups/invitations"
 	grpsRequest "social-network/handlers/groups/joinRequests"
-	"social-network/handlers/profile"
 	notif "social-network/handlers/notifications"
+	"social-network/handlers/profile"
 	ws "social-network/handlers/websocket"
 )
 
@@ -109,8 +109,11 @@ func Routes() http.Handler {
 	mux.Handle("/api/followers/search", mw.GetMW(flw.SearchFollowers))
 
 	// Profiles:
-	mux.Handle("/api/users/profilesInfo", mw.GetMW(profile.ProfileData))
-	mux.Handle("/api/handleAccountStatu", rl.RateLimitMW(mw.PostMW(profile.ChangeStatu)))
+	// mux.Handle("/api/users/profilesInfo", mw.GetMW(profile.ProfileData))
+	// mux.Handle("/api/handleAccountStatu", rl.RateLimitMW(mw.PostMW(profile.ChangeStatu)))
+	mux.HandleFunc("/api/profileData/", mw.GetMW(profile.ProfileData))
+	mux.HandleFunc("/api/profilePosts/", mw.GetMW(profile.GetPosts))
+	mux.HandleFunc("/api/handleAccountStatu/", rl.RateLimitMW(mw.PostMW(profile.ChangeStatu)))
 
 	// Websocket
 	mux.Handle("/api/ws", mw.GetMW(ws.GlobalWS))

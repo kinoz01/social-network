@@ -23,7 +23,7 @@ type DMEntry struct {
 
 // GET /api/chat/dm-list?limit=…
 func ChatDMList(w http.ResponseWriter, r *http.Request) {
-	// 1) Verify authentication
+	// Verify authentication
 	u, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
@@ -31,7 +31,7 @@ func ChatDMList(w http.ResponseWriter, r *http.Request) {
 	}
 	meID := u.ID
 
-	// 2) Parse limit query (default = 300)
+	// Parse limit query (default = 300)
 	limit := 300
 	if limS := r.URL.Query().Get("limit"); limS != "" {
 		if x, err := strconv.Atoi(limS); err == nil && x > 0 {
@@ -49,48 +49,59 @@ func ChatDMList(w http.ResponseWriter, r *http.Request) {
 	   Order by last_time DESC, limit = ?
 	*/
 
-	// 3) Single‐query approach using a derived “latest per peer” subquery:
+	// Single‐query approach using a derived “latest per peer” subquery:
 	rows, err := tp.DB.Query(`
-      WITH latest AS (
-        SELECT 
-          CASE
-            WHEN sender_id = ? THEN receiver_id 
-            ELSE sender_id 
-          END AS peer_id,
-          MAX(created_at) AS max_time
-        FROM private_chats
-        WHERE sender_id = ? OR receiver_id = ?
-        GROUP BY peer_id
-      )
+    WITH latest AS (           -- keep: find most-recent message per peer
       SELECT
-        u.id               AS peer_id,
-        u.first_name,
-        u.last_name,
-        u.profile_pic,
-        pc.content         AS last_content,
-        pc.created_at      AS last_time,
-        IFNULL(uc.unread_cnt, 0) AS unread_count
-      FROM latest
-      JOIN private_chats pc 
-        ON ((pc.sender_id = ? AND pc.receiver_id = latest.peer_id) 
-             OR (pc.sender_id = latest.peer_id AND pc.receiver_id = ?))
-        AND pc.created_at = latest.max_time
-      JOIN users u 
-        ON u.id = latest.peer_id
-      LEFT JOIN (
-        SELECT sender_id AS peer, COUNT(*) AS unread_cnt
-        FROM private_chats
-        WHERE receiver_id = ? AND is_read = 0
-        GROUP BY sender_id
-      ) uc 
-        ON uc.peer = latest.peer_id
-      ORDER BY latest.max_time DESC
-      LIMIT ?`,
-		// bind parameters in order:
-		meID,       // subquery: CASE WHEN sender_id = meID ...
-		meID, meID, // subquery WHERE sender_id=meID OR receiver_id=meID
-		meID, meID, // join pm: pc.sender_id=meID AND pc.receiver_id=peer_id  OR vice versa
-		meID, // LEFT JOIN unread_count: receiver_id = meID AND is_read=0 GROUP BY sender_id
+        CASE
+          WHEN sender_id = ? THEN receiver_id
+          ELSE sender_id
+        END   AS peer_id,
+        MAX(created_at) AS max_time
+      FROM private_chats
+      WHERE sender_id = ? OR receiver_id = ?
+      GROUP BY peer_id
+    )
+    SELECT
+      u.id                AS peer_id,
+      u.first_name,
+      u.last_name,
+      u.profile_pic,
+      pc.content          AS last_content,
+      pc.created_at       AS last_time,
+      IFNULL(uc.unread_cnt, 0) AS unread_count
+    FROM latest
+    JOIN private_chats pc
+      ON (
+           (pc.sender_id   = ? AND pc.receiver_id = latest.peer_id) OR
+           (pc.sender_id   = latest.peer_id AND pc.receiver_id = ?)
+         )
+     AND pc.created_at = latest.max_time
+    JOIN users u
+      ON u.id = latest.peer_id
+
+    JOIN follow_requests fr
+      ON fr.status = 'accepted'
+     AND (
+          (fr.follower_id = ? AND fr.followed_id = u.id)  -- you → them
+       OR (fr.follower_id = u.id AND fr.followed_id = ?)  -- them → you
+         )
+
+    LEFT JOIN (
+      SELECT sender_id AS peer, COUNT(*) AS unread_cnt
+      FROM private_chats
+      WHERE receiver_id = ? AND is_read = 0
+      GROUP BY sender_id
+    ) uc
+      ON uc.peer = latest.peer_id
+    ORDER BY latest.max_time DESC
+    LIMIT ?`,
+		// placeholders (same order as they appear above):
+		meID,       // latest CASE
+		meID, meID, // latest WHERE
+		meID, meID, // pc join
+		meID, meID, // follow_requests join (you → them, them → you)
+		meID, // unread-count sub-query
 		limit,
 	)
 	if err != nil {

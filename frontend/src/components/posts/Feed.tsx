@@ -43,6 +43,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 return
             }
 
+                        
             const uniquePosts = oldPosts.filter(
                 (post) => !postedContent.some((p) => p.id === post.id)
             )
@@ -51,9 +52,9 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 return
             }
 
-            await new Promise((resolve) => setTimeout(resolve, 50))
+           await new Promise((resolve) => setTimeout(resolve, 50))
 
-            setPostedContent((prev) => [...prev, ...uniquePosts])
+           setPostedContent((prev) => [...prev, ...uniquePosts])
         } catch (err) {
             const { status } = err as { status: number };
             if (status === 404) {
@@ -72,6 +73,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
     useEffect(() => {
         loadMOre()
+        
     }, [currentPage, loadMOre])
 
     const lastPostElementRef = useCallback((node: HTMLDivElement | null) => {
@@ -118,17 +120,17 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                     </div>
                 )}
                 {showFOrm && <NewPOst onSubmit={handleNewPOst} onClose={toggleFOrm} userData={user} />}
-
-                {showProfileHeader &&  <ProfileHeader profileId={id} />}
+                {/* //here */}
+                {showProfileHeader && <ProfileHeader profileId={id} />}
 
                 {type === "group" && <GroupPostInput groupId={id} onAdd={handleNewPOst} />}
 
                 {currentPage === 0 && postedContent.length === 0 && !isLoading ?
                     <div className={styles.status}>
-                        <Image src={`/img/${ privateProfile && type === "profile" ? "lock.svg": "empty.svg"}`} alt="" width={200} height={200} />
+                        <Image src={`/img/${privateProfile && type === "profile" ? "lock.svg" : "empty.svg"}`} alt="" width={200} height={200} />
                         <p className={styles.empty}>{profileNotFound && type === "profile" ? "User Not Found"
-                                                        : privateProfile  && type === "profile" ? "This Profile Is Private"
-                                                        : "Empty Feed"}</p>
+                            : privateProfile && type === "profile" ? "This Profile Is Private"
+                                : "Empty Feed"}</p>
                     </div>
                     :
                     <>
@@ -138,7 +140,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                             </div>
                         )
                         )}
-                        {isLoading && ( <Loading />)}
+                        {isLoading && (<Loading />)}
 
                         {!hasMOre && !isLoading && (
                             <div className={styles.noMorePosts}>
