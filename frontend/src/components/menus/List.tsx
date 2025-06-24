@@ -60,10 +60,10 @@ export default function List({
 
       {/* modal overlays */}
       {showModal && type === "followers" && (
-        <FollowersList modal profileId={profileId} onClose={close} />
+        <FollowersList  profileId={profileId} />
       )}
       {showModal && type === "followings" && (
-        <FollowingsList modal profileId={profileId} onClose={close} />
+        <FollowingsList  profileId={profileId} />
       )}
       {showModal && type === "friendRequests" && (
         <FriendRequestList modal onClose={close} />

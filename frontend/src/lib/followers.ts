@@ -1,4 +1,4 @@
-import { FollowShip, FriendRequest, User } from "./types";
+import { Followers, Followings, FriendRequest, User } from "./types";
 import { popup } from "./utils";
 import { API_URL } from "./api_url";
 
@@ -96,27 +96,56 @@ async function getFollowingRequests(
   return null;
 }
 
-async function getFollowShip(
-  type: string,
+
+async function getProfileInfo(id: string, headers?: {}): Promise<User | null> {
+  // Get profile user id from the params objects
+  const url = `${API_URL}/api/profileData/${id}`;
+
+  try {
+    const res = await fetch(url, {
+      headers,
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data: User = await res.json();
+    return data;
+  } catch (error: any) {
+    console.log("error: ", error);
+    // popup(error.msg, false);
+  }
+
+  return null;
+}
+
+async function getFollowers(
   userId: string,
   limit?: number,
   page?: number
-): Promise<FollowShip | null> {
-  const url = `${API_URL}/api/getfollows?kind=${type == "follower" ? "followers": "followings"}&id=${userId}&limit=${limit}&page=${page}`;
+): Promise<Followers | "private" | null> {
+  
+  const url = `${API_URL}/api/followers?id=${userId}&limit=${limit}&page=${page}`;
+
   try {
     const res = await fetch(url, { credentials: "include" });
-    if (res.status === 206) {
-      throw Object.assign(new Error("private profile"), { status: 206 });
-    } else if (!res.ok) {
+    if (res.status === 206) return "private"; 
+    if (!res.ok) {
       throw await res.json();
     }
-    const data: FollowShip = await res.json();
+
+    const data: Followers = await res.json();
 
     return data;
   } catch (error: any) {
-    throw error
+    console.log("fetch error", error);
+    popup(error.msg, false);
   }
+  return null;
 }
+
 
 async function getSuggestions(): Promise<User[] | null> {
   const url = `${API_URL}/api/suggestions`;
@@ -138,11 +167,37 @@ async function getSuggestions(): Promise<User[] | null> {
   return null;
 }
 
+async function getFollowings(
+  userId: string,
+  limit?: number,
+  page?: number
+): Promise<Followings | "private" | null> {
+  const url = `${API_URL}/api/followings?id=${userId}&limit=${limit}&page=${page}`;
+
+  try {
+    const res = await fetch(url, { credentials: "include" });
+    if (res.status === 206) return "private"; 
+    if (!res.ok) {
+      throw await res.json();
+    }
+
+    const data: Followings = await res.json();
+
+    return data;
+  } catch (error: any) {
+    console.log("fetch error", error);
+    popup(error.msg, false);
+  }
+  return null;
+}
+
 export {
   addFollower,
   handleFollow,
   isUserFollowed,
   getFollowingRequests,
   getSuggestions,
-  getFollowShip
+  getFollowers,
+  getFollowings,
+  getProfileInfo
 };

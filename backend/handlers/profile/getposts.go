@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	auth "social-network/handlers/authentication"
-	"social-network/handlers/helpers"
 	Error "social-network/handlers/helpers"
 	tp "social-network/handlers/types"
 )
@@ -30,7 +29,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	currentPage, err := strconv.Atoi(pageStr)
 
 	if err != nil || currentPage < 0 {
-		helpers.JsonError(w, "Invalid pageNum", http.StatusBadRequest, nil)
+		Error.JsonError(w, "Invalid pageNum", http.StatusBadRequest, nil)
 		return
 	}
 
@@ -175,7 +174,6 @@ if !IsPublicAccount && !is_follower && useid != user.ID {
 		}
 
 		if post.Visibility == "almost-private" || (!IsPublicAccount && post.Visibility == "public") {
-			fmt.Println("isvissible")
 			if !is_follower && useid != user.ID {
 				continue
 			}

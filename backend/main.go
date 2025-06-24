@@ -1,11 +1,12 @@
 package main
 
 import (
+	database "social-network/database/sqlite"
 	"social-network/server"
 )
 
 func main() {
-	server.InitialiseDB()
+	database.InitialiseDB()
 	// Initialize router
 	server.Router = server.Routes()
 	// Handle shutdown

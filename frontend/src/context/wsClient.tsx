@@ -7,7 +7,6 @@ import React, {
     useRef,
     useState,
     ReactNode,
-    useCallback,
 } from "react";
 import { useUser } from "@/context/UserContext";
 import { API_URL_WS, API_URL } from "@/lib/api_url";
@@ -38,7 +37,7 @@ export interface ChatMsg {
 
 interface WSContextShape {
     socket: WebSocket | null;
-    wsOpen: boolean;                          // ← NEW
+    wsOpen: boolean;
     meId: string | null;
 
     online: Set<string>;
@@ -46,9 +45,9 @@ interface WSContextShape {
     getGroupMembers: (g: string) => void;
 
     send: (o: object) => void;
-    subscribeDM: (peer: string) => void;
     sendDM: (peer: string, text: string) => void;
-    onNewDM: (peer: string, cb: (m: ChatMsg) => void) => () => void;
+
+    dmFeed: ChatMsg[];           // every incoming DM, unfiltered
 
     totalUnread: number;
     hasUnread: boolean;
@@ -68,25 +67,29 @@ export const useWS = () => useContext(WSContext)!;
 export function WSProvider({ children }: { children: ReactNode }) {
     const { user } = useUser();
     const meId = user?.id ?? null;
-    const { version } = useFollowSync()
+    const { version } = useFollowSync();
 
     const socketRef = useRef<WebSocket | null>(null);
 
     /* state */
-    const [wsOpen, setOpen] = useState(false);             // ← NEW
+    const [wsOpen, setOpen] = useState(false);
     const [online, setOnline] = useState<Set<string>>(new Set());
-    const [groupMembers, setGroupMembers] = useState<Map<string, Member[]>>(new Map());
-    const [unreadCount, setUnreadCount] = useState<Map<string, number>>(new Map());
+    const [groupMembers, setGroupMembers] = useState<
+        Map<string, Member[]>
+    >(new Map());
+
+    const [dmFeed, setDmFeed] = useState<ChatMsg[]>([]);
+    const [unreadCount, setUnreadCount] = useState<Map<string, number>>(
+        new Map()
+    );
 
     const [notifsCount, setNotifsCount] = useState(0);
     const [notifications, setNotifications] = useState<NotificationModel[]>([]);
 
-    /* listeners per peer */
-    const dmListeners = useRef<Map<string, Set<(m: ChatMsg) => void>>>(new Map());
-    const seenDMids = useRef<Set<string>>(new Set()); // dedupe double frames
+    const seenDMids = useRef<Set<string>>(new Set());
     const seenNotifIds = useRef<Set<string>>(new Set());
 
-    /* seed unread-count once */
+    /* ─── preload unread summary ─── */
     useEffect(() => {
         if (!meId) return;
         fetch(`${API_URL}/api/chat/unread-summary`, { credentials: "include" })
@@ -99,21 +102,23 @@ export function WSProvider({ children }: { children: ReactNode }) {
             .catch(() => setUnreadCount(new Map()));
     }, [meId]);
 
+    /* ─── preload notifications count ─── */
     useEffect(() => {
         if (!meId) return;
-        fetch(`${API_URL}/api/notifications/totalcount`, { credentials: "include" })
-            .then(r => (r.ok ? r.json() : { count: 0 }))
+        fetch(`${API_URL}/api/notifications/totalcount`, {
+            credentials: "include",
+        })
+            .then((r) => (r.ok ? r.json() : { count: 0 }))
             .then(({ count }) => setNotifsCount(count))
             .catch(() => setNotifsCount(0));
     }, [meId, version]);
 
-    /* open socket */
+    /* ─── open socket ─── */
     useEffect(() => {
         if (!meId) return;
         const ws = new WebSocket(`${API_URL_WS}/api/ws`);
         socketRef.current = ws;
 
-        /* mark open/close */
         ws.addEventListener("open", () => setOpen(true));
         ws.addEventListener("close", () => setOpen(false));
 
@@ -141,11 +146,11 @@ export function WSProvider({ children }: { children: ReactNode }) {
                     if (seenDMids.current.has(chat.id)) break;
                     seenDMids.current.add(chat.id);
 
-                    const peerId =
-                        chat.sender_id === meId ? chat.receiver_id! : chat.sender_id;
-                    dmListeners.current.get(peerId)?.forEach((cb) => cb(chat));
+                    setDmFeed((f) => [...f, chat]); // push to global feed
 
+                    /* bump unread summary */
                     if (chat.receiver_id === meId) {
+                        const peerId = chat.sender_id;
                         setUnreadCount((prev) =>
                             new Map(prev).set(peerId, (prev.get(peerId) ?? 0) + 1)
                         );
@@ -153,15 +158,18 @@ export function WSProvider({ children }: { children: ReactNode }) {
                     break;
                 }
 
-                case "getNotifications": // paged response
+                case "getNotifications": {
                     const fresh = msg.notifications.filter(
                         (n: NotificationModel) => !seenNotifIds.current.has(n.id)
                     );
-                    fresh.forEach((n: NotificationModel) => seenNotifIds.current.add(n.id));
-                    setNotifications(prev => [...prev, ...fresh]);
+                    fresh.forEach((n: NotificationModel) =>
+                        seenNotifIds.current.add(n.id)
+                    );
+                    setNotifications((prev) => [...prev, ...fresh]);
                     break;
+                }
 
-                case "notification": // upcoming notifications
+                case "notification":
                     setNotifications((prev) => [msg.notification, ...prev]);
                     setNotifsCount((c) => c + 1);
                     break;
@@ -171,7 +179,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
         return () => ws.close();
     }, [meId]);
 
-    /* SENDING helper */
+    /* ─── helpers ─── */
     const send = (obj: object) => {
         const ws = socketRef.current;
         if (!ws) return;
@@ -184,40 +192,44 @@ export function WSProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    /* simple wrappers */
-    const getGroupMembers = (g: string) => send({ type: "getGroupMembers", groupId: g });
-    const subscribeDM = (p: string) => send({ type: "dmSubscribe", peerId: p });
-    const sendDM = (p: string, text: string) => send({ type: "dmMessage", peerId: p, content: text });
+    const getGroupMembers = (g: string) =>
+        send({ type: "getGroupMembers", groupId: g });
 
-    const onNewDM = (peer: string, cb: (m: ChatMsg) => void) => {
-        if (!dmListeners.current.has(peer))
-            dmListeners.current.set(peer, new Set());
-        dmListeners.current.get(peer)!.add(cb);
-        return () => dmListeners.current.get(peer)?.delete(cb);
-    };
+    const sendDM = (peer: string, text: string) =>
+        send({ type: "dmMessage", peerId: peer, content: text });
 
-    const markChatRead = useCallback((peer: string) => {
+    const markChatRead = (peer: string) => {
         setUnreadCount((prev) => {
             const m = new Map(prev);
             if (m.has(peer)) m.set(peer, 0);
             return m;
         });
-    }, []);
+    };
 
-    /* total unread messages for sidebar */
     const totalUnread = [...unreadCount.values()].reduce((a, b) => a + b, 0);
     const hasUnread = totalUnread > 0;
 
-    const getNotifications = (page: number, limit: number) => {
+    const getNotifications = (page: number, limit: number) =>
         send({ type: "getNotifications", page, limit });
+
+    const deleteNotification = (key: string) => {
+        setNotifications((prev) =>
+            key === "ALL"
+                ? []
+                : prev.filter(
+                    (n) =>
+                        n.id !== key &&
+                        n.invitationId !== key &&
+                        n.requestId !== key &&
+                        n.eventId !== key &&
+                        n.followId !== key
+                )
+        );
+        key === "ALL"
+            ? setNotifsCount(0)
+            : setNotifsCount((c) => (c === 0 ? c : c - 1));
     };
 
-    // exposed deleting context
-    const deleteNotification = (key: string) => {
-        setNotifications(prev => key === "ALL" ? [] :
-            prev.filter(n => n.id !== key && n.invitationId !== key && n.requestId !== key && n.eventId !== key && n.followId !== key));
-        setNotifsCount((c) => c === 0 ? c : c - 1);
-    }
     return (
         <WSContext.Provider
             value={{
@@ -228,16 +240,15 @@ export function WSProvider({ children }: { children: ReactNode }) {
                 groupMembers,
                 getGroupMembers,
                 send,
-                subscribeDM,
                 sendDM,
-                onNewDM,
+                dmFeed,
                 totalUnread,
                 hasUnread,
                 markChatRead,
                 notifsCount,
                 notifications,
                 getNotifications,
-                deleteNotification
+                deleteNotification,
             }}
         >
             {children}

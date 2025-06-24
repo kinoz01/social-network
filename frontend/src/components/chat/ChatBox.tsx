@@ -1,7 +1,6 @@
-// src/components/DirectChatBox.tsx
 "use client";
 
-import { useEffect, useLayoutEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { redirect, useParams } from "next/navigation";
 import { useWS, ChatMsg } from "@/context/wsClient";
 import Loading from "@/components/Loading";
@@ -13,76 +12,70 @@ import { throttle } from "../../lib/utils";
 import { useUser } from "@/context/UserContext";
 
 export const EMOJIS = [
-    "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍", "😘", "😗", "😙", "😚", "🙂", "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮", "🤐", "😯", "😪", "😫", "🥱",
-    "😴", "😌", "😛", "😜", "😝", "🤤", "😒", "😓", "😔", "😕", "🙃", "🤑", "😲", "☹️", "🙁", "😖", "😞", "😟", "😤", "😢", "😭", "😦", "😧", "😨", "😩", "🤯", "😬", "😰", "😱", "🥵", "🥶", "😳", "🤪", "😵", "🥴",
-    "😠", "😡", "🤬", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "😇", "🥳", "🥸", "🤠", "🥺", "🤡", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "👍", "👎", "👊", "✊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏",
-    "🤳", "💪", "🦾", "🦿", "✌️", "🤞", "🤟", "🤘", "👌", "🤌", "🤏", "👈", "👉", "👆", "👇", "✋", "🤚", "🖐️", "🖖", "👋", "🤙", "💘", "💝", "💖", "💗", "💓", "💞", "💕", "💟", "❣️", "❤️", "🧡", "💛", "💚",
-    "💙", "💜", "🤎", "🖤", "🤍", "💔", "⚪️", "⚫️", "⬜️", "⬛️", "◻️", "◼️", "▫️", "▪️", "⬤", "⚪", "♟️", "♔", "♚", "♕", "♛", "♖", "♜", "♗", "♝", "♘", "♞", "♠️", "♥️", "♦️", "☆", "★", "♩", "♪", "♫", "♬",
-    "☁️", "❄️", "☂️", "⚡", "💧", "🌊", "🌫️", "🌪️", "🌈", "🌤️", "☀️", "🌞", "🌝", "🌛", "🌜", "🌚", "⭐️", "🌟", "✨", "⚡️", "🔥", "💥", "💫", "🪐", "🪴", "🌱", "🌿", "☘️", "🍀", "🎍", "🎋", "🍃"
+    "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", "😋", "😎", "😍", "😘", "😗", "😙", "😚",
+    "🙂", "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣", "😥", "😮", "🤐", "😯", "😪",
+    "😫", "🥱", "😴", "😌", "😛", "😜", "😝", "🤤", "😒", "😓", "😔", "😕", "🙃", "🤑", "😲", "☹️",
+    "🙁", "😖", "😞", "😟", "😤", "😢", "😭", "😦", "😧", "😨", "😩", "🤯", "😬", "😰", "😱", "🥵",
+    "🥶", "😳", "🤪", "😵", "🥴", "😠", "😡", "🤬", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "😇", "🥳",
+    "🥸", "🤠", "🥺", "🤡", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "👍", "👎", "👊", "✊", "🤛",
+    "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏", "🤳", "💪", "🦾", "🦿", "✌️", "🤞", "🤟", "🤘", "👌",
+    "🤌", "🤏", "👈", "👉", "👆", "👇", "✋", "🤚", "🖐️", "🖖", "👋", "🤙", "💘", "💝", "💖", "💗",
+    "💓", "💞", "💕", "💟", "❣️", "❤️", "🧡", "💛", "💚", "💙", "💜", "🤎", "🖤", "🤍", "💔", "⚪️",
+    "⚫️", "⬜️", "⬛️", "◻️", "◼️", "▫️", "▪️", "⬤", "⚪", "♟️", "♔", "♚", "♕", "♛", "♖", "♜",
+    "♗", "♝", "♘", "♞", "♠️", "♥️", "♦️", "☆", "★", "♩", "♪", "♫", "♬", "☁️", "❄️", "☂️", "⚡",
+    "💧", "🌊", "🌫️", "🌪️", "🌈", "🌤️", "☀️", "🌞", "🌝", "🌛", "🌜", "🌚", "⭐️", "🌟", "✨", "🔥",
+    "💥", "💫", "🪐", "🪴", "🌱", "🌿", "☘️", "🍀", "🎍", "🎋", "🍃"
 ];
 
 export default function DirectChatBox() {
     const { id: peerId } = useParams() as { id: string };
     const { user } = useUser();
-    if (peerId == user?.id) redirect("/chat");
-    
-    const { meId, online, subscribeDM, sendDM, onNewDM, markChatRead } = useWS();
+    if (peerId === user?.id) redirect("/chat");
 
-    /* ─── 1. Peer profile ─── */
+    const { meId, online, sendDM, dmFeed, markChatRead } = useWS();
+
+    /* peer profile */
     const [peerName, setPeerName] = useState<{
         first_name: string;
         last_name: string;
         profile_pic: string | null;
     } | null>(null);
 
-    /* ─── 2. Messages state ─── */
+    /* messages */
     const [msgs, setMsgs] = useState<ChatMsg[]>([]);
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [loadingFirst, setLoading] = useState(true);
 
-    /* ─── 3. Input / emoji ─── */
+    /* input & refs */
     const [text, setText] = useState("");
     const [showEmojis, setShow] = useState(false);
-
-    /* ─── 4. Refs ─── */
     const listRef = useRef<HTMLDivElement>(null);
     const idSetRef = useRef<Set<string>>(new Set());
     const prevScrollHeight = useRef<number | null>(null);
     const firstLoadRef = useRef(true);
     const newMsgRef = useRef(false);
-
-    // ─── 5. Jump button ─── */
     const [showJump, setJump] = useState(false);
 
-    const [isFollow, setIsFollow] = useState(false)
-    
     const PAGE = 20;
 
-    /* ────────────────────────────────────────────────────────────
-       Fetch peer profile
-    ──────────────────────────────────────────────────────────── */
+    /* fetch peer profile */
     useEffect(() => {
         if (!peerId) return;
-        fetch(`${API_URL}/api/users/dmprofiles?user_id=${encodeURIComponent(peerId)}`, {
-            credentials: "include",
-            cache: "no-store",
-        })
-            .then((res) => {
-                if (!res.ok) throw new Error("Failed to fetch user profile");
-                return res.json();
-            })
-            .then((d) => setPeerName(d))
+        fetch(
+            `${API_URL}/api/users/dmprofiles?user_id=${encodeURIComponent(peerId)}`,
+            { credentials: "include", cache: "no-store" }
+        )
+            .then((r) => (r.ok ? r.json() : null))
+            .then(setPeerName)
             .catch(console.error);
     }, [peerId]);
 
     useEffect(() => {
-        if (peerId) markChatRead(peerId);   // when we open a chat, clear its badge from side menu
-    }, [peerId, markChatRead]);
+        if (peerId) markChatRead(peerId);
+    }, [peerId]);
 
-    /* ────────────────────────────────────────────────────────────
-       Helper: fetch one page of history
-    ──────────────────────────────────────────────────────────── */
+    /* RESTful history */
     const fetchPage = async (off: number): Promise<ChatMsg[]> => {
         const qs = new URLSearchParams({
             peer_id: peerId,
@@ -97,9 +90,7 @@ export default function DirectChatBox() {
         return res.json();
     };
 
-    /* ────────────────────────────────────────────────────────────
-       Initial load + WebSocket subscription
-    ──────────────────────────────────────────────────────────── */
+    /* first load */
     useEffect(() => {
         if (!peerId || !meId) return;
         let alive = true;
@@ -114,16 +105,14 @@ export default function DirectChatBox() {
             setOffset(page.length);
             setHasMore(page.length === PAGE);
             setLoading(false);
-
-            subscribeDM(peerId);
         })();
 
-        return () => { alive = false };
+        return () => {
+            alive = false;
+        };
     }, [peerId, meId]);
 
-    /* ────────────────────────────────────────────────────────────
-       Infinite scroll (load older)
-    ──────────────────────────────────────────────────────────── */
+    /* infinite scroll older */
     useEffect(() => {
         const el = listRef.current;
         if (!el || !hasMore) return;
@@ -132,13 +121,16 @@ export default function DirectChatBox() {
             if (el.scrollTop < 250 && !loadingFirst) {
                 (async () => {
                     const older = await fetchPage(offset);
-                    if (!older.length) { setHasMore(false); return; }
+                    if (!older.length) {
+                        setHasMore(false);
+                        return;
+                    }
 
                     prevScrollHeight.current = el.scrollHeight;
-                    const unique = older.filter(m => !idSetRef.current.has(m.id));
-                    unique.forEach(m => idSetRef.current.add(m.id));
-                    setMsgs(prev => [...unique, ...prev]);
-                    setOffset(o => o + unique.length);
+                    const unique = older.filter((m) => !idSetRef.current.has(m.id));
+                    unique.forEach((m) => idSetRef.current.add(m.id));
+                    setMsgs((prev) => [...unique, ...prev]);
+                    setOffset((o) => o + unique.length);
                     setHasMore(older.length === PAGE);
                 })();
             }
@@ -148,100 +140,86 @@ export default function DirectChatBox() {
         return () => el.removeEventListener("scroll", handler);
     }, [offset, hasMore, loadingFirst, peerId]);
 
-    /* ────────────────────────────────────────────────────────────
-       WebSocket: incoming DM
-    ──────────────────────────────────────────────────────────── */
+    /* append new DM from global feed */
     useEffect(() => {
-        if (!peerId) return;
+        if (!peerId || dmFeed.length === 0) return;
+        const last = dmFeed[dmFeed.length - 1];
 
-        const unsubscribe = onNewDM(peerId, (incoming: ChatMsg) => {
-            if (idSetRef.current.has(incoming.id)) return;
-            idSetRef.current.add(incoming.id);
+        const relevant =
+            (last.sender_id === peerId && last.receiver_id === meId) ||
+            (last.sender_id === meId && last.receiver_id === peerId);
 
-            newMsgRef.current = true;           // flag for the next layout pass
-            setMsgs(prev => [...prev, incoming]);
-            setOffset(o => o + 1);
+        if (!relevant || idSetRef.current.has(last.id)) return;
 
-            if (incoming.receiver_id === meId) {
-                setTimeout(() => {
-                    markChatRead(peerId);
-                }, 0);
-                fetch(`${API_URL}/api/chat/mark-read?peer_id=${peerId}`, {
-                    method: "POST",
-                    credentials: "include",
-                }).catch(console.error);
-            }
-        });
-        return () => unsubscribe();
-    }, [peerId, onNewDM, meId]);
+        idSetRef.current.add(last.id);
+        newMsgRef.current = true;
+        setMsgs((prev) => [...prev, last]);
+        setOffset((o) => o + 1);
 
-    /* ────────────────────────────────────────────────────────────
-       Scroll & badge logic on msgs update
-    ──────────────────────────────────────────────────────────── */
-    useLayoutEffect(() => {
+        if (last.receiver_id === meId) {
+            setTimeout(() => markChatRead(peerId), 0);
+            fetch(`${API_URL}/api/chat/mark-read?peer_id=${peerId}`, {
+                method: "POST",
+                credentials: "include",
+            }).catch(console.error);
+        }
+    }, [dmFeed, peerId, meId]);
+
+    /* scroll logic */
+    useEffect(() => {
         const el = listRef.current;
         if (!el) return;
 
-        /* 1. First load → jump to bottom */
         if (firstLoadRef.current) {
             el.scrollTop = el.scrollHeight;
             firstLoadRef.current = false;
             return;
         }
 
-        /* 2. Just prepended older messages → keep viewport */
         if (prevScrollHeight.current !== null) {
             el.scrollTop = el.scrollHeight - prevScrollHeight.current;
             prevScrollHeight.current = null;
             return;
         }
 
-        /* 3. A new incoming message triggered this render */
         if (newMsgRef.current) {
             const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
 
             if (dist < 3500) {
                 el.scrollTop = el.scrollHeight;
                 setJump(false);
-            } else {                            // user is up → show badge
+            } else {
                 setJump(true);
             }
             newMsgRef.current = false;
         }
     }, [msgs]);
 
-    /* ────────────────────────────────────────────────────────────
-       Hide badge when user scrolls back to bottom
-    ──────────────────────────────────────────────────────────── */
+    /* hide badge on manual scroll */
     useEffect(() => {
         const el = listRef.current;
         if (!el) return;
 
         const onScroll = () => {
             const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
-            if (dist < 100 && showJump) {
-                setJump(false);
-            }
+            if (dist < 100 && showJump) setJump(false);
         };
         el.addEventListener("scroll", onScroll);
         return () => el.removeEventListener("scroll", onScroll);
     }, [showJump]);
 
-    /* ────────────────────────────────────────────────────────────
-       Helpers
-    ──────────────────────────────────────────────────────────── */
+    /* helpers */
     const formatTime = (iso: string) =>
-        new Date(iso.endsWith("Z") ? iso.slice(0, -1) : iso).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
+        new Date(iso.endsWith("Z") ? iso.slice(0, -1) : iso).toLocaleTimeString(
+            [],
+            { hour: "2-digit", minute: "2-digit" }
+        );
 
     const formatDate = (iso: string) =>
-        new Date(iso.endsWith("Z") ? iso.slice(0, -1) : iso).toLocaleDateString([], {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
+        new Date(iso.endsWith("Z") ? iso.slice(0, -1) : iso).toLocaleDateString(
+            [],
+            { day: "2-digit", month: "short", year: "numeric" }
+        );
 
     const sendMsg = () => {
         if (!text.trim()) return;
@@ -251,13 +229,16 @@ export default function DirectChatBox() {
 
     const isPeerOnline = online.has(peerId);
 
-    /* ────────────────────────────────────────────────────────────
-       Render states
-    ──────────────────────────────────────────────────────────── */
+    /* render */
     if (!peerName) {
         return (
             <div className={styles.emptyBox}>
-                <Image src="/img/empty.svg" alt="User not found" width={250} height={250} />
+                <Image
+                    src="/img/empty.svg"
+                    alt="User not found"
+                    width={250}
+                    height={250}
+                />
                 <p className={styles.emptyStatus}>
                     User not found
                     <br />
@@ -269,9 +250,6 @@ export default function DirectChatBox() {
 
     if (loadingFirst) return <Loading />;
 
-    /* ────────────────────────────────────────────────────────────
-       JSX
-    ──────────────────────────────────────────────────────────── */
     let lastDay = "";
 
     return (
@@ -311,7 +289,12 @@ export default function DirectChatBox() {
             <div className={styles.messages} ref={listRef}>
                 {msgs.length === 0 ? (
                     <div className={styles.emptyBox}>
-                        <Image src="/img/empty.svg" alt="No messages" width={150} height={150} />
+                        <Image
+                            src="/img/empty.svg"
+                            alt="No messages"
+                            width={150}
+                            height={150}
+                        />
                         <p className={styles.emptyStatus}>
                             No conversation yet
                             <br />
@@ -329,12 +312,13 @@ export default function DirectChatBox() {
                         return (
                             <div key={m.id}>
                                 {showDivider && (
-                                    <div className={styles.dayDivider} key={`day-${day}-${m.id}`}>
+                                    <div className={styles.dayDivider}>
                                         {day}
                                     </div>
                                 )}
                                 <div
-                                    className={`${styles.msg} ${mine ? styles.outgoing : styles.incoming}`}
+                                    className={`${styles.msg} ${mine ? styles.outgoing : styles.incoming
+                                        }`}
                                 >
                                     {!mine && (
                                         <Image
@@ -350,8 +334,12 @@ export default function DirectChatBox() {
                                         />
                                     )}
                                     <div className={styles.bubble}>
-                                        <p className={styles.content}>{m.content}</p>
-                                        <span className={styles.timeRight}>{formatTime(m.created_at)}</span>
+                                        <p className={styles.content}>
+                                            {m.content}
+                                        </p>
+                                        <span className={styles.timeRight}>
+                                            {formatTime(m.created_at)}
+                                        </span>
                                     </div>
                                     {mine && (
                                         <Image

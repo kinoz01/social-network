@@ -1,132 +1,146 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getFollowShip } from "@/lib/followers";
-import { FollowShip, User } from "@/lib/types";
-import { useUser } from "@/context/UserContext";
+import { getFollowers, getProfileInfo } from "@/lib/followers";
+import { Followers, User } from "@/lib/types";
+import { useEffect, useRef, useState } from "react";
+import styles from "./menus.module.css";
 import ListItem from "./ListItem";
 import NoData from "../NoData";
 import Loading from "../Loading";
-import styles from "./menus.module.css";
-import { useInfiniteScroll } from "@/lib/scroller";
-import { useFollowSync } from "@/context/FollowSyncContext";
+import { useUser } from "@/context/UserContext";
+import { throttle } from "@/lib/utils";
+import Image from "next/image";
 
-const LIMIT = 8;
-
-type Props = {
+function FollowersList({
+	page,
+	profileId,
+}: {
+	page?: "home" | "profile";
 	profileId?: string;
-	modal?: boolean;
-	onClose?: () => void;
-};
-
-export default function FollowersList({ profileId, modal = false, onClose }: Props) {
+}) {
+	const limit = 5;
 	const { user: loggedUser } = useUser();
 
-	const [privateProfile, setPrivateProfile] = useState(false)
-	const { version } = useFollowSync()
+	const [profileUser, setProfileUser] = useState<User | null>(null);
+	const [isDataLoading, setIsDataLoading] = useState(false);
+	const [isPrivate, setPrivate] = useState(false);
 
-
-	/* Paging state */
-	const [list, setList] = useState<User[]>([]);
-	const [page, setPage] = useState(1);
-	const [hasMore, setMore] = useState(true);
-	const [loading, setLoad] = useState(false);
-	
-	/* Reset when user changes */
 	useEffect(() => {
-		setList([]);
-		setPage(1);
-		setMore(true);
-	}, [profileId, version]);
+		const fetchProfileInfo = async () => {
+			setIsDataLoading(true);
+
+			const profileInfo = await getProfileInfo(profileId || "");
+			setProfileUser(profileInfo);
+			setIsDataLoading(false);
+		};
+
+		fetchProfileInfo();
+	}, [profileId]);
 
 
-	/* Fetch one page */
-	const fetchPage = useCallback(async (p: number) => {
-		if (!profileId) return;
-		setLoad(true);
-		try {
-			const res: FollowShip | null = await getFollowShip("follower", profileId, LIMIT, p);
-			if (!res || !res.followList) {
-				setMore(false);
-				setLoad(false);
-				return;
-			}
-			setList(prev => {
-				const ids = new Set(prev.map(u => u.id));
-				const uniq = res.followList.filter(u => !ids.has(u.id));
-				return [...prev, ...uniq];
-			});
-			setMore(p < res.totalPages);
-			setPage(p + 1);
-			setLoad(false);
-		} catch (err) {
-			const { status } = err as { status: number };
-			if (status === 206) {				
-				setPrivateProfile(true);
-				setMore(false);
-			}
-		} finally {
-			setLoad(false);
+	const user: User | null = page === "home" ? loggedUser : profileUser;
+
+	const scrollTrigger = useRef<HTMLDivElement>(null);
+	const [currentPage, setPage] = useState<number>(1);
+	const [hasMoreData, setHasMoreData] = useState<Boolean>(true);
+	const [followers, setFollowers] = useState<Followers>({
+		followers: [],
+		totalCount: 0,
+		totalPages: 0,
+	});
+
+
+	const loadMore = async () => {
+		if (isDataLoading || !hasMoreData || !user?.id) {
+			return;
 		}
-	}, [profileId, version]);
 
-	/* Initial page */
+		setIsDataLoading(true);
+
+		const res = await getFollowers(user.id, limit, currentPage);
+
+		if (res === "private") {
+			setPrivate(true);
+			setHasMoreData(false);
+			setIsDataLoading(false);
+			return;
+		}
+		const data = res as Followers;
+
+		if (data && data.followers) {
+			if (data.followers.length === 0 || currentPage === data.totalPages) {
+				setHasMoreData(false);
+			}
+
+			setFollowers((prevData) => {
+				const existingIds = new Set(prevData.followers.map((n) => n.id));
+				const newfollowers = data.followers.filter(
+					(n) => !existingIds.has(n.id)
+				);
+				return {
+					...prevData,
+					followers: [...prevData.followers, ...newfollowers],
+					totalCount: data.totalCount,
+					totalPages: data.totalPages,
+				};
+			});
+
+			setPage((prevPage) => prevPage + 1);
+		}
+		setIsDataLoading(false);
+	};
+
 	useEffect(() => {
-		if (profileId) fetchPage(1);
-	}, [profileId, fetchPage]);
+		if (!scrollTrigger.current || !hasMoreData) {
+			return;
+		}
 
-	/* Infinite scroll */
-	const boxRef = useRef<HTMLDivElement>(null);
-	useInfiniteScroll(boxRef, { loading, hasMore, page, fetchPage });
+		const handleScroll = throttle(async () => {
 
-	/* ───────── Render helpers ───────── */
-	const content = privateProfile ? (
-		<div className={styles.empty}>
-			<img src="/img/lock.svg" alt="private" width={100} height={100} />
-			<p className={styles.empty}>This profile is private</p>
-		</div>
-	) : list.length === 0 && !loading ? (
-		<NoData msg="No Followers yet" />
-	) : (
-		<>
-			{list.map(f => (
-				<ListItem
-					key={f.id}
-					type="followers"
-					item={f}
-					loggedUser={loggedUser}
-				/>
-			))}
-		</>
-	);
+			if (
+				scrollTrigger.current &&
+				scrollTrigger.current.scrollTop +
+				scrollTrigger.current.clientHeight >=
+				scrollTrigger.current.scrollHeight
+			) {
+				if (!isDataLoading) {
+					await loadMore();
+				}
+			}
+		}, 300);
 
 
-	if (!modal) {
-		return (
-			<div className={styles.users} ref={boxRef}>
-				{content}
-				{loading && <Loading />}
-			</div>
-		);
-	}
+		const container = scrollTrigger.current;
+		container.addEventListener("scroll", handleScroll);
 
-	/* Modal overlay */
+		return () => {
+			container.removeEventListener("scroll", handleScroll);
+		};
+	}, [user, hasMoreData, currentPage, isDataLoading]);
+
+	useEffect(() => {
+		async function initialFetch() {
+			await loadMore();
+		}
+		initialFetch();
+	}, [user]);
+
 	return (
-		<div
-			className={styles.modalBackdrop}
-			onClick={() => onClose?.()}
-		>
-			<div
-				className={styles.modalPanel}
-				onClick={e => e.stopPropagation()}   // keep clicks inside modal
-				ref={boxRef}
-			>
-				<button className={styles.closeBtn} onClick={() => onClose?.()}>
-					×
-				</button>
-				<h4 className={styles.modalTitle}>Followers</h4>
-				{content}
-			</div>
+		<div className={styles.users} ref={scrollTrigger}>
+			{isPrivate ? (
+				<div className={styles.lock} >
+					<Image src="/img/lock.svg" alt="Private profile" width={48} height={48} />
+				</div>
+			) : followers.followers.length === 0 ? (
+				<NoData msg="No Followers yet" />
+			) : (
+				followers.followers.map(f => (
+					<ListItem key={f.id} type="followers" item={f} loggedUser={loggedUser} />
+				))
+			)}
+			{isDataLoading && <Loading />}
 		</div>
 	);
 }
+
+export default FollowersList;

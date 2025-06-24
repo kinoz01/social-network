@@ -571,3 +571,7 @@
   outline: none;
   border-color: #000;
 }
+
+.lock {
+  text-align: center;
+}

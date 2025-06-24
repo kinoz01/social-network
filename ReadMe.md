@@ -1,4 +1,4 @@
-This is "hopefully" a complete social web application built using **Golang** and **Next.js**.
+This is a complete social web application built using **Golang** and **Next.js**.
 
 #### How to Start
 - Run locally:

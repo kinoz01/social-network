@@ -22,7 +22,6 @@ import { useFollowSync } from "@/context/FollowSyncContext";
 
 const LIMIT = 10;
 
-
 // for modal
 type Props = {
 	modal?: boolean;

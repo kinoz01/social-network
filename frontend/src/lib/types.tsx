@@ -69,12 +69,6 @@ export interface NotifcationResponse {
     totalPages: number;
 }
 
-export interface FollowShip {
-    followList: User[];
-    totalCount: number;
-    totalPages: number;
-}
-
 // custom minimal User used for follow requests
 export type ReqUser = {
 	id: string;
@@ -89,3 +83,16 @@ export interface FriendRequest {
     totalCount: number;
     totalPages: number;
 }
+
+export interface Followers {
+    followers: User[];
+    totalCount: number;
+    totalPages: number;
+  }
+
+  export interface Followings {
+    followings: User[];
+    totalCount: number;
+    totalPages: number;
+  }
+  
