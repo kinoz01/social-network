@@ -6,7 +6,6 @@ import { User } from "@/lib/types";
 import { handleFollow, isUserFollowed } from "@/lib/followers";
 import { useUser } from "@/context/UserContext";
 import Loading from "../Loading";
-import { useWS } from "@/context/wsClient";
 import { useFollowSync } from "@/context/FollowSyncContext";
 
 export default function FollowButton({ profileUser }: { profileUser: User }) {

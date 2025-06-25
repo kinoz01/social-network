@@ -117,6 +117,7 @@ function FollowersList({
 			container.removeEventListener("scroll", handleScroll);
 		};
 	}, [user, hasMoreData, currentPage, isDataLoading]);
+	
 
 	useEffect(() => {
 		async function initialFetch() {
@@ -131,7 +132,7 @@ function FollowersList({
 				<div className={styles.lock} >
 					<Image src="/img/lock.svg" alt="Private profile" width={48} height={48} />
 				</div>
-			) : followers.followers.length === 0 ? (
+			) : !followers.followers || followers.followers.length === 0 ? (
 				<NoData msg="No Followers yet" />
 			) : (
 				followers.followers.map(f => (

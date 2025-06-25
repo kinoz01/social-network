@@ -8,6 +8,7 @@ import { NotificationModel } from "@/lib/types";
 import { API_URL } from "@/lib/api_url";
 import TimeAgo from "../groups/TimeAgo";
 import { addFollower } from "@/lib/followers";
+import { useFollowSync } from "@/context/FollowSyncContext";
 
 interface Props {
     n: NotificationModel;
@@ -16,6 +17,7 @@ interface Props {
 
 export default function NotificationItem({ n, onRemove }: Props) {
     const [busy, setBusy] = useState(false);
+    const { refresh } = useFollowSync()
 
     /* ───────── helpers ───────── */
     const dropFromServer = async () =>
@@ -108,6 +110,7 @@ export default function NotificationItem({ n, onRemove }: Props) {
             "/api/followers/add"
         );
         onRemove(n.followId || n.id);
+        refresh()
     };
 
     /* ───────── render ───────── */

@@ -1,180 +1,182 @@
 "use client";
 
-import {
-	useState,
-	useRef,
-	useEffect,
-	useCallback,
-	RefObject,
-} from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { API_URL } from "@/lib/api_url";
+
+import { getFollowingRequests, addFollower } from "@/lib/followers";
+import { FriendRequest, ReqUser } from "@/lib/types";
+
 import { useUser } from "@/context/UserContext";
 import { useWS } from "@/context/wsClient";
-import { getFollowingRequests, addFollower } from "@/lib/followers";
+import { useFollowSync } from "@/context/FollowSyncContext";
+
 import NoData from "../NoData";
 import Loading from "../Loading";
 import styles from "./menus.module.css";
-import { API_URL } from "@/lib/api_url";
-import { useInfiniteScroll } from "@/lib/scroller";
-import { ReqUser } from "@/lib/types";
-import { useFollowSync } from "@/context/FollowSyncContext";
 
-const LIMIT = 10;
+function FriendRequestList() {
 
-// for modal
-type Props = {
-	modal?: boolean;
-	onClose?: () => void;
-};
+	let throttleTimer = false;
+	const limit = 8;
 
-/* ───────── Component ───────── */
-export default function FriendRequests({ modal = false, onClose }: Props) {
-	const { deleteNotification } = useWS();
 	const { user: loggedUser } = useUser();
-	const { refresh, version } = useFollowSync()
+	const { deleteNotification } = useWS();
+	const { refresh } = useFollowSync();
 
-	const [list, setList] = useState<ReqUser[]>([]);
-	const [page, setPage] = useState(1);
-	const [hasMore, setMore] = useState(true);
-	const [loading, setLoading] = useState(true);
+	const scrollTrigger = useRef<HTMLDivElement>(null);
 
-	/* fetch page */
-	const fetchPage = useCallback(async (p: number) => {
-		setLoading(true);
-		const res = await getFollowingRequests(LIMIT, p);
-		if (!res || !res.requests) {
-			setMore(false);
-			setLoading(false);
-			return;
-		}
-		setList(prev => [...prev, ...res.requests]);
-		setMore(p < res.totalPages);
-		setPage(p + 1);
-		setLoading(false);
-	}, []);
+	const [currentPage, setPage] = useState(1);
+	const [hasMoreData, setMore] = useState<Boolean>(true);
+	const [isDataLoading, setIsDataLoading] = useState(false);
 
-	/* initial page */
-	useEffect(() => {
-		setList([]);
-		setPage(1);
-		setMore(true);
-		fetchPage(1); 
-	}, [version]);
+	const [friendRequests, setRequests] = useState<FriendRequest>({
+		requests: [],
+		totalCount: 0,
+		totalPages: 0,
+	});
 
-	/* optimistic remove */
+	const throttle = (callback: Function, time: number) => {
+		if (throttleTimer) return;
+		throttleTimer = true;
+		setTimeout(() => {
+			callback();
+			throttleTimer = false;
+		}, time);
+	};
+
 	const dropRow = (followId: string) => {
-		setList(prev => prev.filter(u => u.followId !== followId));
+		setRequests(prev => ({
+			...prev,
+			requests: prev.requests.filter(r => r.followId !== followId),
+		}));
 		deleteNotification(followId);
 	};
 
-	/* unified callback */
-	const handleAction = async (
-		action: "accepted" | "rejected",
-		userId: string,
-		followId: string
-	) => {
+	const handleAction = async (action: "accepted" | "rejected", u: ReqUser) => {
 		await addFollower(
-			{
-				action,
-				status: action,
-				followerID: userId,
-				followedId: String(loggedUser?.id),
-			},
+			{ action, status: action, followerID: u.id, followedId: String(loggedUser?.id) },
 			"/api/followers/add"
 		);
-		dropRow(followId);
-		refresh()
+		dropRow(u.followId);
+		refresh();  // update version for other lists
 	};
 
-	/* infinite scroll */
-	const boxRef = useRef<HTMLDivElement>(null);
-	useInfiniteScroll(boxRef, { loading, hasMore, page, fetchPage });
+	const loadMore = async () => {
+		// Prevent multiple fetches when data is already loading
+		if (isDataLoading || !hasMoreData) return;
 
-	/* ───────── List content ───────── */
-	const content = (
-		<>
-			{list.length === 0 && !loading ? (
-				<NoData msg="No Follow Requests yet" />
+		setIsDataLoading(true); // Mark loading start
+
+		const data: FriendRequest | null = await getFollowingRequests(limit, currentPage);
+
+		if (data && data.requests) {
+			if (data.requests.length === 0 || currentPage === data.totalPages) {
+				setMore(false);
+			}
+
+			setRequests(prev => {
+				const seen = new Set(prev.requests.map(n => n.followId));
+				const fresh = data.requests.filter(n => !seen.has(n.followId));
+				return {
+					...prev,
+					requests: [...prev.requests, ...fresh],
+					totalCount: data.totalCount,
+					totalPages: data.totalPages,
+				};
+			});
+
+			setPage(p => p + 1);
+		} else {
+			setMore(false);
+		}
+		setIsDataLoading(false);
+	};
+
+	useEffect(() => {
+		if (!scrollTrigger.current || !hasMoreData) {
+			return;
+		}
+
+		const handleScroll = () => {
+			throttle(() => {
+				if (
+					scrollTrigger.current &&
+					scrollTrigger.current.scrollTop +
+					scrollTrigger.current.clientHeight >=
+					scrollTrigger.current.scrollHeight
+				) {
+					// If we've reached the bottom and not loading data, trigger loadMore
+					if (!isDataLoading) {
+						loadMore();
+					}
+				}
+			}, 300);
+		};
+
+		// Attach the scroll event listener
+		const container = scrollTrigger.current;
+		container.addEventListener("scroll", handleScroll);
+
+		// Cleanup the scroll event listener
+		return () => {
+			container.removeEventListener("scroll", handleScroll);
+		};
+	}, [hasMoreData, currentPage, isDataLoading]); // Watch for changes in `hasMoreData` and `isDataLoading`
+
+
+	useEffect(() => {
+		setPage(1);
+		setMore(true);
+		loadMore(); // Initial fetch on component mount
+	}, []); // Empty dependency array means this only runs once on mount
+
+	return (
+		<div className={styles.users} ref={scrollTrigger}>
+			{friendRequests.requests.length === 0 && !isDataLoading ? (
+				<NoData msg="No Friend Requests yet" />
 			) : (
-				<>
-					{list.map(u => (
-						<li key={u.id} className={styles.item}>
-							<Link
-								href={`/profile/${u.id}`}
-								className={styles.rowLink}
-								scroll={false}
-							>
-								<Image
-									className={styles.avt}
-									src={
-										u.profile_pic
-											? `${API_URL}/api/storage/avatars/${u.profile_pic}`
-											: "/img/default-avatar.png"
-									}
-									alt=""
-									width={36}
-									height={36}
-								/>
-								<span className={styles.name}>
-									{u.first_name} {u.last_name}
-								</span>
-							</Link>
+				friendRequests.requests.map(u => (
+					<li key={u.followId} className={styles.item}>
+						<Link href={`/profile/${u.id}`} className={styles.rowLink} scroll={false}>
+							<Image
+								className={styles.avt}
+								src={
+									u.profile_pic
+										? `${API_URL}/api/storage/avatars/${u.profile_pic}`
+										: "/img/default-avatar.png"
+								}
+								alt=""
+								width={36}
+								height={36}
+							/>
+							<span className={styles.name}>{u.first_name} {u.last_name}</span>
+						</Link>
 
-							<div
-								className={styles.buttons}
-								onClick={e => e.stopPropagation()}
+						<div className={styles.buttons} onClick={e => e.stopPropagation()}>
+							<button
+								className={styles.icnButton}
+								title="Accept"
+								onClick={() => handleAction("accepted", u)}
 							>
-								<button
-									className={styles.icnButton}
-									title="Accept"
-									onClick={() => handleAction("accepted", u.id, u.followId)}
-								>
-									<Image src="/img/accept.svg" alt="" width={20} height={20} />
-								</button>
-								<button
-									className={styles.icnButton}
-									title="Reject"
-									onClick={() => handleAction("rejected", u.id, u.followId)}
-								>
-									<Image src="/img/refuse.svg" alt="" width={20} height={20} />
-								</button>
-							</div>
-						</li>
-					))}
-				</>
+								<Image src="/img/accept.svg" alt="accept" width={20} height={20} />
+							</button>
+							<button
+								className={styles.icnButton}
+								title="Reject"
+								onClick={() => handleAction("rejected", u)}
+							>
+								<Image src="/img/refuse.svg" alt="refuse" width={20} height={20} />
+							</button>
+						</div>
+					</li>
+				))
 			)}
 
-			{loading && <Loading />}
-		</>
-	);
-
-	/* inline mode */
-	if (!modal) {
-		return (
-			<div className={styles.users} ref={boxRef}>
-				{content}
-			</div>
-		);
-	}
-
-	/* modal overlay */
-	return (
-		<div
-			className={styles.modalBackdrop}
-			onClick={() => onClose?.()}
-		>
-			<div
-				className={styles.modalPanel}
-				onClick={e => e.stopPropagation()}
-				ref={boxRef}
-			>
-				<button className={styles.closeBtn} onClick={() => onClose?.()}>
-					×
-				</button>
-				<h4 className={styles.modalTitle}>Follow Requests</h4>
-				{content}
-			</div>
+			{isDataLoading && <Loading />}
 		</div>
 	);
 }
+
+export default FriendRequestList;

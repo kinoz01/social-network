@@ -47,7 +47,7 @@ interface WSContextShape {
     send: (o: object) => void;
     sendDM: (peer: string, text: string) => void;
 
-    dmFeed: ChatMsg[];           // every incoming DM, unfiltered
+    dmFeed: ChatMsg[]; // incoming DM
 
     totalUnread: number;
     hasUnread: boolean;

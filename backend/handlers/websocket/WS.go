@@ -333,8 +333,7 @@ func broadcastDM(receiverID string, m ChatMsg) {
 	clientsMu.RUnlock()
 }
 
-/*────────── Notifications (untouched) ─────────*/
-
+/*────────── Notifications ─────────*/
 func BroadcastNotification(n tp.Notification) {
 	if err := notif.AddNotification(n); err != nil {
 		return

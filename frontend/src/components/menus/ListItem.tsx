@@ -4,13 +4,6 @@ import Link from "next/link";
 import { useState, MouseEvent, ReactNode } from "react";
 
 import styles from "./menus.module.css";
-import {
-  AcceptIcon,
-  AddFriendIcon,
-  ChatIcon,
-  RejectIcon,
-  UserIcon,
-} from "../icons";
 
 import { User } from "@/lib/types";
 import { addFollower } from "@/lib/followers";
@@ -35,7 +28,6 @@ interface Props {
 function ListItem({ type, name, item, loggedUser }: Props) {
   const [isResponded, setResponded] = useState(false);
 
-  /* ----------  friend-request handler  ---------- */
   const handleResponse = async (e: MouseEvent<HTMLButtonElement>) => {
     const action = e.currentTarget.value as "accepted" | "rejected";
     setResponded(true);
@@ -51,10 +43,8 @@ function ListItem({ type, name, item, loggedUser }: Props) {
     );
   };
 
-  /* ----------  avatar path  ---------- */
   const profilePic = `${API_URL}/api/storage/avatars/${item?.profile_pic}`;
 
-  /* ----------  link wrapper – only for items that used to have “View Profile”  ---------- */
   const needsLink =
     type === "followers" || type === "followings" || type === "suggestions";
 

@@ -19,7 +19,8 @@ async function addFollower(body: {}, url: string) {
       throw await res.json();
     }
   } catch (error: any) {
-    popup(error.msg, false);
+    console.log("fetch error", error);
+    // popup(error.msg, false);
   }
 }
 
@@ -70,7 +71,7 @@ async function isUserFollowed(id: string) {
     return await res.json();
   } catch (error: any) {
     console.log("fetch error", error);
-    popup(error.msg, false);
+    // popup(error.msg, false);
   }
 }
 
@@ -91,7 +92,7 @@ async function getFollowingRequests(
     return data;
   } catch (error: any) {
     console.log("fetch error", error);
-    popup(error.msg, false);
+    // popup(error.msg, false);
   }
   return null;
 }
@@ -141,7 +142,7 @@ async function getFollowers(
     return data;
   } catch (error: any) {
     console.log("fetch error", error);
-    popup(error.msg, false);
+    // popup(error.msg, false);
   }
   return null;
 }
@@ -162,7 +163,7 @@ async function getSuggestions(): Promise<User[] | null> {
     return data;
   } catch (error: any) {
     console.log("fetch error", error);
-    popup(error.msg, false);
+    // popup(error.msg, false);
   }
   return null;
 }
@@ -186,7 +187,7 @@ async function getFollowings(
     return data;
   } catch (error: any) {
     console.log("fetch error", error);
-    popup(error.msg, false);
+    // popup(error.msg, false);
   }
   return null;
 }

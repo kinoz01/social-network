@@ -12,6 +12,7 @@ import { useUser } from "@/context/UserContext";
 import { throttle } from "@/lib/utils";
 import Image from "next/image";
 
+
 function FollowingsList({
 	page,
 	profileId,
@@ -124,7 +125,7 @@ function FollowingsList({
 			await loadMore(); // Initial fetch on component mount
 		}
 		initialFetch();
-	}, [user]); // Empty dependency array means this only runs once on mount
+	}, [user]); 
 
 	return (
 		<div className={styles.users} ref={scrollTrigger}>
@@ -132,7 +133,7 @@ function FollowingsList({
 				<div className={styles.lock} >
 					<Image src="/img/lock.svg" alt="Private profile" width={48} height={48} />
 				</div>
-			) : followings.followings === null || followings.followings.length === 0 ? (
+			) : !followings.followings || followings.followings.length === 0 ? (
 				<NoData msg="No followings yet" />
 			) : (
 				followings.followings.map((following) => {

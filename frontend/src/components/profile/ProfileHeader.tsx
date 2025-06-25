@@ -1,19 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import styles from "./profileHeader.module.css";
 import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/api_url";
 import FollowersList from "@/components/menus/FollowersList";
 import FollowingsList from "@/components/menus/FollowingsList";
-import FriendRequestList from "@/components/menus/FriendRequest";
-import Loading from "../Loading";
-import { User } from "@/lib/types";
 import FollowButton from "./FollowButton";
 import { useFollowSync } from "@/context/FollowSyncContext";
 import { useUser } from "@/context/UserContext";
-import Feed from "../posts/Feed";
+import Loading from "../Loading";
 
 
 export interface Profile {
@@ -45,6 +41,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 	const [followers, setFollowers] = useState<boolean>(false)
 	const [followings, setFollowings] = useState<boolean>(false)
 	const { user } = useUser();
+	const { version } = useFollowSync()	
 
 	const accoutType = userData?.account_type === "public" ? "private" : "public";
 
@@ -54,7 +51,7 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 		setIsLoading(true);
 
 		try {
-			const res = await fetch(`http://localhost:8080/api/handleAccountStatu/${profileId}`, {
+			const res = await fetch(`${API_URL}/api/handleAccountStatu/${profileId}`, {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json',
@@ -75,13 +72,12 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 	}
 
 
-
 	async function fetchData() {
 		if (isLoading) return;
 
 		setIsLoading(true);
 		try {
-			const res = await fetch(`http://localhost:8080/api/profileData/${profileId}`, {
+			const res = await fetch(`${API_URL}/api/profileData/${profileId}`, {
 				credentials: "include",
 			})
 			const data = await res.json();
@@ -104,10 +100,10 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 			await fetchData();
 		}
 		fetch()
-	}, [statusUpdated])
+	}, [statusUpdated, version])
 
 
-	if (!userData) return <p>loading ...</p>
+	if (!userData) return <Loading />
 	return <>
 		<div className={styles.container}>
 			<div className={styles.userInfo}>
@@ -219,7 +215,6 @@ const ProfileHeader = ({ profileId }: { profileId?: string }) => {
 				</div>
 			</div>
 		}
-
 	</>
 }
 
