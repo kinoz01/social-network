@@ -39,11 +39,7 @@ type eventResp struct {
 
 /*──────────── POST /api/groups/create-event ───────────*/
 func CreateEvent(w http.ResponseWriter, r *http.Request) {
-	u, err := auth.GetUser(r)
-	if err != nil {
-		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
-		return
-	}
+	u, _ := auth.GetUser(r)
 
 	var req createEventReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -55,8 +51,12 @@ func CreateEvent(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "title required", http.StatusBadRequest, nil)
 		return
 	}
+	if strings.TrimSpace(req.Description) == "" {
+		help.JsonError(w, "description required", http.StatusBadRequest, nil)
+		return
+	}
 	start, err := time.Parse(time.RFC3339, req.StartTime)
-	if err != nil || start.Before(time.Now()) {
+	if err != nil || start.Before(time.Now()) || start.Year() > 9999 {
 		help.JsonError(w, "invalid start_time", http.StatusBadRequest, nil)
 		return
 	}
@@ -68,7 +68,7 @@ func CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if _, err := tx.Exec(`
 		INSERT INTO group_events
 		     (id, group_id, creator_id, title, description, start_time)
-		VALUES (?,  ?,        ?,          ?,     ?,           ?)`,
+		VALUES (?,?,?,?,?,?)`,
 		eid, req.GroupID, u.ID, req.Title, req.Description, start,
 	); err != nil {
 		tx.Rollback()
