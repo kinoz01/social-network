@@ -14,7 +14,6 @@ import (
 )
 
 func GetPosts(w http.ResponseWriter, r *http.Request) {
-	
 	user, err := auth.GetUser(r)
 	if err != nil {
 		Error.JsonError(w, "Internal Server Error", http.StatusUnauthorized, err)
@@ -48,7 +47,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-
 	if !Found(useid) {
 		Error.JsonError(w, "user not found", 404, nil)
 		return
@@ -65,39 +63,10 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-if !IsPublicAccount && !is_follower && useid != user.ID {
-        Error.JsonError(w, "private account", http.StatusPartialContent, nil)
-        return
-    }
-// 	var is_accountexist , is_follower, IsPublicAccount bool
-
-// 	err = tp.DB.QueryRow(`
-// SELECT
-//     CASE
-//         WHEN users.id IS NOT NULL THEN 1
-//         ELSE 0
-//     END as is_accountexist ,
-//     CASE
-//         WHEN follow_requests.follower_id IS NOT NULL THEN 1
-//         ELSE 0
-//     END as is_follower,
-//     CASE WHEN users.account_type = "public" THEN 1 ELSE 0 END AS is_public
-// FROM
-//     users
-//     LEFT JOIN follow_requests  ON follow_requests.follower_id = ?
-//     AND follow_requests.followed_id = users.id
-//     AND follow_requests.status = 'accepted'
-// WHERE
-//     users.id = ?`, user.ID, useid).Scan(&is_accountexist ,&is_follower, &IsPublicAccount)
-// 	if err != nil {
-// 		if err == sql.ErrNoRows {
-// 			Error.JsonError(w, "user not found", 404, nil)
-// 			return
-// 		}
-// 		Error.JsonError(w, "Internal Server Error", 500, nil)
-// 	}
-
-
+	if !IsPublicAccount && !is_follower && useid != user.ID {
+		Error.JsonError(w, "private account", http.StatusPartialContent, nil)
+		return
+	}
 
 	postsQuery := `SELECT
 		    posts.body,

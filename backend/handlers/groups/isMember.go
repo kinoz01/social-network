@@ -8,7 +8,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-// Api check
+// Api check for redirecting (from groups/id to /groups) if not a group member (protecting layout page)
 func IsGroupMember(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {

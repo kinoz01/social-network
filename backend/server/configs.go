@@ -14,7 +14,7 @@ func Shutdown() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
-	<-stop
+	<-stop //- stops here until an interrupt signal is received
 	log.Println("shutting down server...")
 	if err := db.DB.Close(); err != nil {
 		log.Fatal("Error closing DB:", err)

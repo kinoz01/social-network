@@ -24,8 +24,6 @@ import (
 	ws "social-network/handlers/websocket"
 )
 
-var Router http.Handler
-
 // Application routes.
 func Routes() http.Handler {
 	mux := http.NewServeMux()

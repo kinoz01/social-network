@@ -9,7 +9,7 @@ import (
 
 )
 
-// Middleware that checks if the user is a member of a group
+// Middleware that checks if the user is a member of a group (all requests have to carry group_id query to pass)
 func Gm(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := auth.GetUser(r)

@@ -11,6 +11,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// api endpoint to query events with going/notgoing counts and my actual response (if no response yet -> nil) 
 func GetEvents(w http.ResponseWriter, r *http.Request) {
 	userId, _ := auth.GetUserId(r)
 	gid := r.URL.Query().Get("group_id")

@@ -52,18 +52,18 @@ func AcceptJoinRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	defer tx.Rollback()
+
 	// Delete join request
 	_, err = tx.Exec(`DELETE FROM group_requests WHERE id = ?`, body.RequestID)
 	if err != nil {
-		tx.Rollback()
 		help.JsonError(w, "Failed to delete request", 500, err)
 		return
 	}
 
-	// Delete existing invitation (if there are)
+	// Delete existing invitation (if there is any)
 	_, err = tx.Exec(`DELETE FROM group_invitations WHERE group_id = ? AND invitee_id = ?`, groupID, requesterID)
 	if err != nil {
-		tx.Rollback()
 		help.JsonError(w, "Failed to delete invitation", 500, err)
 		return
 	}
@@ -72,7 +72,6 @@ func AcceptJoinRequest(w http.ResponseWriter, r *http.Request) {
 	_, err = tx.Exec(`INSERT OR IGNORE INTO group_users (id, group_id, users_id) VALUES (?, ?, ?)`,
 		uuid.Must(uuid.NewV4()).String(), groupID, requesterID)
 	if err != nil {
-		tx.Rollback()
 		help.JsonError(w, "Failed to add user to group", 500, err)
 		return
 	}

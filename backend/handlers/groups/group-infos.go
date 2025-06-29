@@ -9,7 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-// GET /api/groups/info?id=<group-id>
+// api end-point to get group information to display
 func GetGroupInfo(w http.ResponseWriter, r *http.Request) {
 	userId, _ := auth.GetUserId(r)
 

@@ -65,7 +65,7 @@ func GetNotifications(id string, limitQuery, pageQuery int) (*Notifcations, erro
 	for rows.Next() {
 		var n tp.Notification
 
-		/* nullable FK columns */
+		// nullable Foreign Key columns 
 		var groupID, eventID, invitationID, requestID, followId sql.NullString
 
 		if err := rows.Scan(
@@ -92,7 +92,7 @@ func GetNotifications(id string, limitQuery, pageQuery int) (*Notifcations, erro
 			return nil, err
 		}
 
-		/* copy nullable fields into the struct */
+		// copy nullable fields into the struct
 		if groupID.Valid {
 			n.Group = groupID.String
 		}

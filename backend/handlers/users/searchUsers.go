@@ -11,6 +11,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// api end-point to search users using query
 func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	me, err := auth.GetUser(r)
 	if err != nil {
@@ -18,7 +19,7 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// params
+	// query params
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	if limit == 0 {
 		limit = 50
@@ -27,12 +28,12 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	q := strings.TrimSpace(r.URL.Query().Get("q"))
 
 	if q == "" {
-		// no query → nothing to return
+		// no query - nothing to return
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	// 3) base SQL (no privacy filter, only exclude self)
+	// query to get users excluding self
 	base := `
 	  SELECT u.id,
 	         u.first_name,
@@ -51,7 +52,7 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	    FROM users u
 	   WHERE u.id <> ?            -- exclude self
 	     AND (
-	       u.first_name   LIKE ? COLLATE NOCASE OR
+	       u.first_name   LIKE ? COLLATE NOCASE OR -- case-insensitive
 	       u.last_name    LIKE ? COLLATE NOCASE OR
 	       u.username     LIKE ? COLLATE NOCASE OR
 	       (u.first_name || ' ' || u.last_name) LIKE ? COLLATE NOCASE
@@ -61,7 +62,7 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 	`
 	pattern := q + "%"
 	args := []any{
-		me.ID, me.ID, me.ID, // three ? before the LIKEs
+		me.ID, me.ID, me.ID,
 		pattern, pattern, pattern, pattern,
 		limit, offset,
 	}
@@ -82,7 +83,7 @@ func SearchUsers(w http.ResponseWriter, r *http.Request) {
 		FollowsMe  bool   `json:"followsMe"`
 	}
 
-	list := make([]person, 0)
+	list := make([]person, 0)  //- ps: using var list []person would give null in json encoding while make results in []
 	for rows.Next() {
 		var p person
 		if err := rows.Scan(

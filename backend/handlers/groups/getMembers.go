@@ -11,9 +11,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-/*
-GET /api/groups/members?group_id=<id>&limit=50&offset=0&q=john
-*/
+// get all group members to show in menu
 func GetMembers(w http.ResponseWriter, r *http.Request) {
 	
 	gid := r.URL.Query().Get("group_id")
@@ -25,17 +23,17 @@ func GetMembers(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := tp.DB.Query(`
 	  SELECT u.id, u.first_name, u.last_name, u.profile_pic,
-	         CASE WHEN g.group_owner = u.id THEN 1 ELSE 0 END AS is_owner
+	         CASE WHEN g.group_owner = u.id THEN 1 ELSE 0 END AS is_owner -- assign owner when found
 	  FROM   group_users gu
 	  JOIN   users  u ON u.id = gu.users_id
-	  JOIN   groups g ON g.id = gu.group_id         -- fixed join
+	  JOIN   groups g ON g.id = gu.group_id
 	  WHERE  gu.group_id = ?
-	    AND  ( ? = '' OR
+	    AND  ( ? = '' OR      -- if q is empty skip the filtering
 	           u.first_name LIKE ? COLLATE NOCASE OR
 	           u.last_name  LIKE ? COLLATE NOCASE OR
 	           u.username   LIKE ? COLLATE NOCASE OR
 			   (u.first_name || ' ' || u.last_name) LIKE ? COLLATE NOCASE)
-	  ORDER  BY is_owner DESC, u.first_name
+	  ORDER  BY is_owner DESC, u.first_name  -- owner at top
 	  LIMIT  ? OFFSET ?`, gid, q, like, like, like, like, limit, offset)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
@@ -64,11 +62,6 @@ func GetMembers(w http.ResponseWriter, r *http.Request) {
 			m.ProfilePic = img.String
 		}
 		list = append(list, m)
-	}
-
-	if len(list) == 0 {
-		w.WriteHeader(http.StatusNoContent)
-		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

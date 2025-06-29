@@ -15,25 +15,21 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// inviting end-point called from group invite menu
 func InviteFollowers(w http.ResponseWriter, r *http.Request) {
 	inviter, _ := auth.GetUser(r)
 
 	var body struct {
-		GroupID    string          `json:"group_id"`
-		InviteeIDs json.RawMessage `json:"invitee_ids"`
+		GroupID    string   `json:"group_id"`
+		InviteeIDs []string `json:"invitee_ids"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.GroupID == "" {
 		help.JsonError(w, "bad json", http.StatusBadRequest, err)
 		return
 	}
 
-	var ids []string
-	if err := json.Unmarshal(body.InviteeIDs, &ids); err != nil {
-		help.JsonError(w, "invalid invitee_ids", http.StatusBadRequest, err)
-		return
-	}
-	if len(ids) > 0 {
-		if err := Invite(body.GroupID, *inviter, ids); err != nil {
+	if len(body.InviteeIDs) > 0 {
+		if err := Invite(body.GroupID, *inviter, body.InviteeIDs); err != nil {
 			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
 			return
 		}
@@ -44,6 +40,7 @@ func InviteFollowers(w http.ResponseWriter, r *http.Request) {
 
 // Invite followers to join a group and notify them (if not already a member)
 // Allows multiple users to invite the same person, but avoids duplicate notifs from the same sender
+// if user is re-invited send notif if it's not already there.
 func Invite(groupID string, inviter tp.User, inviteeIDs []string) error {
 	if len(inviteeIDs) > 7000 {
 		return fmt.Errorf("too many invitees (max 7000)")
@@ -107,7 +104,7 @@ func Invite(groupID string, inviter tp.User, inviteeIDs []string) error {
 		var invID string
 		err := tx.QueryRow(getExistingInvStmt, groupID, uid).Scan(&invID)
 		if err == sql.ErrNoRows {
-			// Create new invitation
+			// Create and insert a new invitation
 			invID = uuid.Must(uuid.NewV4()).String()
 			_, err = invStmt.Exec(invID, groupID, uid)
 			if err != nil {

@@ -143,7 +143,7 @@ export default function NotificationItem({ n, onRemove }: Props) {
                     <Link className={styles.link} href={`/profile/${n.sender.id}`}>
                         @{`${n.sender.first_name} ${n.sender.last_name}`}
                     </Link>
-                    <div className={styles.content}>{formatContent(n.content)}</div>
+                    <div className={styles.content}>{formatContent(n.content, n.groupId)}</div>
                 </div>
             </div>
 
@@ -198,13 +198,33 @@ export default function NotificationItem({ n, onRemove }: Props) {
     );
 }
 
-function formatContent(text: string) {
-    const parts = text.split(/('.*?')/); // keeps quotes in the result
-    return parts.map((part, i) =>
-        part.startsWith("'") && part.endsWith("'") ? (
-            <span key={i} className={styles.highlighted}>{part}</span>
-        ) : (
-            <span key={i}>{part}</span>
-        )
-    );
+function formatContent(text: string, groupId?: string) {    
+    const parts = text.split(/('.*?')/); // keep quoted chunks
+    const isEvent = /event/i.test(text); // contains the event"
+
+    return parts.map((part, i) => {
+        const isQuoted = part.startsWith("'") && part.endsWith("'");
+        
+        if (isQuoted && isEvent && groupId) {
+            return (
+                <Link
+                    key={i}
+                    href={`/groups/${groupId}/events`}
+                    className={styles.highlighted}
+                >
+                    {part}
+                </Link>
+            );
+        }
+
+        if (isQuoted) {
+            return (
+                <span key={i} className={styles.highlighted}>
+                    {part}
+                </span>
+            );
+        }
+
+        return <span key={i}>{part}</span>;
+    });
 }

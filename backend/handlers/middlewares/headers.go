@@ -10,7 +10,7 @@ func EnableCORS(next http.HandlerFunc) http.HandlerFunc {
 		// Allow only specific origins
 		if origin == "http://localhost:3000" || origin == "https://snet.fly.dev" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
-			w.Header().Set("Vary", "Origin") // for caching proxies
+			w.Header().Set("Vary", "Origin") //- Do not reuse a cached version of this response unless the Origin header is exactly the same.
 		}
 
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE, PUT") // Allow Http methods
@@ -29,9 +29,9 @@ func EnableCORS(next http.HandlerFunc) http.HandlerFunc {
 // Secure Headers Middleware.
 func SecureHeaders(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Security-Policy", "script-src 'self';") // For XSS attacks (only alllow scripts from the same origin serving html)
-		w.Header().Set("X-Frame-Options", "DENY")                       // For clickjacking (prevent from clickjacking - embedding website)
-		w.Header().Set("X-Content-Type-Options", "nosniff")             // For MIME sniffing
+		w.Header().Set("Content-Security-Policy", "script-src 'self';") //- only allow scripts from the same origin serving html, and also prevent inline scripts
+		w.Header().Set("X-Frame-Options", "DENY")                       //- Blocks iframe embedding (clickjacking)
+		w.Header().Set("X-Content-Type-Options", "nosniff")             //- browser don't guess the content type. Only rely on Content-Type header.
 		next.ServeHTTP(w, r)
 	}
 }

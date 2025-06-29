@@ -15,8 +15,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := cookie.Value
-	if err := clearSession(w, token); err != nil {
+	if err := clearSession(w, cookie.Value); err != nil {
 		hlp.JsonError(w, "Failed to remove session", http.StatusInternalServerError, err)
 		return
 	}

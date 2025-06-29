@@ -30,9 +30,9 @@ func FilesHandler(w http.ResponseWriter, r *http.Request) {
 	// Serve the image file
 	http.ServeFile(w, r, filePath)
 }
-
+// Reads the uploaded file with a size limit, checks img ext validity and return uuid to be insterted in db.
 func HandleFileUpload(r *http.Request, genre string, formFile string) (string, error) {
-	file, handler, err := r.FormFile(formFile)
+	file, handler, err := r.FormFile(formFile) //- file: uploaded content to read from | handler: file data
 	if err != nil {
 		return "", nil
 	}

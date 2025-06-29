@@ -77,9 +77,9 @@ func IsCommentReacted(l pType.React) error {
 	    WHERE user_id = ? AND comment_id = ?`,
 		l.UserID, l.CommentID).Scan(&uid, &cid)
 	if err == sql.ErrNoRows {
-		return fmt.Errorf("no like") //  treated as “not yet reacted”
+		return fmt.Errorf("no like") //- treated as "not yet reacted"
 	}
-	return err // nil means it *is* reacted
+	return err //- nil means it *is* reacted
 }
 
 func SaveCommentLike(l pType.React) error {

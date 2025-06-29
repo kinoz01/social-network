@@ -8,7 +8,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-
+// delete a notification 
 func DeleteNotification(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
@@ -29,7 +29,7 @@ func DeleteNotification(w http.ResponseWriter, r *http.Request) {
 
 	_, err = tp.DB.Exec(
 		`DELETE FROM notifications
-		  WHERE id = ? AND receiver_id = ?`, id, user.ID,
+		  WHERE id = ? AND receiver_id = ?`, id, user.ID, // receiver check for safety
 	)
 	if err != nil {
 		help.JsonError(w, "db error", http.StatusInternalServerError, err)
@@ -39,7 +39,7 @@ func DeleteNotification(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-
+// delete all notifications
 func ClearAllNotifications(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)

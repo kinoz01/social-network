@@ -147,6 +147,7 @@ export default function AllMembersMenu({
                                         strokeWidth="1.5"
                                         fill="currentColor"
                                     />
+                                    <title>Group Owner</title>
                                 </svg>
                             )}
                         </Link>

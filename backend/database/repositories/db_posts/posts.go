@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// insert post into db
 func CreatePostDB(newPost pType.Post) error {
 	var imgPost sql.NullString
 	if newPost.Imag_post != "" {
@@ -37,6 +38,7 @@ func CreatePostDB(newPost pType.Post) error {
 	return nil
 }
 
+// insert an allowed vip user for a certain post
 func PostPrivacyDB(postID string, userID string) error {
 	const query = `INSERT INTO post_privacy (id, post_id, allowed_users)
            VALUES (?, ?, ?)`
@@ -54,6 +56,7 @@ func PostPrivacyDB(postID string, userID string) error {
 	return nil
 }
 
+// Get all posts excluding group posts and private/vip except if user allowed.
 func GetAllPOst(offset int, userID string) ([]pType.PostData, error) {
 	const q = `
 	SELECT
@@ -96,27 +99,28 @@ func GetAllPOst(offset int, userID string) ([]pType.PostData, error) {
 	return scanPosts(rows)
 }
 
+// get all group posts
 func GetGroupPOsts(offset int, userID, groupID string) ([]pType.PostData, error) {
 	const q = `
 		SELECT
 		    p.post_id, p.user_id, p.body, p.img_post, u.first_name, u.last_name, u.profile_pic, lr.react_type, p.created_at,
 		    (
-		        SELECT COUNT(*)
+		        SELECT COUNT(*)					-- likes counter
 		        FROM like_reaction lr2
 		        WHERE lr2.post_id = p.post_id
-		        AND lr2.react_type = '1'
+		        AND lr2.react_type = '1' 
 		    ),
 		    (
-		        SELECT COUNT(*)
+		        SELECT COUNT(*)					-- comments counter
 		        FROM comments c
 		        WHERE c.post_id = p.post_id
 		    ),
 		    p.visibility,
 		    p.group_id
 		FROM posts p
-		JOIN users u
-		  ON u.id = p.user_id
-		LEFT JOIN like_reaction lr
+		JOIN users u						   -- rows that match between posts and users
+		ON u.id = p.user_id 				   
+		LEFT JOIN like_reaction lr			   -- all rows from the left, and match rows from the right table (no match -> NULL)
 		  ON lr.post_id = p.post_id
 		 AND lr.user_id = ?
 		WHERE p.group_id = ?
@@ -126,103 +130,6 @@ func GetGroupPOsts(offset int, userID, groupID string) ([]pType.PostData, error)
 		OFFSET ?;`
 
 	rows, err := pType.DB.Query(q, userID, groupID, offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	return scanPosts(rows)
-}
-
-func GetProfilePosts(offset int, userID, profileID string) ([]pType.PostData, error) {
-	var exists bool
-	if err := pType.DB.QueryRow(`SELECT EXISTS (SELECT 1 FROM users WHERE id = ?)`, profileID).Scan(&exists); err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, fmt.Errorf("profile not found")
-	}
-	// self-view: everything
-	if userID == profileID {
-		rows, err := pType.DB.Query(`
-			SELECT
-			  p.post_id, p.user_id, p.body, p.img_post,
-			  u.first_name, u.last_name, u.profile_pic,
-			  lr.react_type, p.created_at,
-			  (SELECT COUNT(*) FROM like_reaction lr2
-			     WHERE lr2.post_id=p.post_id AND lr2.react_type='1'),
-			  (SELECT COUNT(*) FROM comments c WHERE c.post_id=p.post_id),
-			  p.visibility, p.group_id
-			FROM posts p
-			JOIN users u ON u.id = p.user_id
-			LEFT JOIN like_reaction lr
-			       ON lr.post_id = p.post_id AND lr.user_id = ?
-			WHERE p.user_id = ? AND p.group_id IS NULL
-			ORDER BY p.created_at DESC, p.ROWID DESC
-			LIMIT 20 OFFSET ?;`, userID, profileID, offset)
-		if err != nil {
-			return nil, err
-		}
-		defer rows.Close()
-		return scanPosts(rows)
-	}
-
-	// relation check
-	var accountType string
-	if err := pType.DB.QueryRow(`SELECT account_type FROM users WHERE id = ?`, profileID).
-		Scan(&accountType); err != nil {
-		return nil, err
-	}
-	var followed bool
-	_ = pType.DB.QueryRow(`
-    	SELECT EXISTS (
-    	  SELECT 1
-    	    FROM follow_requests
-    	   WHERE status = 'accepted'
-    	     AND follower_id = ? 
-    	     AND followed_id = ? 
-    	);`, userID, profileID).Scan(&followed)
-
-	if !followed && accountType == "private" {
-		return nil, fmt.Errorf("private profile")
-	}
-
-	visCond := "p.visibility='public'"
-	args := []any{userID, profileID}
-
-	if followed {
-		visCond = `
-			(p.visibility IN ('public','almost-private')
-  			OR (
-    		   p.visibility='private'
-   			AND EXISTS(SELECT 1
-    		        FROM post_privacy
-    		           WHERE post_id = p.post_id
-    		        AND allowed_users = ?)
-  			))`
-		args = append(args, userID)
-	}
-
-	// final query
-	query := fmt.Sprintf(`
-		SELECT
-		  	p.post_id, p.user_id, p.body, p.img_post,
-		  	u.first_name, u.last_name, u.profile_pic,
-		  	lr.react_type, p.created_at,
-		  	(SELECT COUNT(*) FROM like_reaction lr2
-		     	WHERE lr2.post_id=p.post_id AND lr2.react_type='1'),
-		  	(SELECT COUNT(*) FROM comments c WHERE c.post_id=p.post_id),
-		p.visibility, p.group_id
-		FROM posts p
-		JOIN users u ON u.id = p.user_id
-		LEFT JOIN like_reaction lr
-		    ON lr.post_id = p.post_id AND lr.user_id = ?
-		WHERE p.user_id = ? AND p.group_id IS NULL 
-		  	AND (%s)  
-		ORDER BY p.created_at DESC, p.ROWID DESC
-		LIMIT 20 OFFSET %d;`,
-		visCond, offset)
-
-	rows, err := pType.DB.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}

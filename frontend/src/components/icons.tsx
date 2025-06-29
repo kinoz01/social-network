@@ -397,6 +397,7 @@ const CloseFriendIcon = () => (
       d="M50 15 L61.8 38.2 H85.4 L66.9 53.8 L78.7 77 L50 62.6 L21.3 77 L33.1 53.8 L14.6 38.2 H38.2 Z"
       fill="white"
     />
+    <title>Visible to Slected Followers</title>
   </svg>
 )
 const PublicIcon = () => (
@@ -404,12 +405,14 @@ const PublicIcon = () => (
     <circle cx="12" cy="12" r="10"></circle>
     <line x1="2" y1="12" x2="22" y2="12"></line>
     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    <title>Public</title>
   </svg>
 )
 const PrivateIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#464849" strokeWidth="2">
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    <title>Visible to Followers</title>
   </svg>
 )
 function Heart({ filled = false, ...p }:

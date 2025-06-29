@@ -11,6 +11,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// handle getting group and home feeds posts
 func AllPosts(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
@@ -28,20 +29,14 @@ func AllPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var posts []tp.PostData
-	if r.URL.Query().Get("profileId") != "" {
-		posts, err = repoPosts.GetProfilePosts(currentPage, user.ID, r.URL.Query().Get("profileId"))
-	} else if r.URL.Query().Get("groupId") != "" {
+	if r.URL.Query().Get("groupId") != "" {
 		posts, err = repoPosts.GetGroupPOsts(currentPage, user.ID, r.URL.Query().Get("groupId"))
 	} else {
 		posts, err = repoPosts.GetAllPOst(currentPage, user.ID)
 	}
 
 	if err != nil {
-		if err.Error() == "private profile" {
-			helpers.JsonError(w, "private profile", http.StatusPartialContent, err)
-		} else if err.Error() == "profile not found" {
-			helpers.JsonError(w, "profile not found", http.StatusNotFound, err)
-		}
+		helpers.JsonError(w, "something went wrong", http.StatusInternalServerError, err)
 		return
 	}
 

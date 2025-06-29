@@ -38,9 +38,9 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* ---------- invitations ---------- */
+	// send group invitations
 	groupID := uuid.Must(uuid.NewV4()).String()
-	invitees := r.FormValue("invitee_ids")
+	invitees := r.FormValue("invitee_ids") //- JSON-formatted string representing an array (e.g. '["id1","id2"]')
 	var ids []string
 	if err := json.Unmarshal([]byte(invitees), &ids); err != nil {
 		help.JsonError(w, "Invalid invitee_ids", 400, err)
@@ -99,7 +99,7 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 
 // Checks if the group name and description are valid.
 func ValidatePayload(groupName string, description string) error {
-	validInputRegex := regexp.MustCompile(`^[\p{L}\p{N}\s.,!?'_@\-\(\)]+$`)
+	validInputRegex := regexp.MustCompile(`^[\p{L}\p{N}\s.,!?'_@\-\(\)]+$`) //- \p{L} Any letter from any language | \p{N} Any number
 	exists := false
 	err := tp.DB.QueryRow(`
 		SELECT EXISTS(SELECT 1 FROM groups WHERE group_name = ?)`, groupName).Scan(&exists)

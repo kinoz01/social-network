@@ -14,6 +14,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// api end-point for creating a group post
 func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 	userId, _ := auth.GetUserId(r)
 
@@ -33,7 +34,7 @@ func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 	re := regexp.MustCompile(`(\r\n|\r|\n){3,}`)
 	body = re.ReplaceAllString(body, "\n\n")
 
-	/* ─ optional image ─ */
+	// optional image 
 	var imgPath sql.NullString
 	imgstr, err := help.HandleFileUpload(r, "groups_posts/", "imag_post")
 	if err != nil {
@@ -59,7 +60,7 @@ func CreateGroupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* ─ fetch full row for immediate UI update ─ */
+	/* ─ fetch full row to return for immediate UI update ─ */
 	var p tp.PostData
 	var img sql.NullString
 	row := tp.DB.QueryRow(`

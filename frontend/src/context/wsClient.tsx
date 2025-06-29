@@ -69,19 +69,15 @@ export function WSProvider({ children }: { children: ReactNode }) {
     const meId = user?.id ?? null;
     const { version } = useFollowSync();
 
-    const socketRef = useRef<WebSocket | null>(null);
+    const socketRef = useRef<WebSocket | null>(null); //- useref is used to store value between re-renders, to access value we use current (unlike useState changing ref value don't cause re-render of component)
 
-    /* state */
+    // state */
     const [wsOpen, setOpen] = useState(false);
     const [online, setOnline] = useState<Set<string>>(new Set());
-    const [groupMembers, setGroupMembers] = useState<
-        Map<string, Member[]>
-    >(new Map());
+    const [groupMembers, setGroupMembers] = useState<Map<string, Member[]>>(new Map());
 
     const [dmFeed, setDmFeed] = useState<ChatMsg[]>([]);
-    const [unreadCount, setUnreadCount] = useState<Map<string, number>>(
-        new Map()
-    );
+    const [unreadCount, setUnreadCount] = useState<Map<string, number>>(new Map());
 
     const [notifsCount, setNotifsCount] = useState(0);
     const [notifications, setNotifications] = useState<NotificationModel[]>([]);
@@ -89,7 +85,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
     const seenDMids = useRef<Set<string>>(new Set());
     const seenNotifIds = useRef<Set<string>>(new Set());
 
-    /* ─── preload unread summary ─── */
+    /* ─── preload chat unread summary ─── */
     useEffect(() => {
         if (!meId) return;
         fetch(`${API_URL}/api/chat/unread-summary`, { credentials: "include" })
@@ -116,7 +112,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
     /* ─── open socket ─── */
     useEffect(() => {
         if (!meId) return;
-        const ws = new WebSocket(`${API_URL_WS}/api/ws`);
+        const ws = new WebSocket(`${API_URL_WS}/api/ws`); // upgrade
         socketRef.current = ws;
 
         ws.addEventListener("open", () => setOpen(true));
@@ -137,7 +133,7 @@ export function WSProvider({ children }: { children: ReactNode }) {
 
                 case "groupMembers":
                     setGroupMembers((prev) =>
-                        new Map(prev).set(msg.groupId, msg.members)
+                        new Map(prev).set(msg.groupId, msg.members) //- create copy using the prev map and Update it
                     );
                     break;
 

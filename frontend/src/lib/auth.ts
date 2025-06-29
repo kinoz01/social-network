@@ -5,14 +5,14 @@ import { API_URL } from "@/lib/api_url";
 // Check if the user is logged in by checking the session cookie
 export async function requireSession() {
     // Check session cookie (no backend call)
-    const cookieStore = await cookies();
+    const cookieStore = await cookies(); //- get cookie from header in server component
     const token = cookieStore.get("session_token")?.value;
     
     if (!token) redirect("/login");
 
     // check session validity (backend call)
     const res = await fetch(`${API_URL}/api/check-session`, {
-        headers: { cookie: cookieStore.toString() }, // The server needs to pass cookies manually
+        headers: { cookie: cookieStore.toString() }, //- The server needs to pass cookies manually (can't do credential:  include on server component)
         cache: "no-store",
     });
     if (!res.ok) {

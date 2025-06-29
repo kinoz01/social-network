@@ -21,7 +21,7 @@ func AcceptInvitation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var body struct {
-		InvitationID string `json:"invitation_id"`
+		InvitationID string `json:"invitation_id"` //- invitaion id sent from front
 	}
 	if json.NewDecoder(r.Body).Decode(&body) != nil || body.InvitationID == "" {
 		help.JsonError(w, "Bad request", http.StatusBadRequest, nil)
@@ -34,6 +34,8 @@ func AcceptInvitation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	defer tx.Rollback() //- rolls back if Commit is never reached or fails
+
 	// Get group_id and inviteee_id from the invitations table
 	var groupID string
 	err = tx.QueryRow(`
@@ -41,21 +43,19 @@ func AcceptInvitation(w http.ResponseWriter, r *http.Request) {
 		WHERE id = ? AND invitee_id = ?`,
 		body.InvitationID, user.ID).Scan(&groupID)
 	if err == sql.ErrNoRows {
-		tx.Rollback()
 		help.JsonError(w, "Not found", 404, err)
 		return
 	} else if err != nil {
-		tx.Rollback()
 		help.JsonError(w, "DB error", 500, err)
 		return
 	}
-
+	
+	//- insert the user as a member
 	_, err = tx.Exec(`
 		INSERT OR IGNORE INTO group_users (id, group_id, users_id)
 		VALUES (?, ?, ?)`,
-		uuid.Must(uuid.NewV4()).String(), groupID, user.ID)
+		uuid.Must(uuid.NewV4()).String(), groupID, user.ID) 
 	if err != nil {
-		tx.Rollback()
 		help.JsonError(w, "insert failed", 500, err)
 		return
 	}
@@ -66,14 +66,13 @@ func AcceptInvitation(w http.ResponseWriter, r *http.Request) {
 		WHERE group_id = ? AND requester_id = ?`,
 		groupID, user.ID)
 	if err != nil {
-		tx.Rollback()
 		help.JsonError(w, "delete join request failed", 500, err)
 		return
 	}
-
+	//- btw Delete will automatically delete any rows in the notifications table that reference the deleted group_requests.id or group_invitations.id
+	// Delete the group invitation
 	_, err = tx.Exec(`DELETE FROM group_invitations WHERE id = ?`, body.InvitationID)
 	if err != nil {
-		tx.Rollback()
 		help.JsonError(w, "delete failed", 500, err)
 		return
 	}

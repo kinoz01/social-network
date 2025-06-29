@@ -56,10 +56,10 @@ func AvailableGroups(w http.ResponseWriter, r *http.Request) {
          	AND gi.invitee_id = ?
          	AND gi.status = 'pending'
 	)
-	`, user.ID,  /*  for CASE (join‑request)        */
-		user.ID, /*  for LEFT JOIN (member check)   */
-		user.ID, /*  for owner <> ?                 */
-		user.ID) /*  for NOT EXISTS (invitation)    */
+	`, user.ID, //-  for CASE (join‑request)
+		user.ID, //-  for LEFT JOIN (member check)
+		user.ID, //-  for owner <> ?
+		user.ID) //-  for NOT EXISTS (invitation)
 	if err != nil {
 		help.JsonError(w, "DB error", http.StatusInternalServerError, err)
 		return
@@ -68,7 +68,7 @@ func AvailableGroups(w http.ResponseWriter, r *http.Request) {
 
 	var list []tp.Group
 	for rows.Next() {
-		var req sql.NullString // To correctly scan nulled string
+		var req sql.NullString //- To correctly scan nulled string
 		var g tp.Group
 
 		if err := rows.Scan(

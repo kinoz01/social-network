@@ -17,7 +17,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 
-	// Limit the size of the request body to 30 KB.
+	// Limit the size of the readable request body to 30 KB.
 	r.Body = http.MaxBytesReader(w, r.Body, 30000)
 
 	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {

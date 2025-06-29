@@ -92,7 +92,7 @@ export default function Chat() {
         socket.addEventListener("message", h);
         send({ type: "subscribeChat", groupId });
         return () => socket.removeEventListener("message", h);
-    }, [groupId, send]);
+    }, [groupId, socket]);
 
 
     /* scroll restore / auto-bottom -------------------------------*/

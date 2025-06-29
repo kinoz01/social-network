@@ -9,6 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
+// Handles owner's refusal of a join request to a group.
 func RefuseJoinRequest(w http.ResponseWriter, r *http.Request) {
 	user, err := auth.GetUser(r)
 	if err != nil {
@@ -24,7 +25,7 @@ func RefuseJoinRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* ensure the request belongs to a group the caller owns */
+	// ensure the request belongs to a group the caller owns
 	res, err := tp.DB.Exec(`
 		DELETE FROM group_requests
 		 WHERE id = ?
@@ -34,7 +35,7 @@ func RefuseJoinRequest(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "DB error", 500, err)
 		return
 	}
-	if n, _ := res.RowsAffected(); n == 0 {
+	if n, _ := res.RowsAffected(); n == 0 { //- if not owner don't just return ok make return more verbose
 		help.JsonError(w, "Forbidden", 403, err)
 		return
 	}

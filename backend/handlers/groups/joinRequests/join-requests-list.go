@@ -17,14 +17,12 @@ type joinReq struct {
 	ProfilePic string `json:"profile_pic"`
 }
 
-/* -------------------------------------------------------------------- */
-/* GET /api/groups/requests?group_id=…  → only owner can call           */
-/* -------------------------------------------------------------------- */
+// group join requests called by owner
 func ListJoinRequests(w http.ResponseWriter, r *http.Request) {
 	userId, _ := auth.GetUserId(r)
 	gid := r.URL.Query().Get("group_id")
 
-	/* ensure caller is the owner */
+	// ensure caller is the owner
 	var ownerID string
 	if err := tp.DB.QueryRow(`SELECT group_owner FROM groups WHERE id = ?`, gid).Scan(&ownerID); err != nil {
 		help.JsonError(w, "Group not found", 404, err)

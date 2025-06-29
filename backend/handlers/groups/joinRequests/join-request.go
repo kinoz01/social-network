@@ -47,7 +47,7 @@ func JoinRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* insert (or re-use) request + notification inside one tx */
+	// insert request + notification
 	if err := JoinRequestNotif(body.GroupID, *user); err != nil {
 		help.JsonError(w, err.Error(), http.StatusInternalServerError, err)
 		return
@@ -56,15 +56,15 @@ func JoinRequest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-/* helper: wraps all DB work + websocket fan-out */
+// helper: wraps all DB work + websocket notification broadcast
 func JoinRequestNotif(groupID string, requester tp.User) error {
 	tx, err := tp.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback() // safe no-op if Commit succeeds
+	defer tx.Rollback() //- rolls back if Commit is never reached or fails
 
-	/* group owner + name */
+	// group name + owner
 	var ownerID, groupName string
 	if err := tx.QueryRow(
 		`SELECT group_owner, group_name FROM groups WHERE id = ?`,
@@ -80,14 +80,14 @@ func JoinRequestNotif(groupID string, requester tp.User) error {
 			 VALUES (?, ?, ?)`,
 		reqID, groupID, requester.ID,
 	); err != nil {
-		return err //- if user don't use UI he will be stopped here by the UNIQUE constraint
+		return err //- if user don't use UI he will be stopped here by the UNIQUE constraint in db
 	}
 
 	if err := tx.Commit(); err != nil {
 		return err
 	}
 
-	/* create notification */
+	// create notification 
 	notif := tp.Notification{
 		ID:        uuid.Must(uuid.NewV4()).String(),
 		Type:      "join_request",

@@ -15,12 +15,11 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-/*──────────── structs ───────────*/
 type createEventReq struct {
 	GroupID     string `json:"group_id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	StartTime   string `json:"start_time"` // RFC 3339 string
+	StartTime   string `json:"start_time"` // RFC 3339 string (YYYY-MM-DDTHH:MM:SSZ)
 	Going       bool   `json:"going"`      // creator's own response
 }
 
@@ -37,11 +36,11 @@ type eventResp struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
-/*──────────── POST /api/groups/create-event ───────────*/
+// api end-point creating an event while braodcasting notifs to all group members.
 func CreateEvent(w http.ResponseWriter, r *http.Request) {
 	u, _ := auth.GetUser(r)
 
-	var req createEventReq
+	var req createEventReq //- data shape from frontend
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		help.JsonError(w, "bad json", http.StatusBadRequest, err)
 		return
@@ -91,7 +90,7 @@ func CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fetch all other group members
+	// fetch all other group members -to notify
 	rows, err := tx.Query(`
 		SELECT u.id, u.first_name, u.last_name, u.profile_pic
 		FROM users u
@@ -135,7 +134,7 @@ func CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// HTTP response
+	// HTTP response to render back the event
 	respBody := eventResp{
 		ID:            eid,
 		GroupID:       req.GroupID,

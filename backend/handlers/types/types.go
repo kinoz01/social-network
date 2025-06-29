@@ -79,7 +79,7 @@ type Group struct {
 	GroupPic    string `json:"group_pic"`
 	Description string `json:"description"`
 	CreatedAt   string `json:"created_at"`
-	Request     string `json:"request"` // pending toggle when rendering all groups
+	Request     string `json:"request"` // "pending" toggle when rendering all groups
 	Members     int    `json:"members"`
 }
 

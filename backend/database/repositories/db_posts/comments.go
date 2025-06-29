@@ -7,6 +7,7 @@ import (
 	"social-network/handlers/types"
 )
 
+// insert comment into db
 func CreateCommentDB(newComment types.Comment) error {
 	var imgComment sql.NullString
 	if newComment.Img_comment != "" {
@@ -34,6 +35,7 @@ func CreateCommentDB(newComment types.Comment) error {
 	return nil
 }
 
+// select comments of a specific post alongside likes counts and viewer reaction
 func CommentByPost(postID string, page int, viewerID string) ([]types.Comment, error) {
 	var out []types.Comment
 	rows, err := types.DB.Query(`

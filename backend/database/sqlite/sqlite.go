@@ -46,7 +46,7 @@ func runMigrations(databasePath string) {
 	if err != nil {
 		log.Fatalf("Error loading migrations: %v", err)
 	}
-
+	//- Automatically finds and runs unapplied .up.sql files - Skips already-applied ones - Records each applied version in the database
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatalf("Migration failed: %v", err)
 	} else if err == migrate.ErrNoChange {

@@ -29,7 +29,7 @@ func HandleCommentLike(w http.ResponseWriter, r *http.Request) {
 
 	like.UserID = u.ID
 	like.ID = uuid.Must(uuid.NewV4()).String()
-	like.ISLike = "1" // only a heart for now
+	like.ISLike = "1"
 
 	// toggle
 	exists := postDB.IsCommentReacted(like) == nil // found row: already liked

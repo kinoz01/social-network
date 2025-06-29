@@ -23,7 +23,7 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(10 << 20); err != nil {
+	if err := r.ParseMultipartForm(10 << 20); err != nil { //- limit memory usage to 10 MB, larger will be stored in a temporary file in disk
 		helpers.JsonError(w, "invalid form", http.StatusBadRequest, err)
 		return
 	}
@@ -71,7 +71,7 @@ func CreatPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK) //- default if nothing written
 
 	if err := json.NewEncoder(w).Encode(newPost); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)

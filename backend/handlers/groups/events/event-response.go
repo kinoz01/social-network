@@ -12,6 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// handle going/notgoing btn click 
 func EventResponse(w http.ResponseWriter, r *http.Request) {
 	u, err := auth.GetUser(r)
 	if err != nil {
@@ -63,7 +64,7 @@ func EventResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return fresh counts so UI is always correct
+	// Return fresh counts so UI is always updated
 	var going, notGoing int
 	if err := tx.QueryRow(`
 	    SELECT

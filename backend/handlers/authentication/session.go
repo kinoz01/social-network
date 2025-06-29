@@ -87,17 +87,17 @@ func CreateSession(w http.ResponseWriter, user *tp.User) error {
 	}
 
 	// Set the token in a cookie
-	raw := (&http.Cookie{
+	cookie := &http.Cookie{
 		Name:     "session_token",
 		Value:    token,
-		Path:     "/",
 		Expires:  expiresAt,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-	}).String()
-	
-	w.Header().Add("Set-Cookie", raw+"; Partitioned")
+		HttpOnly: true,  //- make cookie inaccessible to JavaScript (document.cookie)
+		Path:     "/", 	 //- cookie sent with every request to your domain, regardless of path that did set it.
+		Secure:   true,  //- only send over https
+		SameSite: http.SameSiteNoneMode,  //- cookie can be sent cross-site — but must have Secure: true (allow cookie to be sent when front request origin != back)
+	}
+
+	http.SetCookie(w, cookie)
 
 	return nil
 }

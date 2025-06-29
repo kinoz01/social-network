@@ -18,7 +18,7 @@ func Serve(handler http.Handler) {
 
 	httpServer := &http.Server{
 		Handler:           handler,
-		ReadHeaderTimeout: 5 * time.Second,  // Headers must arrive within 5s
+		ReadHeaderTimeout: 5 * time.Second,  // Headers must arrive within 5s //- resource exhaustion attacks
 		ReadTimeout:       5 * time.Second,  // Prevent slow-client attacks
 		WriteTimeout:      5 * time.Second,  // Protect from server hanging
 		IdleTimeout:       15 * time.Second, // Reduce unauthorised access

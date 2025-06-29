@@ -10,7 +10,7 @@ import (
 	ws "social-network/handlers/websocket"
 )
 
-// GET /api/groups/chat?group_id=...&limit=20&offset=40
+// api end-point to get group chat history
 func ChatPage(w http.ResponseWriter, r *http.Request) {
 	
 	gid := r.URL.Query().Get("group_id")

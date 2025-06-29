@@ -39,9 +39,6 @@ FROM follow_requests
  AND follow_requests.status = "accepted"
 `, UserLoggedin_id, userProfile_id).Scan(&row)
 	if err != nil {
-		// if err == sql.ErrNoRows {
-		// 	return false, nil
-		// }
 		Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return false, err
 	}
@@ -75,16 +72,12 @@ FROM users
 func PostVisibility(PostID string, useid string) (bool, error) {
 	var row int
 	err := tp.DB.QueryRow(`
-SELECT COUNT (*) 
- FROM post_privacy
-WHERE post_privacy.post_id = ?
-and post_privacy.allowed_users = ?
-`, PostID, useid).Scan(&row)
+		SELECT COUNT (*) 
+		 	FROM post_privacy
+			WHERE post_privacy.post_id = ?
+			and post_privacy.allowed_users = ?
+		`, PostID, useid).Scan(&row)
 	if err != nil {
-		// if err == sql.ErrNoRows {
-		// 	return false, nil
-		// }
-		// Error.JsonError(w, "Internal Server Error "+fmt.Sprintf("%v", err), 500, nil)
 		return false, err
 	}
 	if row == 1 {

@@ -47,6 +47,6 @@ func (rl *RateLimiter) RateLimitMW(next http.HandlerFunc) http.HandlerFunc {
 			helpers.JsonError(w, "Request could not be processed.", http.StatusServiceUnavailable, nil)
 			return
 		}
-		next(w, r) //- next.ServeHTTP(w, r) Also works - this internally just call: next(w, r)
+		next(w, r) //- next.ServeHTTP(w, r) Also works - it internally just call: next(w, r)
 	}
 }

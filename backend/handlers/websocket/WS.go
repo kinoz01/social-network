@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -16,7 +17,6 @@ import (
 )
 
 /*────────── Payload structs ─────────*/
-
 type wsMember struct {
 	ID         string `json:"id"`
 	FirstName  string `json:"first_name"`
@@ -67,7 +67,7 @@ var upgrader = websocket.Upgrader{
 /*────────── Incoming message ─────────*/
 type inbound struct {
 	Type    string `json:"type"`
-	PeerID  string `json:"peerId,omitempty"`
+	PeerID  string `json:"peerId,omitempty"` //- omitempty only affects encoding (json.Marshal → sending data), only for clarification
 	GroupID string `json:"groupId,omitempty"`
 	Content string `json:"content,omitempty"`
 
@@ -78,7 +78,6 @@ type inbound struct {
 }
 
 /*────────── Entry point (upgrade) ─────────*/
-
 func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	u, err := auth.GetUser(r)
 	if err != nil {
@@ -97,12 +96,12 @@ func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	clientsMu.Lock()
-	clients[cl] = true
-	onlineCounts[u.ID]++
+	clients[cl] = true   //- add client to map
+	onlineCounts[u.ID]++ //- track how many open connex by each client
 	clientsMu.Unlock()
 	broadcastOnlineStatus()
 
-	for {
+	for { //- read pump
 		_, raw, err := conn.ReadMessage()
 		if err != nil {
 			break
@@ -110,6 +109,7 @@ func GlobalWS(w http.ResponseWriter, r *http.Request) {
 		handleMessage(cl, raw, u)
 	}
 
+	// connexion closed handling
 	clientsMu.Lock()
 	delete(clients, cl)
 	if onlineCounts[u.ID]--; onlineCounts[u.ID] == 0 {
@@ -123,12 +123,11 @@ func GlobalWS(w http.ResponseWriter, r *http.Request) {
 	}
 	chatHubs.mu.Unlock()
 
-	broadcastOnlineStatus()
+	broadcastOnlineStatus() //- update online users
 	conn.Close()
 }
 
-/*────────── Router ─────────*/
-
+/*────────── Messages Router ─────────*/
 func handleMessage(c *client, raw []byte, u *tp.User) {
 	var msg inbound
 	if err := json.Unmarshal(raw, &msg); err != nil {
@@ -138,7 +137,7 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 	switch msg.Type {
 
 	case "getGroupMembers":
-		sendGroupSnapshot(c, msg.GroupID)
+		sendGroupMembers(c, msg.GroupID)
 
 	case "subscribeChat":
 		chatHubs.mu.Lock()
@@ -147,14 +146,14 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 		}
 		chatHubs.m[msg.GroupID][c] = true
 		chatHubs.mu.Unlock()
-		sendChatHistory(c, msg.GroupID)
+		// PrintChatHubs()
 
 	case "groupChatMessage":
 		if msg.Content == "" || len(msg.Content) > 500 {
 			return
 		}
-		m := storeAndBuildGroupMessage(msg.GroupID, u, msg.Content)
-		broadcastGroupChat(msg.GroupID, m)
+		mesg := storeAndBuildGroupMessage(msg.GroupID, u, msg.Content)
+		broadcastGroupChat(msg.GroupID, mesg)
 
 	case "dmMessage":
 		if msg.Content == "" {
@@ -168,13 +167,12 @@ func handleMessage(c *client, raw []byte, u *tp.User) {
 	}
 }
 
-/*────────── Broadcast online status ─────────*/
-
+// send ids found in the onlineCounts map
 func broadcastOnlineStatus() {
 	clientsMu.RLock()
 	defer clientsMu.RUnlock()
 
-	ids := make([]string, 0, len(onlineCounts))
+	ids := make([]string, 0, len(onlineCounts)) //- 0 initial length | capacity len(onlineCounts)
 	for id := range onlineCounts {
 		ids = append(ids, id)
 	}
@@ -187,8 +185,8 @@ func broadcastOnlineStatus() {
 	}
 }
 
-/*────────── Group chat logic ─────────*/
-func sendGroupSnapshot(c *client, gid string) {
+// send group members to be shown in the online menu
+func sendGroupMembers(c *client, gid string) {
 	members, err := buildMembers(gid)
 	if err != nil {
 		return
@@ -203,6 +201,7 @@ func sendGroupSnapshot(c *client, gid string) {
 	c.mu.Unlock()
 }
 
+// build online members menu including online and offline group members (filtering offline is done on the front)
 func buildMembers(gid string) ([]wsMember, error) {
 	rows, err := tp.DB.Query(`
 	  SELECT u.id, u.first_name, u.last_name, u.profile_pic
@@ -233,40 +232,7 @@ func buildMembers(gid string) ([]wsMember, error) {
 	return out, nil
 }
 
-func sendChatHistory(c *client, gid string) {
-	rows, _ := tp.DB.Query(`
-	  SELECT gc.id, gc.content, gc.created_at,
-	         u.id, u.first_name, u.last_name, u.profile_pic
-	  FROM group_chats gc
-	  JOIN users u ON u.id = gc.sender_id
-	  WHERE gc.group_id = ?
-	  ORDER BY gc.created_at DESC, gc.ROWID DESC
-	  LIMIT 20`, gid)
-	defer rows.Close()
-
-	var hist []ChatMsg
-	for rows.Next() {
-		var m ChatMsg
-		rows.Scan(
-			&m.ID,
-			&m.Content,
-			&m.CreatedAt,
-			&m.SenderID,
-			&m.FirstName,
-			&m.LastName,
-			&m.ProfilePic,
-		)
-		hist = append([]ChatMsg{m}, hist...)
-	}
-	c.mu.Lock()
-	_ = c.conn.WriteJSON(map[string]any{
-		"type":     "chatHistory",
-		"groupId":  gid,
-		"messages": hist,
-	})
-	c.mu.Unlock()
-}
-
+// insert GROUP message into db and returns it to be braodcasted in group hub
 func storeAndBuildGroupMessage(gid string, u *tp.User, content string) ChatMsg {
 	id := uuid.Must(uuid.NewV4()).String()
 	tp.DB.Exec(`INSERT INTO group_chats(id, group_id, sender_id, content) VALUES(?,?,?,?)`,
@@ -284,6 +250,7 @@ func storeAndBuildGroupMessage(gid string, u *tp.User, content string) ChatMsg {
 	}
 }
 
+// send message to all client in the group hub
 func broadcastGroupChat(gid string, m ChatMsg) {
 	payload := map[string]any{"type": "groupChatMessage", "groupId": gid, "message": m}
 	chatHubs.mu.RLock()
@@ -295,8 +262,7 @@ func broadcastGroupChat(gid string, m ChatMsg) {
 	}
 }
 
-/*────────── DM logic (simplified) ─────────*/
-
+// insert DM message in db and return it to be broadcasted 
 func storeAndBuildDM(senderID, receiverID, content string) ChatMsg {
 	id := uuid.Must(uuid.NewV4()).String()
 	tp.DB.Exec(`INSERT INTO private_chats(id, sender_id, receiver_id, content) VALUES(?,?,?,?)`,
@@ -319,6 +285,7 @@ func storeAndBuildDM(senderID, receiverID, content string) ChatMsg {
 	}
 }
 
+// search for receiver and sender in clients and send message to them via ws
 func broadcastDM(receiverID string, m ChatMsg) {
 	payload := map[string]any{"type": "dmMessage", "message": m}
 
@@ -333,7 +300,7 @@ func broadcastDM(receiverID string, m ChatMsg) {
 	clientsMu.RUnlock()
 }
 
-/*────────── Notifications ─────────*/
+// insert notification into db and send it to receiver via ws
 func BroadcastNotification(n tp.Notification) {
 	if err := notif.AddNotification(n); err != nil {
 		return
@@ -354,6 +321,7 @@ func BroadcastNotification(n tp.Notification) {
 	clientsMu.RUnlock()
 }
 
+// used as a ws GET endpoint instead of restful GET
 func sendNotificationList(c *client, u *tp.User, msg inbound, msgType string) {
 	notifs, err := notif.GetNotifications(u.ID, msg.Limit, msg.Page)
 	if err != nil {
@@ -371,4 +339,19 @@ func sendNotificationList(c *client, u *tp.User, msg inbound, msgType string) {
 	c.mu.Lock()
 	_ = c.conn.WriteJSON(payload)
 	c.mu.Unlock()
+}
+
+// visualisation function for groups chat hub
+func PrintChatHubs() {
+	chatHubs.mu.RLock()
+	defer chatHubs.mu.RUnlock()
+
+	fmt.Println("==== chatHubs Map ====")
+	for groupID, clients := range chatHubs.m {
+		fmt.Printf("Group: %s\n", groupID)
+		for c := range clients {
+			fmt.Printf("  - Client: %p (User ID: %v)\n", c, c.userID)
+		}
+	}
+	fmt.Println("======================")
 }
