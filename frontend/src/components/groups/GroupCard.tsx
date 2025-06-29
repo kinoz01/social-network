@@ -52,7 +52,7 @@ export default function GroupCard({
                 const res = await fetch(url, { credentials: "include" });
                 if (!res.ok) throw new Error();
                 const data = await res.json();
-                setGroups(Array.isArray(data) ? data : []); //- isArray is sefety check (used just early while still naif :)
+                setGroups(Array.isArray(data) ? data : []); //- isArray is just sefety check
             }
         } catch (err) {
             console.error(err);
