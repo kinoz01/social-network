@@ -10,20 +10,8 @@ import (
 	tp "social-network/handlers/types"
 )
 
-/*
-Route:  GET  /api/chat/messages
-Query:  peer_id  (the other user's ID)
-
-	limit    (optional, default 20)
-	offset   (optional, default 0)
-
-Returns:
-  - 200 + JSON array of up to <limit> messages (ascending by created_at)
-  - Each message: { id, sender_id, content, created_at, first_name, last_name, profile_pic }
-  - 204 if no messages at all / no more messages
-*/
+// chat history with limit and offset
 func GetPrivateMessages(w http.ResponseWriter, r *http.Request) {
-	// 1. Auth check
 	user, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
@@ -44,7 +32,7 @@ func GetPrivateMessages(w http.ResponseWriter, r *http.Request) {
 		limit = 20
 	}
 
-	// 2. Fetch messages where (sender=user AND receiver=peer) OR vice versa
+	// Fetch messages where (sender=user AND receiver=peer) OR vice versa
 	query := `
 	  SELECT pc.id, pc.sender_id, pc.content, pc.created_at,
 	         u.first_name, u.last_name, u.profile_pic
@@ -97,7 +85,7 @@ func GetPrivateMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Reverse into ascending order (oldest→newest)
+	// Reverse into ascending order (oldest to newest)
 	for i, j := 0, len(rev)-1; i < j; i, j = i+1, j-1 {
 		rev[i], rev[j] = rev[j], rev[i]
 	}

@@ -9,7 +9,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-// GET /api/chat/unread
+// total count of unread message from all peers
 func GetUnreadSummary(w http.ResponseWriter, r *http.Request) {
 	me, err := auth.GetUser(r) // your usual cookie lookup
 	if err != nil {

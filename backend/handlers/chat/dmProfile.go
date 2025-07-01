@@ -46,8 +46,8 @@ func GetDMProfile(w http.ResponseWriter, r *http.Request) {
 			FROM follow_requests
 			WHERE status = 'accepted'
 			  	AND (
-			        (follower_id = ? AND followed_id = ?)  -- you → them
-			    OR (follower_id = ? AND followed_id = ?)  -- them → you
+			        (follower_id = ? AND followed_id = ?)  -- followship check
+			    OR (follower_id = ? AND followed_id = ?)  
 			);
 		`, u.ID, userID, userID, u.ID,
 		u.ID, userID, userID, u.ID).Scan(&count)

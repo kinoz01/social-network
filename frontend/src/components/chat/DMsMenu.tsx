@@ -32,7 +32,7 @@ export default function DMsMenu() {
 
     const pathname = usePathname();
 
-    /* 1) initial list */
+    // initial list fetch
     useEffect(() => {
         if (!user) return;
 
@@ -51,14 +51,14 @@ export default function DMsMenu() {
                 if (!res.ok) throw new Error("Failed to load DM list");
 
                 let raw: DMEntry[] = await res.json();
-                raw = dedupePeerId(raw);
+                raw = dedupePeerId(raw); //- safety to remove duplicate
 
-                /* ---- NEW: zero badge for the thread the user is already viewing ---- */
-                const match = pathname.match(/^\/chat\/([^/]+)$/);
+                //- no badge for the thread the user is already viewing
+                const match = pathname.match(/^\/chat\/([^/]+)$/); //- we capture peer id at the current path 
                 if (match) {
                     const openPeer = match[1];
                     raw = raw.map(e =>
-                        e.peer_id === openPeer ? { ...e, unread_count: 0 } : e
+                        e.peer_id === openPeer ? { ...e, unread_count: 0 } : e //- if open peer set it's unread_count to 0
                     );
                 }
 
@@ -73,7 +73,7 @@ export default function DMsMenu() {
         fetchDMList();
     }, [user, pathname]);
 
-    /* 2) update on every new DM */
+    // update on every new DM
     useEffect(() => {
         if (!meId || dmFeed.length === 0) return;
         const incoming = dmFeed[dmFeed.length - 1];
@@ -113,7 +113,7 @@ export default function DMsMenu() {
         });
     }, [dmFeed, meId, pathname]);
 
-    /* 3) clear badge when that thread is open (now also re-runs after list loads) */
+    //  clear badge when thread is open (also re-runs after list loads)
     useEffect(() => {
         const match = pathname.match(/^\/chat\/([^/]+)$/);
         if (!match || !meId) return;
@@ -121,12 +121,11 @@ export default function DMsMenu() {
         const openPeer = match[1];
         markChatRead(openPeer); 
 
-        /* only mutate when there is something to clear */
         setList(prev => {
             const hasBadge = prev.some(
                 e => e.peer_id === openPeer && e.unread_count !== 0
             );
-            if (!hasBadge) return prev;
+            if (!hasBadge) return prev; //- only set new when there is a badge to clear
 
             return prev.map(e =>
                 e.peer_id === openPeer ? { ...e, unread_count: 0 } : e
@@ -134,7 +133,7 @@ export default function DMsMenu() {
         });
     }, [pathname, meId]);
 
-    /* 4) mark read on click from sidebar */
+    /* mark read on click from sidebar */
     const handlePeerClick = async (peerId: string) => {
         if (!meId) return;
         try {

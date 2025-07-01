@@ -9,12 +9,8 @@ import (
 	tp "social-network/handlers/types"
 )
 
-// POST /api/chat/mark-read?peer_id=…
+// mark a whole chat with a peer as read (when a chat is opened)
 func ChatMarkRead(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		help.JsonError(w, "method not allowed", http.StatusMethodNotAllowed, nil)
-		return
-	}
 	u, err := auth.GetUser(r)
 	if err != nil {
 		help.JsonError(w, "unauthorized", http.StatusUnauthorized, err)
@@ -40,7 +36,7 @@ func ChatMarkRead(w http.ResponseWriter, r *http.Request) {
 	}
 	cnt, _ := res.RowsAffected()
 
-	// Return a small JSON indicating how many were marked
+	// Return JSON indicating how many were marked
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
 		"marked": cnt,

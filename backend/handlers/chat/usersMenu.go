@@ -12,20 +12,7 @@ import (
 	tp "social-network/handlers/types"
 )
 
-/*
-Route:  GET /api/chat/list
-Query parameters:
-
-	q       (optional search string)
-	limit   (default 50)
-	offset  (default 0)
-
-Returns 200 + []Person or 204 when no rows.
-A "person" is shown when:
-  - their account is PUBLIC   OR
-  - viewer follows them       OR
-  - they follow the viewer
-*/
+// all available users to chat with including search query
 func GetChatList(w http.ResponseWriter, r *http.Request) {
 	// Authenticate viewer 
 	u, err := auth.GetUser(r)
@@ -139,7 +126,6 @@ func GetChatList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ── 7) Return results ──────────────────────────────────────────────────────────
 	if len(list) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 		return

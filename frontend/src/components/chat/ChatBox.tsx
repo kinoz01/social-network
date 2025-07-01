@@ -30,28 +30,28 @@ export const EMOJIS = [
 export default function DirectChatBox() {
     const { id: peerId } = useParams() as { id: string };
     const { user } = useUser();
-    if (peerId === user?.id) redirect("/chat");
+    if (peerId === user?.id) redirect("/chat"); //- don't allow chat with myselef
 
     const { meId, online, sendDM, dmFeed, markChatRead } = useWS();
 
-    /* peer profile */
+    // peer profile
     const [peerName, setPeerName] = useState<{
         first_name: string;
         last_name: string;
         profile_pic: string | null;
     } | null>(null);
 
-    /* messages */
+    // messages
     const [msgs, setMsgs] = useState<ChatMsg[]>([]);
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [loadingFirst, setLoading] = useState(true);
 
-    /* input & refs */
+    // input & refs
     const [text, setText] = useState("");
     const [showEmojis, setShow] = useState(false);
     const listRef = useRef<HTMLDivElement>(null);
-    const idSetRef = useRef<Set<string>>(new Set());
+    const idSetRef = useRef<Set<string>>(new Set()); //- persistent Set of message IDs (used as sefty to always remove unexpected duplicate messages if any)
     const prevScrollHeight = useRef<number | null>(null);
     const firstLoadRef = useRef(true);
     const newMsgRef = useRef(false);
@@ -75,7 +75,7 @@ export default function DirectChatBox() {
         if (peerId) markChatRead(peerId);
     }, [peerId]);
 
-    /* RESTful history */
+    // api history call
     const fetchPage = async (off: number): Promise<ChatMsg[]> => {
         const qs = new URLSearchParams({
             peer_id: peerId,
@@ -90,15 +90,13 @@ export default function DirectChatBox() {
         return res.json();
     };
 
-    /* first load */
+    // first load
     useEffect(() => {
         if (!peerId || !meId) return;
-        let alive = true;
 
         (async () => {
             setLoading(true);
             const page = await fetchPage(0);
-            if (!alive) return;
 
             idSetRef.current = new Set(page.map((m) => m.id));
             setMsgs(page);
@@ -106,10 +104,6 @@ export default function DirectChatBox() {
             setHasMore(page.length === PAGE);
             setLoading(false);
         })();
-
-        return () => {
-            alive = false;
-        };
     }, [peerId, meId]);
 
     /* infinite scroll older */
@@ -126,7 +120,7 @@ export default function DirectChatBox() {
                         return;
                     }
 
-                    prevScrollHeight.current = el.scrollHeight;
+                    prevScrollHeight.current = el.scrollHeight; //- store the current scrollHeight (This value is the total height of the chat container before new messages are added)
                     const unique = older.filter((m) => !idSetRef.current.has(m.id));
                     unique.forEach((m) => idSetRef.current.add(m.id));
                     setMsgs((prev) => [...unique, ...prev]);
@@ -156,7 +150,7 @@ export default function DirectChatBox() {
         setMsgs((prev) => [...prev, last]);
         setOffset((o) => o + 1);
 
-        if (last.receiver_id === meId) {
+        if (last.receiver_id === meId) { // we received a msg while chat is open -> immediatly mark as read
             setTimeout(() => markChatRead(peerId), 0);
             fetch(`${API_URL}/api/chat/mark-read?peer_id=${peerId}`, {
                 method: "POST",
@@ -170,23 +164,23 @@ export default function DirectChatBox() {
         const el = listRef.current;
         if (!el) return;
 
-        if (firstLoadRef.current) {
-            el.scrollTop = el.scrollHeight;
+        if (firstLoadRef.current) {  //- On initial mount, scroll to the bottom of the chat, then disable this logic so it only runs once (firstLoadRef.current = false).
+            el.scrollTop = el.scrollHeight; //- scrollTop = 0 being the top, this line effectively scroll to bottom of container
             firstLoadRef.current = false;
             return;
         }
 
-        if (prevScrollHeight.current !== null) {
-            el.scrollTop = el.scrollHeight - prevScrollHeight.current;
+        if (prevScrollHeight.current !== null) { //- run after pagination scroll-up.
+            el.scrollTop = el.scrollHeight - prevScrollHeight.current; //- scroll the user back to their old position when loading new page.
             prevScrollHeight.current = null;
             return;
         }
 
         if (newMsgRef.current) {
-            const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
+            const dist = el.scrollHeight - el.scrollTop - el.clientHeight; //- full scrollable content heigh - current scroll position from the top - visible height of the container
 
-            if (dist < 3500) {
-                el.scrollTop = el.scrollHeight;
+            if (dist < 3500) { //- How far the user is from the bottom of the chat
+                el.scrollTop = el.scrollHeight; //- scroll  to bottom  on new msg if under 3500, else show scroll btn
                 setJump(false);
             } else {
                 setJump(true);
