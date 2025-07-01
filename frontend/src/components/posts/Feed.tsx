@@ -31,7 +31,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
     const { user } = useUser();
 
-    const loadMOre = useCallback(async () => {
+    const loadMOre = useCallback(async () => { //-  prevent a function from being re-created on every render unless its dependencies change.
         if (!hasMOre || requestedPages.current.has(currentPage)) return
         requestedPages.current.add(currentPage)
 
@@ -76,19 +76,19 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
     }, [currentPage, loadMOre])
 
-    const lastPostElementRef = useCallback((node: HTMLDivElement | null) => {
+    const lastPostElementRef = useCallback((node: HTMLDivElement | null) => { //- lastPostElementRef is assigned only to the last past (bellow)
         if (isLoading || !hasMOre) return
-        if (observer.current) observer.current.disconnect()
+        if (observer.current) observer.current.disconnect() //- avoid duplicates or memory leaks.
 
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMOre) {
+        observer.current = new IntersectionObserver(entries => { //- only one element in entries (our last post -we clear old one using disconnect)
+            if (entries[0].isIntersecting && hasMOre) { //- when the entry element enter the viewport and there is more posts load more
                 setPage((prev) => prev + 1)
             }
         }, {
-            rootMargin: '100px', threshold: 0.1
+            rootMargin: '100px', threshold: 0.1 //- rootMargin: '100px': triggers the observer a bit before the element actually reaches the viewport | threshold: 0.1: fires when 10% of the element is visible
         })
 
-        if (node) observer.current.observe(node)
+        if (node) observer.current.observe(node) //- attach to node
     }, [isLoading, hasMOre])
 
     const handleNewPOst = (post: Post) => {
