@@ -96,7 +96,7 @@ func AddFollowRequest(w http.ResponseWriter, r *http.Request) {
 			DELETE FROM notifications
 				WHERE related_follow_id = (
 				SELECT id FROM follow_requests
-				WHERE follower_id = ? AND followed_id = ?)`, 
+				WHERE follower_id = ? AND followed_id = ?)`,
 			followRequest.FollowerID, followRequest.FollowedID); err != nil {
 			help.JsonError(w, "db error", http.StatusInternalServerError, err)
 			return

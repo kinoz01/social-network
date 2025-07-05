@@ -46,12 +46,6 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 		help.JsonError(w, "Invalid invitee_ids", 400, err)
 		return
 	}
-	if len(ids) > 0 {
-		if err := grpInvite.Invite(groupID, *user, ids); err != nil {
-			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
-			return
-		}
-	}
 
 	/* ---------- Save group image ---------- */
 	var picPath string
@@ -91,6 +85,13 @@ func CreateGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		help.JsonError(w, "Failed to add owner as group member", http.StatusInternalServerError, err)
 		return
+	}
+
+	if len(ids) > 0 {
+		if err := grpInvite.Invite(groupID, *user, ids); err != nil {
+			help.JsonError(w, err.Error(), http.StatusBadRequest, err)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

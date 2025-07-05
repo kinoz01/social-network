@@ -84,21 +84,22 @@ export default function GroupMenu() {
                 </div>
 
                 <nav className={styles.menu}>
-                    <Link href={`/groups/${id}`} className={styles.menuItem}>
+                    <Link href={`/groups/${id}`} className={styles.menuItem} title="Posts">
                         <Image src="/img/menu-posts.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Posts</span>
                     </Link>
-                    <Link href={`/groups/${id}/chat`} className={styles.menuItem}>
+                    <Link href={`/groups/${id}/chat`} className={styles.menuItem} title="Chat">
                         <Image src="/img/menu-chat.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Chat</span>
                     </Link>
-                    <Link href={`/groups/${id}/events`} className={styles.menuItem}>
+                    <Link href={`/groups/${id}/events`} className={styles.menuItem} title="Events">
                         <Image src="/img/menu-events.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Events</span>
                     </Link>
                     <button
                         className={`${styles.menuItem} ${styles.responsiveOnly}`}
                         onClick={() => setInviteOpen(true)}
+                        title="Invite Members"
                     >
                         <Image src="/img/menu-invite.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Invite</span>
@@ -107,6 +108,7 @@ export default function GroupMenu() {
                         <button
                             className={`${styles.menuItem} ${styles.responsiveOnly}`}
                             onClick={() => setRequestsOpen(true)}
+                            title="Join Requests"
                         >
                             <Image src="/img/menu-requests.svg" alt="" width={22} height={22} />
                             <span className={styles.label}>Join Requests</span>
@@ -115,6 +117,7 @@ export default function GroupMenu() {
                     <button
                         className={`${styles.menuItem} ${styles.responsiveOnly}`}
                         onClick={() => setAllMembersOpen(true)}
+                        title="Group Members"
                     >
                         <Image src="/img/menu-members.svg" alt="" width={22} height={22} />
                         <span className={styles.label}>Members</span>
