@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -59,9 +61,45 @@ var (
 /*────────── Upgrader ─────────*/
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
-		origin := r.Header.Get("Origin")
-		return origin == "http://localhost:3000" || origin == "https://snet.fly.dev"
+		origin := normalizeOrigin(r.Header.Get("Origin"))
+		_, ok := allowedOrigins[origin]
+		return ok
 	},
+}
+
+var allowedOrigins = loadAllowedOrigins()
+
+func loadAllowedOrigins() map[string]struct{} {
+	defaults := []string{
+		"http://localhost:3000",
+		"https://snet.fly.dev",
+	}
+
+	if envOrigin := normalizeOrigin(os.Getenv("NEXT_PUBLIC_BACKEND_ORIGIN")); envOrigin != "" {
+		defaults = append(defaults, envOrigin)
+	}
+
+	if extra := os.Getenv("WS_ALLOWED_ORIGINS"); extra != "" {
+		for _, origin := range strings.Split(extra, ",") {
+			if trimmed := normalizeOrigin(origin); trimmed != "" {
+				defaults = append(defaults, trimmed)
+			}
+		}
+	}
+
+	set := make(map[string]struct{}, len(defaults))
+	for _, origin := range defaults {
+		if trimmed := normalizeOrigin(origin); trimmed != "" {
+			set[trimmed] = struct{}{}
+		}
+	}
+	return set
+}
+
+func normalizeOrigin(origin string) string {
+	origin = strings.TrimSpace(origin)
+	origin = strings.TrimRight(origin, "/")
+	return origin
 }
 
 /*────────── Incoming message ─────────*/
@@ -262,7 +300,7 @@ func broadcastGroupChat(gid string, m ChatMsg) {
 	}
 }
 
-// insert DM message in db and return it to be broadcasted 
+// insert DM message in db and return it to be broadcasted
 func storeAndBuildDM(senderID, receiverID, content string) ChatMsg {
 	id := uuid.Must(uuid.NewV4()).String()
 	tp.DB.Exec(`INSERT INTO private_chats(id, sender_id, receiver_id, content) VALUES(?,?,?,?)`,

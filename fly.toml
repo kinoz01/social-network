@@ -1,0 +1,47 @@
+# fly.toml app configuration file generated for anthospace on 2026-02-26T13:21:35Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'anthospace'
+primary_region = 'cdg'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+  [build.args]
+    NEXT_PUBLIC_BACKEND_ORIGIN = 'https://anthospace.fly.dev'
+
+[env]
+  NEXT_PUBLIC_BACKEND_ORIGIN = 'https://anthospace.fly.dev'
+
+[processes]
+  edge = '/app/scripts/start-edge.sh'
+
+[[mounts]]
+  source = 'db'
+  destination = '/app/backend/database'
+  processes = ['edge']
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 3000
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['edge']
+
+  [[services.ports]]
+    port = 80
+    handlers = ['http']
+
+  [[services.ports]]
+    port = 443
+    handlers = ['tls', 'http']
+
+
+[[vm]]
+  memory = '256mb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256

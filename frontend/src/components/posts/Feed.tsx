@@ -31,7 +31,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
 
     const { user } = useUser();
 
-    const loadMOre = useCallback(async () => { //-  prevent a function from being re-created on every render unless its dependencies change.
+    const loadMOre = useCallback(async () => { //- prevent recreating the callback unnecessarily
         if (!hasMOre || requestedPages.current.has(currentPage)) return
         requestedPages.current.add(currentPage)
 
@@ -43,18 +43,23 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
                 return
             }
 
-
-            const uniquePosts = oldPosts.filter(
-                (post) => !postedContent.some((p) => p.id === post.id)
-            )
-            if (uniquePosts.length === 0) {
-                setPage((prev) => prev + 1)
-                return
-            }
-
             await new Promise((resolve) => setTimeout(resolve, 50))
 
-            setPostedContent((prev) => [...prev, ...uniquePosts])
+            let appended = false
+            setPostedContent((prev) => {
+                const uniquePosts = oldPosts.filter(
+                    (post) => !prev.some((p) => p.id === post.id)
+                )
+                if (uniquePosts.length === 0) {
+                    return prev
+                }
+                appended = true
+                return [...prev, ...uniquePosts]
+            })
+
+            if (!appended) {
+                setPage((prev) => prev + 1)
+            }
         } catch (err) {
             const { status } = err as { status: number };
             if (status === 404) {
@@ -69,7 +74,7 @@ export default function Feed({ type, id }: { type?: string, id?: string }) {
         } finally {
             setLoading(false)
         }
-    }, [currentPage, hasMOre, postedContent, isLoading])
+    }, [currentPage, hasMOre, type, id])
 
     useEffect(() => {
         loadMOre()
